@@ -116,6 +116,12 @@ int toInt(const char *s)
     return any ? (neg ? -val : val) : 0;
 }
 
+int strLength(const char *s) {
+    int i = 0;
+    while (s[i] != '\0') i++;
+    return i;
+}
+
 void copyString(char *dst, const char *src, int maxlen)
 {
     int i = 0;
@@ -126,6 +132,18 @@ void copyString(char *dst, const char *src, int maxlen)
     }
     dst[i] = '\0';
 }
+
+void copyStringDynamic(char **dst, const char *src) {
+    int len = strLength(src);
+    *dst = malloc(len + 1);
+    if (*dst == NULL) return;
+
+    for (int i = 0; i < len; i++) {
+        (*dst)[i] = src[i];
+    }
+    (*dst)[len] = '\0';
+}
+
 
 int ensureCapacity(void **arrPtr, int *capacity, size_t elemSize, int needed)
 {
