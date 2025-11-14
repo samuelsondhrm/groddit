@@ -12,6 +12,14 @@ void IgnoreBlanks()
     }
 }
 
+void IgnoreNewline()
+{
+    while (currentChar == '\n' || currentChar == '\r')
+    {
+        ADV();
+    }
+}
+
 void STARTWORD()
 {
     START();

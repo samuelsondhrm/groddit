@@ -116,6 +116,26 @@ int toInt(const char *s)
     return any ? (neg ? -val : val) : 0;
 }
 
+int strCmp(const char *s1, const char *s2)
+{
+    int i = 0;
+    while (s1[i] != '\0' && s2[i] != '\0')
+    {
+        if (s1[i] != s2[i])
+            return s1[i] - s2[i];
+        i++;
+    }
+    return s1[i] - s2[i];
+}
+
+int strLength(const char *s)
+{
+    int i = 0;
+    while (s[i] != '\0')
+        i++;
+    return i;
+}
+
 void copyString(char *dst, const char *src, int maxlen)
 {
     int i = 0;
@@ -125,6 +145,20 @@ void copyString(char *dst, const char *src, int maxlen)
         i++;
     }
     dst[i] = '\0';
+}
+
+void copyStringDynamic(char **dst, const char *src)
+{
+    int len = strLength(src);
+    *dst = malloc(len + 1);
+    if (*dst == NULL)
+        return;
+
+    for (int i = 0; i < len; i++)
+    {
+        (*dst)[i] = src[i];
+    }
+    (*dst)[len] = '\0';
 }
 
 int ensureCapacity(void **arrPtr, int *capacity, size_t elemSize, int needed)
@@ -143,4 +177,22 @@ int ensureCapacity(void **arrPtr, int *capacity, size_t elemSize, int needed)
     *arrPtr = newArr;
     *capacity = newCap;
     return 1;
+}
+
+int wordToString(char *dest, Word w)
+{
+    int start = 0, end = w.Length - 1;
+
+    while (start <= end && (w.TabWord[start] == ' ' || w.TabWord[start] == '\n' || w.TabWord[start] == '\r'))
+        start++;
+
+    while (end >= start && (w.TabWord[end] == ' ' || w.TabWord[end] == '\n' || w.TabWord[end] == '\r'))
+        end--;
+
+    int len = 0;
+    for (int i = start; i <= end; i++)
+        dest[len++] = w.TabWord[i];
+
+    dest[len] = '\0';
+    return len;
 }
