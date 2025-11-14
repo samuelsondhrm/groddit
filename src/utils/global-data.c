@@ -30,3 +30,6 @@ int SOCIAL_COUNT = 0;
 Voting *VOTINGS = NULL;
 int VOTING_CAPACITY = 0;
 int VOTING_COUNT = 0;
+
+// User saat ini
+User *CURRENT_USER = NULL;

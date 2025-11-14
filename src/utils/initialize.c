@@ -5,16 +5,6 @@
 #include "header/load-config.h"
 #include "header/global-data.h"
 
-int wordToString(char *dest, Word w)
-{
-    for (int i = 0; i < w.Length; i++)
-    {
-        dest[i] = w.TabWord[i];
-    }
-    dest[w.Length] = '\0';
-    return w.Length;
-}
-
 void buildPath(char *out, const char *folder, const char *file)
 {
     int p = 0;
@@ -43,6 +33,8 @@ void initialize()
     printf("Masukkan folder konfigurasi untuk dimuat: ");
 
     STARTWORD();
+    IgnoreNewline();
+    IgnoreBlanks();
 
     printf("\n");
 

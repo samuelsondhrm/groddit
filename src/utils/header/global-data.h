@@ -1,7 +1,7 @@
 #ifndef GLOBAL_DATA_H
 #define GLOBAL_DATA_H
 
-#include "../../adt/header/adt-sederhana.h" 
+#include "../../adt/header/adt-sederhana.h"
 
 // Users
 extern User *USERS;
@@ -32,5 +32,8 @@ extern int SOCIAL_COUNT;
 extern Voting *VOTINGS;
 extern int VOTING_CAPACITY;
 extern int VOTING_COUNT;
+
+// User saat ini
+extern User *CURRENT_USER;
 
 #endif
