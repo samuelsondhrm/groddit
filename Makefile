@@ -21,7 +21,7 @@ OBJ_FILES   := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SRC_FILES))
 
 # Compiler and Flags
 CC          := gcc
-CFLAGS      := -Wall -Wextra -I$(SRC_DIR)
+CFLAGS      := -Wall -Wextra -I$(SRC_DIR) -I$(SRC_DIR)/adt/header
 DEBUG_FLAGS := -g
 
 # Define phony targets
