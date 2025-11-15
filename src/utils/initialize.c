@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "../../adt/header/MesinKata.h"
+#include "../../adt/header/mesinkata.h"
 #include "../../adt/header/adt-sederhana.h"
 #include "header/initialize.h"
 #include "header/load-config.h"

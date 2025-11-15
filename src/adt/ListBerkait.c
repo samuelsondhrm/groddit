@@ -103,7 +103,7 @@ void insertAt(List *l, ElType val, int idx) {
     }
 }
 
-void deleteFirst(List *l, ElType *val) {
+void deleterFirst(List *l, ElType *val) {
     Address p = FIRST(*l);
     *val = INFO(p);
     FIRST(*l) = NEXT(p);
