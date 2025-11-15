@@ -1,114 +1,163 @@
-/* File : listlinier.h */
-/* contoh ADT list berkait dengan representasi fisik pointer  */
-/* Representasi address dengan pointer */
-/* ElType adalah integer */
+#ifndef LISTBERKAIT_H
+#define LISTBERKAIT_H
 
-#ifndef listlinier_H
-#define listlinier_H
-
+#include <stdio.h>
+#include <stdlib.h>
 #include "boolean.h"
+#include "adt-sederhana.h"
 
-/* Definisi Node : */
-typedef int ElType;
-typedef struct node *Address;
-typedef struct node
-{
-  ElType info;
-  Address next;
+/* ============================================================================
+ *                          Element Variant Type
+ * ============================================================================
+ * ListElement dapat menyimpan salah satu dari:
+ * - User
+ * - Post
+ * - Comment
+ * - Subgroddit
+ *
+ * Elemen disimpan BY VALUE (bukan pointer), aman terhadap memory leak.
+ * Setiap elemen memiliki tag type untuk identifikasi.
+ */
+
+typedef enum {
+    TYPE_USER,
+    TYPE_POST,
+    TYPE_COMMENT,
+    TYPE_SUBGRODDIT
+} ElementType;
+
+typedef struct {
+    ElementType type;
+    union {
+        User user;
+        Post post;
+        Comment comment;
+        Subgroddit subgroddit;
+    } data;
+} ListElement;
+
+/* Factory untuk membuat ListElement berdasarkan tipe */
+ListElement makeUserElement(User u);
+ListElement makePostElement(Post p);
+ListElement makeCommentElement(Comment c);
+ListElement makeSubgrodditElement(Subgroddit s);
+
+/* ============================================================================
+ *                                 Node & List
+ * ============================================================================
+ */
+
+typedef struct Node {
+    ListElement element;
+    struct Node *next;
 } Node;
 
-#define INFO(p) (p)->info
-#define NEXT(p) (p)->next
+typedef struct {
+    Node *head;
+} List;
 
-Address newNode(ElType val);
+/* ============================================================================
+ *                          Node Constructor / Initializer
+ * ============================================================================
+ */
 
-/* Definisi List : */
-/* List kosong : FIRST(l) = NULL */
-/* Setiap elemen dengan Address p dapat diacu INFO(p), NEXT(p) */
-/* Elemen terakhir list: jika addressnya Last, maka NEXT(Last)=NULL */
+/**
+ * Membuat node baru berisi satu ListElement.
+ * @param elem  Elemen yang ingin dimasukkan ke node.
+ * @return      Pointer ke Node baru; NULL jika alokasi gagal.
+ */
+Node* newNode(ListElement elem);
 
-typedef Address List;
+/* ============================================================================
+ *                          Create & Validation
+ * ============================================================================
+ */
 
-#define IDX_UNDEF (-1)
-#define FIRST(l) (l)
+/**
+ * Inisialisasi list kosong.
+ * @param L Pointer ke List yang akan diinisialisasi.
+ */
+void createList(List *L);
 
-/* PROTOTYPE */
-/****************** PEMBUATAN LIST KOSONG ******************/
-void CreateList(List *l);
-/* I.S. sembarang             */
-/* F.S. Terbentuk list kosong */
+/**
+ * Mengecek apakah list kosong.
+ * @param L List yang akan dicek.
+ * @return true jika kosong, false jika tidak.
+ */
+boolean isEmptyList(List L);
 
-/****************** TEST LIST KOSONG ******************/
-boolean isEmpty(List l);
-/* Mengirim true jika list kosong */
+/**
+ * Menghasilkan panjang list.
+ * @param L List input.
+ * @return jumlah elemen dalam list.
+ */
+int listLength(List L);
 
-/****************** GETTER SETTER ******************/
-ElType getElmt(List l, int idx);
-/* I.S. l terdefinisi, idx indeks yang valid dalam l, yaitu 0..length(l) */
-/* F.S. Mengembalikan nilai elemen l pada indeks idx */
+/* ============================================================================
+ *                          Insertion Operations
+ * ============================================================================
+ */
 
-void setElmt(List *l, int idx, ElType val);
-/* I.S. l terdefinisi, idx indeks yang valid dalam l, yaitu 0..length(l) */
-/* F.S. Mengubah elemen l pada indeks ke-idx menjadi val */
+void insertFirstList(List *L, ListElement elem);
+void insertLastList(List *L, ListElement elem);
+void insertAtList(List *L, ListElement elem, int idx);
 
-int indexOf(List l, ElType val);
-/* I.S. l, val terdefinisi */
-/* F.S. Mencari apakah ada elemen list l yang bernilai val */
-/* Jika ada, mengembalikan indeks elemen pertama l yang bernilai val */
-/* Mengembalikan IDX_UNDEF jika tidak ditemukan */
+/* ============================================================================
+ *                          Deletion Operations
+ * ============================================================================
+ */
 
-/****************** PRIMITIF BERDASARKAN NILAI ******************/
-/*** PENAMBAHAN ELEMEN ***/
-void insertFirst(List *l, ElType val);
-/* I.S. l mungkin kosong */
-/* F.S. Melakukan alokasi sebuah elemen dan */
-/* menambahkan elemen pertama dengan nilai val jika alokasi berhasil. */
-/* Jika alokasi gagal: I.S.= F.S. */
+void deleteFirstList(List *L, ListElement *out);
+void deleteLastList(List *L, ListElement *out);
+void deleteAtList(List *L, int idx, ListElement *out);
 
-void insertLast(List *l, ElType val);
-/* I.S. l mungkin kosong */
-/* F.S. Melakukan alokasi sebuah elemen dan */
-/* menambahkan elemen list di akhir: elemen terakhir yang baru */
-/* bernilai val jika alokasi berhasil. Jika alokasi gagal: I.S.= F.S. */
+/* ============================================================================
+ *                          Search / Find Operations
+ * ============================================================================
+ */
 
-void insertAt(List *l, ElType val, int idx);
-/* I.S. l tidak mungkin kosong, idx indeks yang valid dalam l, yaitu 0..length(l) */
-/* F.S. Melakukan alokasi sebuah elemen dan */
-/* menyisipkan elemen dalam list pada indeks ke-idx (bukan menimpa elemen di i) */
-/* yang bernilai val jika alokasi berhasil. Jika alokasi gagal: I.S.= F.S. */
+/**
+ * Mencari indeks elemen menggunakan comparator.
+ * Comparator harus memiliki bentuk:
+ *      boolean cmp(ListElement a, ListElement b)
+ *
+ * @param L         List yang dicari.
+ * @param target    Elemen target.
+ * @param cmp       Fungsi pembanding.
+ * @return          index (0-based) jika ketemu; -1 jika tidak.
+ */
+int indexOfList(
+    List L,
+    ListElement target,
+    boolean (*cmp)(ListElement a, ListElement b)
+);
 
-/*** PENGHAPUSAN ELEMEN ***/
-void deleteFirst(List *l, ElType *val);
-/* I.S. List l tidak kosong  */
-/* F.S. Elemen pertama list dihapus: nilai info disimpan pada x */
-/*      dan alamat elemen pertama di-dealokasi */
-void deleteLast(List *l, ElType *val);
-/* I.S. list tidak kosong */
-/* F.S. Elemen terakhir list dihapus: nilai info disimpan pada x */
-/*      dan alamat elemen terakhir di-dealokasi */
+/* ============================================================================
+ *                          Traversal / Display
+ * ============================================================================
+ */
 
-void deleteAt(List *l, int idx, ElType *val);
-/* I.S. list tidak kosong, idx indeks yang valid dalam l, yaitu 0..length(l) */
-/* F.S. val diset dengan elemen l pada indeks ke-idx. */
-/*      Elemen l pada indeks ke-idx dihapus dari l */
+/**
+ * Menampilkan seluruh elemen list menggunakan callback printer.
+ * Callback print harus berbentuk:
+ *      void printElement(ListElement e)
+ *
+ * @param L     List yang ingin ditampilkan.
+ * @param print Fungsi callback untuk menampilkan satu elemen.
+ */
+void displayList(List L, void (*print)(ListElement e));
 
-/****************** PROSES SEMUA ELEMEN LIST ******************/
-void displayList(List l);
-// void printInfo(List l);
-/* I.S. List mungkin kosong */
-/* F.S. Jika list tidak kosong, iai list dicetak ke kanan: [e1,e2,...,en] */
-/* Contoh : jika ada tiga elemen bernilai 1, 20, 30 akan dicetak: [1,20,30] */
-/* Jika list kosong : menulis [] */
-/* Tidak ada tambahan karakter apa pun di awal, akhir, atau di tengah */
+/* ============================================================================
+ *                          Utility Operations
+ * ============================================================================
+ */
 
-int length(List l);
-/* Mengirimkan banyaknya elemen list; mengirimkan 0 jika list kosong */
+List concatList(List L1, List L2);
 
-/****************** PROSES TERHADAP LIST ******************/
-List concat(List l1, List l2);
-/* I.S. l1 dan l2 sembarang */
-/* F.S. l1 dan l2 kosong, l3 adalah hasil konkatenasi l1 & l2 */
-/* Konkatenasi dua buah list : l1 dan l2    */
-/* menghasilkan l3 yang baru (dengan elemen list l1 dan l2 secara beurutan). */
-/* Tidak ada alokasi/dealokasi pada prosedur ini */
+/**
+ * Menghapus semua node list TANPA menghapus data di dalamnya
+ * (karena elemen disimpan by value, tidak butuh free).
+ */
+void freeList(List *L);
+
 #endif

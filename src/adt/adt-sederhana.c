@@ -1,11 +1,22 @@
 #include <stdlib.h>
 #include "header/adt-sederhana.h"
+#include "header/MesinKata.h"
+#include "header/MesinKalimat.h"
 
-void initUser(User *u)
-{
-    u->user_id[0] = '\0';
-    u->username[0] = '\0';
-    u->password[0] = '\0';
+void initWord(Word *w) {
+    w->Length = 0;
+    w->TabWord[0] = '\0';
+}
+
+void initSentence(Sentence *s) {
+    s->Length = 0;
+    s->TabSentence[0] = '\0';
+}
+
+void initUser(User *u) {
+    initWord(&u->user_id);
+    initWord(&u->username);
+    initWord(&u->password);
     u->karma = 0;
     u->created_at = 0;
 }
@@ -22,33 +33,31 @@ void initPost(Post *p)
     p->downvotes = 0;
 }
 
-void initComment(Comment *c)
-{
+void initComment(Comment *c) {
     c->comment_id = 0;
-    c->post_id[0] = '\0';
-    c->author_id[0] = '\0';
+    initWord(&c->post_id);
+    initWord(&c->author_id);
     c->parent_comment_id = -1;
-    c->content = NULL;
+
+    initSentence(&c->content);
+
     c->upvotes = 0;
     c->downvotes = 0;
 }
 
-void initSubgroddit(Subgroddit *s)
-{
-    s->subgroddit_id[0] = '\0';
-    s->name[0] = '\n';
+void initSubgroddit(Subgroddit *s) {
+    initWord(&s->subgroddit_id);
+    initWord(&s->name);
 }
 
-void initSocial(Social *s)
-{
-    s->follower_id[0] = '\0';
-    s->following_id[0] = '\0';
+void initSocial(Social *s) {
+    initWord(&s->follower_id);
+    initWord(&s->following_id);
 }
 
-void initVoting(Voting *v)
-{
-    v->user_id[0] = '\0';
-    v->target_type[0] = '\0';
-    v->target_id[0] = '\0';
-    v->vote_type[0] = '\0';
+void initVoting(Voting *v) {
+    v->user_id = 0;
+    initWord(&v->target_type);
+    initWord(&v->target_id);
+    initWord(&v->vote_type);
 }
