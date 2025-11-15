@@ -29,3 +29,6 @@ int wordToString(char *dest, Word w);
 
 // Mengubah format time_t ke string
 char *convertTimeToStr(time_t t);
+
+// Mengubah format string ke time_t
+time_t parseTime(const char *str);
