@@ -1,4 +1,4 @@
-#include "mesinkarakter.h"
+#include "MesinKarakter.h"
 #include <stdio.h>
 
 char currentChar;
