@@ -79,3 +79,10 @@ void registerUser()
 
     printf("Akun dengan username %s berhasil didaftarkan! Silahkan gunakan perintah LOGIN untuk mengakses fitur-fitur Groddit\n", username);
 }
+
+int findUserIndexByUsername(const char *username){
+    //TODO Implementasi fungsinya boy
+}
+const char *getUsernameByIndex(int idx){
+    //TODO Implementasi fungsinya boy
+}
