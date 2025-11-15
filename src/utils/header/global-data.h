@@ -2,6 +2,7 @@
 #define GLOBAL_DATA_H
 
 #include "../../adt/header/adt-sederhana.h"
+#include "../../adt/header/Graph.h"
 
 // Users
 extern User *USERS;
@@ -24,9 +25,7 @@ extern int SUBGRODDIT_CAPACITY;
 extern int SUBGRODDIT_COUNT;
 
 // Socials
-extern Social *SOCIALS;
-extern int SOCIAL_CAPACITY;
-extern int SOCIAL_COUNT;
+extern Graph SOCIAL_GRAPH;
 
 // Votings
 extern Voting *VOTINGS;
@@ -34,6 +33,6 @@ extern int VOTING_CAPACITY;
 extern int VOTING_COUNT;
 
 // User saat ini
-extern User *CURRENT_USER;
-
+extern int CURRENT_USER_INDEX;
+boolean isLoggedIn();
 #endif
