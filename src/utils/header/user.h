@@ -18,3 +18,8 @@ void loginUser();
 
 // User logout
 void logoutUser();
+// Search index user dari USERS berdasarkan masukan username
+int findUserIndexByUsername(const char *username);
+
+// Menghasilkan username dari USERS berdasarkan masukan index
+const char *getUsernameByIndex(int idx);

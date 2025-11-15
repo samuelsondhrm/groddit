@@ -1,185 +1,210 @@
 #include "header/ListBerkait.h"
 
-#include <stdio.h>
-#include <stdlib.h>
+ListElement makeUserElement(User u) {
+    ListElement e;
+    e.type = TYPE_USER;
+    e.data.user = u;
+    return e;
+}
 
-Address newNode(ElType val) {
-    Address p = (Address) malloc(sizeof(Node));
-    if (p != NULL) {
-        INFO(p) = val;
-        NEXT(p) = NULL;
+ListElement makePostElement(Post p) {
+    ListElement e;
+    e.type = TYPE_POST;
+    e.data.post = p;
+    return e;
+}
+
+ListElement makeCommentElement(Comment c) {
+    ListElement e;
+    e.type = TYPE_COMMENT;
+    e.data.comment = c;
+    return e;
+}
+
+ListElement makeSubgrodditElement(Subgroddit s) {
+    ListElement e;
+    e.type = TYPE_SUBGRODDIT;
+    e.data.subgroddit = s;
+    return e;
+}
+
+Node* newNode(ListElement elem) {
+    Node *n = (Node*) malloc(sizeof(Node));
+    if (n != NULL) {
+        n->element = elem;
+        n->next = NULL;
     }
-    return p;
+    return n;
 }
 
-boolean isEmpty(List l) {
-    return (FIRST(l) == NULL);
+void createList(List *L) {
+    L->head = NULL;
 }
 
-void CreateList(List *l) {
-    FIRST(*l) = NULL;
+boolean isEmptyList(List L) {
+    return (L.head == NULL);
 }
 
-ElType getElmt(List l, int idx) {
-    int ctr = 0;
-    Address p = FIRST(l);
-    while (ctr < idx) {
-        ctr++;
-        p = NEXT(p);
+int listLength(List L) {
+    int count = 0;
+    Node *p = L.head;
+    while (p != NULL) {
+        count++;
+        p = p->next;
     }
-    return INFO(p);
+    return count;
 }
 
-void setElmt(List *l, int idx, ElType val) {
-    int ctr = 0;
-    Address p = FIRST(*l);
-    while (ctr < idx) {
-        ctr++;
-        p = NEXT(p);
+
+void insertFirstList(List *L, ListElement elem) {
+    Node *n = newNode(elem);
+    if (n != NULL) {
+        n->next = L->head;
+        L->head = n;
     }
-    INFO(p) = val;
 }
 
-int indexOf(List l, ElType val) {
-    int idx = 0;
-    Address p = FIRST(l);
-    boolean found = false;
-    while (p != NULL && !found) {
-        if (INFO(p) == val) {
-            found = true;
-        } else {
-            idx++;
-            p = NEXT(p);
-        }
-    }
-    if (found) {
-        return idx;
+void insertLastList(List *L, ListElement elem) {
+    Node *n = newNode(elem);
+    if (n == NULL) return;
+    if (isEmptyList(*L)) {
+        L->head = n;
     } else {
-        return IDX_UNDEF;
-    }
-}
-
-void insertFirst(List *l, ElType val) {
-    Address p = newNode(val);
-    if (p != NULL) {
-        NEXT(p) = FIRST(*l);
-        FIRST(*l) = p;
-    }
-}
-
-void insertLast(List *l, ElType val) {
-    Address p, last;
-    if (isEmpty(*l)) {
-        insertFirst(l, val);
-    } else {
-        p = newNode(val);
-        if (p != NULL) {
-            last = FIRST(*l);
-            while (NEXT(last) != NULL) {
-                last = NEXT(last);
-            }
-            NEXT(last) = p;
+        Node *p = L->head;
+        while (p->next != NULL) {
+            p = p->next;
         }
+        p->next = n;
     }
 }
 
-void insertAt(List *l, ElType val, int idx) {
-    int ctr;
-    Address p, loc;
+void insertAtList(List *L, ListElement elem, int idx) {
     if (idx == 0) {
-        insertFirst(l, val);
-    } else {
-        p = newNode(val);
-        if (p != NULL) {
-            ctr = 0;
-            loc = FIRST(*l);
-            while (ctr < idx-1) {
-                ctr++;
-                loc = NEXT(loc);
-            }
-            NEXT(p) = NEXT(loc);
-            NEXT(loc) = p;
+        insertFirstList(L, elem);
+        return;
+    }
+    int i = 0;
+    Node *p = L->head;
+    while (p != NULL && i < idx - 1) {
+        p = p->next;
+        i++;
+    }
+    if (p != NULL) {
+        Node *n = newNode(elem);
+        if (n != NULL) {
+            n->next = p->next;
+            p->next = n;
         }
     }
 }
 
-void deleteFirst(List *l, ElType *val) {
-    Address p = FIRST(*l);
-    *val = INFO(p);
-    FIRST(*l) = NEXT(p);
-    free(p);
+
+
+void deleteFirstList(List *L, ListElement *out) {
+    if (!isEmptyList(*L)) {
+        Node *del = L->head;
+        *out = del->element;
+        L->head = del->next;
+        free(del);
+    }
 }
 
-void deleteLast(List *l, ElType *val) {
-    Address p = FIRST(*l);
-    Address loc = NULL;
-    while (NEXT(p) != NULL) {
-        loc = p;
-        p = NEXT(p);
-    }
-    if (loc == NULL) {
-        FIRST(*l)= NULL;
-    } else {
-        NEXT(loc) = NULL;
-    }
-    *val = INFO(p);
-    free(p);
-}
-
-void deleteAt(List *l, int idx, ElType *val) {
-    int ctr;
-    Address p, loc;
-    if (idx == 0) {
-        deleteFirst(l, val);
-    } else {
-        ctr = 0;
-        loc = FIRST(*l);
-        while (ctr < idx - 1) {
-            ctr++;
-            loc = NEXT(loc);
-        }
-        p = NEXT(loc);
-        *val = INFO(p);
-        NEXT(loc) = NEXT(p);
+void deleteLastList(List *L, ListElement *out) {
+    if (isEmptyList(*L)) return;
+    Node *p = L->head;
+    if (p->next == NULL) {
+        *out = p->element;
         free(p);
+        L->head = NULL;
+        return;
+    }
+    while (p->next->next != NULL) {
+        p = p->next;
+    }
+    Node *del = p->next;
+    *out = del->element;
+    p->next = NULL;
+    free(del);
+}
+
+void deleteAtList(List *L, int idx, ListElement *out) {
+    if (idx == 0) {
+        deleteFirstList(L, out);
+        return;
+    }
+    int i = 0;
+    Node *p = L->head;
+    while (p != NULL && i < idx - 1) {
+        p = p->next;
+        i++;
+    }
+    if (p != NULL && p->next != NULL) {
+        Node *del = p->next;
+        *out = del->element;
+        p->next = del->next;
+        free(del);
     }
 }
 
-void displayList(List l) {
-    Address p = FIRST(l);
-    printf("[");
-    while (p != NULL) {
-        printf("%d", INFO(p));
-        if (NEXT(p) != NULL) {
-            printf(",");
+
+
+int indexOfList(
+    List L,
+    ListElement target,
+    boolean (*cmp)(ListElement a, ListElement b)) {
+        int idx = 0;
+        Node *p = L.head;
+
+        while (p != NULL) {
+            if (cmp(p->element, target)) {
+                return idx;
+            }
+            idx++;
+            p = p->next;
         }
-        p = NEXT(p);
-    }
-    printf("]");
+
+        return -1;
 }
 
-int length(List l) {
-    int ctr = 0;
-    Address p = FIRST(l);
+
+
+void displayList(List L, void (*print)(ListElement e)) {
+    Node *p = L.head;
+
     while (p != NULL) {
-        ctr++;
-        p = NEXT(p);
+        print(p->element);
+        p = p->next;
     }
-    return ctr;
 }
 
-List concat(List l1, List l2) {
-    Address p = FIRST(l1);
-    List l3;
-    CreateList(&l3);
+
+List concatList(List L1, List L2) {
+    List L;
+    createList(&L);
+
+    Node *p = L1.head;
     while (p != NULL) {
-        insertLast(&l3, INFO(p));
-        p = NEXT(p);
+        insertLastList(&L, p->element);
+        p = p->next;
     }
-    p = FIRST(l2);
+
+    p = L2.head;
     while (p != NULL) {
-        insertLast(&l3, INFO(p));
-        p = NEXT(p);
+        insertLastList(&L, p->element);
+        p = p->next;
     }
-    return l3;
+
+    return L;
+}
+
+void freeList(List *L) {
+    Node *p = L->head;
+
+    while (p != NULL) {
+        Node *next = p->next;
+        free(p);
+        p = next;
+    }
+
+    L->head = NULL;
 }

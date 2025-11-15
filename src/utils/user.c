@@ -150,3 +150,10 @@ void logoutUser()
 
     return;
 }
+
+int findUserIndexByUsername(const char *username){
+    //TODO Implementasi fungsinya boy
+}
+const char *getUsernameByIndex(int idx){
+    //TODO Implementasi fungsinya boy
+}
