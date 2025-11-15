@@ -7,7 +7,8 @@
 int loadUsers(const char *filepath, User **userPtr, int *capacityPtr)
 {
     FILE *f = fopen(filepath, "r");
-    if (!f) {
+    if (!f)
+    {
         printf("[DEBUG] fopen failed: %s\n", filepath);
         return -1;
     }
@@ -18,14 +19,16 @@ int loadUsers(const char *filepath, User **userPtr, int *capacityPtr)
     int capacity = *capacityPtr;
     User *users = *userPtr;
 
-    if (!fgets(buffer, sizeof(buffer), f)) {
+    if (!fgets(buffer, sizeof(buffer), f))
+    {
         fclose(f);
         return 0;
     }
 
     while (1)
     {
-        if (!ensureCapacity((void**)&users, &capacity, sizeof(User), count + 1)) {
+        if (!ensureCapacity((void **)&users, &capacity, sizeof(User), count + 1))
+        {
             fclose(f);
             return -1;
         }
@@ -37,7 +40,8 @@ int loadUsers(const char *filepath, User **userPtr, int *capacityPtr)
         char f1[32], f2[256], f3[64], f4[32], f5[32];
 
         int end = readField(f1, sizeof(f1), f);
-        if (end && f1[0] == '\0') {
+        if (end && f1[0] == '\0')
+        {
             break;
         }
         readField(f2, sizeof(f2), f);
@@ -49,7 +53,7 @@ int loadUsers(const char *filepath, User **userPtr, int *capacityPtr)
         copyString(users[count].username, f2, 256);
         copyString(users[count].password, f3, 25);
         users[count].karma = toInt(f4);
-        copyString(users[count].created_at, f5, 20);
+        users[count].created_at = parseTime(f5);
 
         count++;
     }
@@ -61,7 +65,8 @@ int loadUsers(const char *filepath, User **userPtr, int *capacityPtr)
 int loadPosts(const char *filepath, Post **postPtr, int *capacityPtr)
 {
     FILE *f = fopen(filepath, "r");
-    if (!f) {
+    if (!f)
+    {
         printf("[DEBUG] fopen failed: %s\n", filepath);
         return -1;
     }
@@ -72,14 +77,16 @@ int loadPosts(const char *filepath, Post **postPtr, int *capacityPtr)
     int capacity = *capacityPtr;
     Post *posts = *postPtr;
 
-    if (!fgets(buffer, sizeof(buffer), f)) {
+    if (!fgets(buffer, sizeof(buffer), f))
+    {
         fclose(f);
         return 0;
     }
 
     while (1)
     {
-        if (!ensureCapacity((void**)&posts, &capacity, sizeof(Post), count + 1)) {
+        if (!ensureCapacity((void **)&posts, &capacity, sizeof(Post), count + 1))
+        {
             fclose(f);
             return -1;
         }
@@ -91,7 +98,8 @@ int loadPosts(const char *filepath, Post **postPtr, int *capacityPtr)
         char f1[32], f2[32], f3[32], f4[256], f5[512], f6[32], f7[32], f8[32];
 
         int end = readField(f1, sizeof(f1), f);
-        if (end && f1[0] == '\0') {
+        if (end && f1[0] == '\0')
+        {
             break;
         }
         readField(f2, sizeof(f2), f);
@@ -107,7 +115,7 @@ int loadPosts(const char *filepath, Post **postPtr, int *capacityPtr)
         copyString(posts[count].author_id, f3, 20);
         copyString(posts[count].title, f4, 256);
         copyStringDynamic(&posts[count].content, f5);
-        copyString(posts[count].created_at, f6, 20);
+        posts[count].created_at = parseTime(f6);
         posts[count].upvotes = toInt(f7);
         posts[count].downvotes = toInt(f8);
 
@@ -121,7 +129,8 @@ int loadPosts(const char *filepath, Post **postPtr, int *capacityPtr)
 int loadComments(const char *filepath, Comment **commentPtr, int *capacityPtr)
 {
     FILE *f = fopen(filepath, "r");
-    if (!f) {
+    if (!f)
+    {
         printf("[DEBUG] fopen failed: %s\n", filepath);
         return -1;
     }
@@ -132,14 +141,16 @@ int loadComments(const char *filepath, Comment **commentPtr, int *capacityPtr)
     int capacity = *capacityPtr;
     Comment *comment = *commentPtr;
 
-    if (!fgets(buffer, sizeof(buffer), f)) {
+    if (!fgets(buffer, sizeof(buffer), f))
+    {
         fclose(f);
         return 0;
     }
 
     while (1)
     {
-        if (!ensureCapacity((void**)&comment, &capacity, sizeof(Comment), count + 1)) {
+        if (!ensureCapacity((void **)&comment, &capacity, sizeof(Comment), count + 1))
+        {
             fclose(f);
             return -1;
         }
@@ -151,7 +162,8 @@ int loadComments(const char *filepath, Comment **commentPtr, int *capacityPtr)
         char f1[32], f2[32], f3[64], f4[32], f5[512], f6[32], f7[32];
 
         int end = readField(f1, sizeof(f1), f);
-        if (end && f1[0] == '\0') {
+        if (end && f1[0] == '\0')
+        {
             break;
         }
         readField(f2, sizeof(f2), f);
@@ -180,7 +192,8 @@ int loadComments(const char *filepath, Comment **commentPtr, int *capacityPtr)
 int loadSubgroddits(const char *filepath, Subgroddit **subPtr, int *capacityPtr)
 {
     FILE *f = fopen(filepath, "r");
-    if (!f) {
+    if (!f)
+    {
         printf("[DEBUG] fopen failed: %s\n", filepath);
         return -1;
     }
@@ -191,14 +204,16 @@ int loadSubgroddits(const char *filepath, Subgroddit **subPtr, int *capacityPtr)
     int capacity = *capacityPtr;
     Subgroddit *subs = *subPtr;
 
-    if (!fgets(buffer, sizeof(buffer), f)) {
+    if (!fgets(buffer, sizeof(buffer), f))
+    {
         fclose(f);
         return 0;
     }
 
     while (1)
     {
-        if (!ensureCapacity((void**)&subs, &capacity, sizeof(Subgroddit), count + 1)) {
+        if (!ensureCapacity((void **)&subs, &capacity, sizeof(Subgroddit), count + 1))
+        {
             fclose(f);
             return -1;
         }
@@ -211,7 +226,8 @@ int loadSubgroddits(const char *filepath, Subgroddit **subPtr, int *capacityPtr)
         char f1[32], f2[256];
 
         int end = readField(f1, sizeof(f1), f);
-        if (end && f1[0] == '\0') {
+        if (end && f1[0] == '\0')
+        {
             break;
         }
         readField(f2, sizeof(f2), f);
@@ -229,7 +245,8 @@ int loadSubgroddits(const char *filepath, Subgroddit **subPtr, int *capacityPtr)
 int loadSocial(const char *filepath, Social **socialPtr, int *capacityPtr)
 {
     FILE *f = fopen(filepath, "r");
-    if (!f) {
+    if (!f)
+    {
         printf("[DEBUG] fopen failed: %s\n", filepath);
         return -1;
     }
@@ -240,14 +257,16 @@ int loadSocial(const char *filepath, Social **socialPtr, int *capacityPtr)
     int capacity = *capacityPtr;
     Social *socials = *socialPtr;
 
-    if (!fgets(buffer, sizeof(buffer), f)) {
+    if (!fgets(buffer, sizeof(buffer), f))
+    {
         fclose(f);
         return 0;
     }
 
     while (1)
     {
-        if (!ensureCapacity((void**)&socials, &capacity, sizeof(Social), count + 1)) {
+        if (!ensureCapacity((void **)&socials, &capacity, sizeof(Social), count + 1))
+        {
             fclose(f);
             return -1;
         }
@@ -260,7 +279,8 @@ int loadSocial(const char *filepath, Social **socialPtr, int *capacityPtr)
         char f1[32], f2[32];
 
         int end = readField(f1, sizeof(f1), f);
-        if (end && f1[0] == '\0') {
+        if (end && f1[0] == '\0')
+        {
             break;
         }
         readField(f2, sizeof(f2), f);
@@ -278,7 +298,8 @@ int loadSocial(const char *filepath, Social **socialPtr, int *capacityPtr)
 int loadVoting(const char *filepath, Voting **votePtr, int *capacityPtr)
 {
     FILE *f = fopen(filepath, "r");
-    if (!f) {
+    if (!f)
+    {
         printf("[DEBUG] fopen failed: %s\n", filepath);
         return -1;
     }
@@ -289,14 +310,16 @@ int loadVoting(const char *filepath, Voting **votePtr, int *capacityPtr)
     int capacity = *capacityPtr;
     Voting *votes = *votePtr;
 
-    if (!fgets(buffer, sizeof(buffer), f)) {
+    if (!fgets(buffer, sizeof(buffer), f))
+    {
         fclose(f);
         return 0;
     }
 
     while (1)
     {
-        if (!ensureCapacity((void**)&votes, &capacity, sizeof(Voting), count + 1)) {
+        if (!ensureCapacity((void **)&votes, &capacity, sizeof(Voting), count + 1))
+        {
             fclose(f);
             return -1;
         }
@@ -309,7 +332,8 @@ int loadVoting(const char *filepath, Voting **votePtr, int *capacityPtr)
         char f1[32], f2[32], f3[32], f4[32];
 
         int end = readField(f1, sizeof(f1), f);
-        if (end && f1[0] == '\0') {
+        if (end && f1[0] == '\0')
+        {
             break;
         }
         readField(f2, sizeof(f2), f);

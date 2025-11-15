@@ -205,3 +205,45 @@ char *convertTimeToStr(time_t t)
     strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", tm_info);
     return buf;
 }
+
+time_t parseTime(const char *str)
+{
+    struct tm t;
+    t.tm_isdst = -1;
+
+    // Parsing manual: YYYY-MM-DD HH:MM:SS
+    int year =
+        (str[0] - '0') * 1000 +
+        (str[1] - '0') * 100 +
+        (str[2] - '0') * 10 +
+        (str[3] - '0');
+
+    int month =
+        (str[5] - '0') * 10 +
+        (str[6] - '0');
+
+    int day =
+        (str[8] - '0') * 10 +
+        (str[9] - '0');
+
+    int hour =
+        (str[11] - '0') * 10 +
+        (str[12] - '0');
+
+    int minute =
+        (str[14] - '0') * 10 +
+        (str[15] - '0');
+
+    int second =
+        (str[17] - '0') * 10 +
+        (str[18] - '0');
+
+    t.tm_year = year - 1900;
+    t.tm_mon = month - 1;
+    t.tm_mday = day;
+    t.tm_hour = hour;
+    t.tm_min = minute;
+    t.tm_sec = second;
+
+    return mktime(&t);
+}

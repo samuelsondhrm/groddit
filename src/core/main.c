@@ -83,7 +83,7 @@ int main()
     char command[50];
 
     while (1)
-    {   
+    {
         printf("Masukkan perintah: ");
 
         IgnoreBlanks();
@@ -91,7 +91,7 @@ int main()
         STARTWORD();
         IgnoreBlanks();
         IgnoreNewline();
-        
+
         wordToString(command, currentWord);
 
         // cek perintah
@@ -121,12 +121,20 @@ int main()
         }
         else if (strCmp(command, "QUIT") == 0)
         {
-            printf("Program keluar.\n");
+            printf("Anda telah keluar dari program Groddit.\n");
             break;
         }
         else if (strCmp(command, "REGISTER") == 0)
         {
             registerUser();
+        }
+        else if (strCmp(command, "LOGIN") == 0)
+        {
+            loginUser();
+        }
+        else if (strCmp(command, "LOGOUT") == 0)
+        {
+            logoutUser();
         }
         else
         {
