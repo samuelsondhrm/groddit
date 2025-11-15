@@ -4,8 +4,8 @@
 #include <stdio.h>
 
 #include "../adt/header/boolean.h"
-#include "../adt/header/mesinkata.h"
-#include "../adt/header/mesinkarakter.h"
+#include "../adt/header/MesinKata.h"
+#include "../adt/header/MesinKarakter.h"
 #include "../adt/header/adt-sederhana.h"
 
 #include "../utils/header/initialize.h"
