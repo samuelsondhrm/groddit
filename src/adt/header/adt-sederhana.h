@@ -1,26 +1,23 @@
-#ifndef ADTSEDERHANA_H
-#define ADTSEDERHANA_H
-
-#include "MesinKata.h"
-#include "MesinKalimat.h"
+#ifndef COMMENT_H
+#define COMMENT_H
 
 typedef struct
 {
-    Word user_id;
-    Word username;
-    Word password;
+    char user_id[20];
+    char username[256];
+    char password[25];
     int karma;
-    Sentence created_at;
+    char created_at[20];
 } User;
 
 typedef struct
 {
-    Word post_id;
-    Word subgroddit_id;
-    Word author_id;
-    Sentence title;
-    Sentence content;
-    Sentence created_at;
+    char post_id[20];
+    char subgroddit_id[20];
+    char author_id[20];
+    char title[256];
+    char *content;
+    char created_at[20];
     int upvotes;
     int downvotes;
 } Post;
@@ -28,40 +25,41 @@ typedef struct
 typedef struct
 {
     int comment_id;
-    Word post_id;
-    Word author_id;
+    char post_id[20];
+    char author_id[20];
     int parent_comment_id;
-    Sentence content;
+    char *content;
     int upvotes;
     int downvotes;
 } Comment;
 
 typedef struct
 {
-    Word subgroddit_id;
-    Word name;
+    char subgroddit_id[20];
+    char name[256];
 } Subgroddit;
 
 typedef struct
 {
-    Word follower_id;
-    Word following_id;
+    char follower_id[20];
+    char following_id[20];
 } Social;
 
 typedef struct
 {
-    int user_id;
-    Word target_type;
-    Word target_id;
-    Word vote_type;
+    char user_id[20];
+    char target_type[20];
+    char target_id[20];
+    char vote_type[20];
 } Voting;
 
-// Inisialisasi struktur
+// Inisialisasi comment
 void initUser(User *u);
 void initPost(Post *p);
 void initComment(Comment *c);
 void initSubgroddit(Subgroddit *s);
 void initSocial(Social *s);
 void initVoting(Voting *v);
+
 
 #endif
