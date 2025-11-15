@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "global-data.h"
-#include "../../adt/header/mesinkata.h"
+#include "../../adt/header/MesinKata.h"
 #include  "helper.h"
 
 // Mengecek apakah username sebelumnya telah ada atau belum

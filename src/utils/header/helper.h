@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "../../adt/header/mesinkata.h"
+#include "../../adt/header/MesinKata.h"
 
 // Membaca field pada .csv
 int readField(char *dest, int maxLen, FILE *f);
