@@ -1,13 +1,15 @@
 #ifndef COMMENT_H
 #define COMMENT_H
 
+#include <time.h>
+
 typedef struct
 {
     char user_id[20];
     char username[256];
     char password[25];
     int karma;
-    char created_at[20];
+    time_t created_at;
 } User;
 
 typedef struct
@@ -17,7 +19,7 @@ typedef struct
     char author_id[20];
     char title[256];
     char *content;
-    char created_at[20];
+    time_t created_at;
     int upvotes;
     int downvotes;
 } Post;
@@ -60,6 +62,5 @@ void initComment(Comment *c);
 void initSubgroddit(Subgroddit *s);
 void initSocial(Social *s);
 void initVoting(Voting *v);
-
 
 #endif

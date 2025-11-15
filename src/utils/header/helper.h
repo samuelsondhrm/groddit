@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../../adt/header/MesinKata.h"
+#include <time.h>
 
 // Membaca field pada .csv
 int readField(char *dest, int maxLen, FILE *f);
@@ -25,3 +26,6 @@ int ensureCapacity(void **arrPtr, int *capacity, size_t elemSize, int needed);
 
 // Konversi word ke string
 int wordToString(char *dest, Word w);
+
+// Mengubah format time_t ke string
+char *convertTimeToStr(time_t t);

@@ -7,7 +7,7 @@ void initUser(User *u)
     u->username[0] = '\0';
     u->password[0] = '\0';
     u->karma = 0;
-    u->created_at[0] = '\0';
+    u->created_at = 0;
 }
 
 void initPost(Post *p)
@@ -17,7 +17,7 @@ void initPost(Post *p)
     p->author_id[0] = '\0';
     p->title[0] = '\0';
     p->content = NULL;
-    p->created_at[0] = '\0';
+    p->created_at = 0;
     p->upvotes = 0;
     p->downvotes = 0;
 }
