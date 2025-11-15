@@ -196,3 +196,12 @@ int wordToString(char *dest, Word w)
     dest[len] = '\0';
     return len;
 }
+
+char *convertTimeToStr(time_t t)
+{
+    static char buf[20]; // "YYYY-MM-DD HH:MM:SS"
+    struct tm *tm_info = localtime(&t);
+
+    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", tm_info);
+    return buf;
+}

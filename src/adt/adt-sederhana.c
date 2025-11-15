@@ -18,18 +18,17 @@ void initUser(User *u) {
     initWord(&u->username);
     initWord(&u->password);
     u->karma = 0;
-    initSentence(&u->created_at);
+    u->created_at = 0;
 }
 
-void initPost(Post *p) {
-    initWord(&p->post_id);
-    initWord(&p->subgroddit_id);
-    initWord(&p->author_id);
-
-    initSentence(&p->title);
-    initSentence(&p->content);
-    initSentence(&p->created_at);
-
+void initPost(Post *p)
+{
+    p->post_id[0] = '\0';
+    p->subgroddit_id[0] = '\0';
+    p->author_id[0] = '\0';
+    p->title[0] = '\0';
+    p->content = NULL;
+    p->created_at = 0;
     p->upvotes = 0;
     p->downvotes = 0;
 }

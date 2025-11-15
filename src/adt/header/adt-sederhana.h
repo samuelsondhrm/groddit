@@ -4,23 +4,25 @@
 #include "MesinKata.h"
 #include "MesinKalimat.h"
 
+#include <time.h>
+
 typedef struct
 {
     Word user_id;
     Word username;
     Word password;
     int karma;
-    Sentence created_at;
+    time_t created_at;
 } User;
 
 typedef struct
 {
-    Word post_id;
-    Word subgroddit_id;
-    Word author_id;
-    Sentence title;
-    Sentence content;
-    Sentence created_at;
+    char post_id[20];
+    char subgroddit_id[20];
+    char author_id[20];
+    char title[256];
+    char *content;
+    time_t created_at;
     int upvotes;
     int downvotes;
 } Post;
