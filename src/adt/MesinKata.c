@@ -1,66 +1,172 @@
-#include <stdio.h>
-#include "MesinKata.h"
+#include "header/MesinKata.h"
 
-boolean EndWord;
 Word currentWord;
 
-void IgnoreBlanks()
+boolean EndWordInput = false;
+
+void IgnoreBlanksInput()
 {
-    while (currentChar == BLANK)
+    while (!EOP && currentChar == BLANK)
     {
-        ADV();
+        ADVINPUT();
     }
 }
 
-void IgnoreNewline()
+void STARTWORD_INPUT()
 {
-    while (currentChar == '\n' || currentChar == '\r')
-    {
-        ADV();
-    }
-}
+    STARTINPUT();
+    IgnoreBlanksInput();
+    IgnoreNewline();
 
-void STARTWORD()
-{
-    START();
-    IgnoreBlanks();
-    if (currentChar == MARK)
+    if (currentChar == CHAR_MARK)
     {
-        EndWord = true;
+        EndWordInput = true;
     }
     else
     {
-        EndWord = false;
-        CopyWord();
+        EndWordInput = false;
+        CopyWordInput();
     }
 }
 
-void ADVWORD()
+void ADVWORD_INPUT()
 {
-    IgnoreBlanks();
-    if (currentChar == MARK)
+    while (!EOP && (currentChar == '\n' || currentChar == '\r'))
     {
-        EndWord = true;
+        ADVINPUT();
+    }
+
+    IgnoreBlanksInput();
+
+    if (currentChar == CHAR_MARK)
+    {
+        EndWordInput = true;
+    }
+    else if (EOP)
+    {
+        EndWordInput = true;
     }
     else
     {
-        EndWord = false;
-        CopyWord();
-        IgnoreBlanks();
+        CopyWordInput();
+        IgnoreBlanksInput();
     }
 }
 
-void CopyWord()
+void CopyWordInput()
 {
     currentWord.Length = 0;
-    while (currentChar != BLANK && currentChar != MARK)
+
+    while (!EOP && currentChar != BLANK && currentChar != CHAR_MARK)
     {
         if (currentWord.Length < NMax)
-        {
             currentWord.TabWord[currentWord.Length++] = currentChar;
-            ADV();
+        ADVINPUT();
+    }
+}
+
+boolean EndWordCSV = false;
+
+void STARTWORD_CSV(const char *filename)
+{
+    STARTCSV(filename);
+
+    if (EOP)
+    {
+        EndWordCSV = true;
+        return;
+    }
+
+    EndWordCSV = false;
+    CopyFieldCSV();
+}
+
+void ADVWORD_CSV()
+{
+    if (EOP)
+    {
+        EndWordCSV = true;
+        return;
+    }
+
+    if (currentChar == '\n' || currentChar == '\r')
+    {
+        while (!EOP && (currentChar == '\n' || currentChar == '\r'))
+        {
+            ADVCSV();
+        }
+
+        if (EOP)
+        {
+            EndWordCSV = true;
         }
         else
-            break;
+        {
+            CopyFieldCSV();
+        }
+        return;
+    }
+
+    if (currentChar == ',')
+    {
+        ADVCSV();
+        if (!EOP && currentChar != '\n' && currentChar != '\r')
+        {
+            CopyFieldCSV();
+        }
+        return;
+    }
+
+    CopyFieldCSV();
+}
+
+void CopyFieldCSV()
+{
+    currentWord.Length = 0;
+
+    if (currentChar == '"')
+    {
+        ADVCSV();
+
+        while (!EOP)
+        {
+
+            if (currentChar == '"')
+            {
+                ADVCSV();
+
+                if (currentChar == '"')
+                {
+                    if (currentWord.Length < NMax)
+                        currentWord.TabWord[currentWord.Length++] = '"';
+                    ADVCSV();
+                }
+                else
+                {
+                    break;
+                }
+            }
+            else
+            {
+                if (currentWord.Length < NMax)
+                    currentWord.TabWord[currentWord.Length++] = currentChar;
+                ADVCSV();
+            }
+        }
+
+        if (currentChar == '"')
+            ADVCSV();
+
+        return;
+    }
+
+    while (!EOP && currentChar != ',' &&
+           currentChar != '\n' && currentChar != '\r')
+    {
+
+        if (currentWord.Length < NMax)
+            currentWord.TabWord[currentWord.Length++] = currentChar;
+
+        ADVCSV();
     }
 }

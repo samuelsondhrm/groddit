@@ -1,198 +1,89 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include "header/helper.h"
-#include "../adt/header/adt-sederhana.h"
 
-// Menghapus carriage return
-static void removeCR(char *s)
+int compareWord(Word a, Word b)
 {
-    int len = strlen(s);
-    if (len > 0 && s[len - 1] == '\r')
-    {
-        s[len - 1] = '\0';
-    }
+    if (a.Length != b.Length)
+        return 0;
+
+    for (int i = 0; i < a.Length; i++)
+        if (a.TabWord[i] != b.TabWord[i])
+            return 0;
+
+    return 1;
 }
 
-int readField(char *dest, int maxLen, FILE *f)
+int wordToInt(Word w)
 {
-    int len = 0;
-    int c = fgetc(f);
+    int sign = 1;
+    int result = 0;
+    int i = 0;
 
-    if (c == EOF)
+    if (w.Length == 0)
+        return 0;
+
+    if (w.TabWord[0] == '-')
     {
-        dest[0] = '\0';
-        return 1;
+        sign = -1;
+        i = 1;
     }
 
-    int quoted = 0;
-
-    if (c == '"')
+    for (; i < w.Length; i++)
     {
-        quoted = 1;
-        c = fgetc(f);
-    }
-
-    while (1)
-    {
-        if (quoted)
-        {
-            if (c == '"')
-            {
-                int peek = fgetc(f);
-                if (peek == '"')
-                {
-                    if (len < maxLen - 1)
-                        dest[len++] = '"';
-                    c = fgetc(f);
-                    continue;
-                }
-                else
-                {
-                    if (peek != EOF)
-                        ungetc(peek, f);
-                    break;
-                }
-            }
-        }
-        else
-        {
-            if (c == ',' || c == '\n' || c == '\r' || c == EOF)
-            {
-                if (c != EOF)
-                    ungetc(c, f);
-                break;
-            }
-        }
-
-        if (len < maxLen - 1)
-            dest[len++] = c;
-        c = fgetc(f);
-        if (c == EOF)
+        if (w.TabWord[i] < '0' || w.TabWord[i] > '9')
             break;
+        result = result * 10 + (w.TabWord[i] - '0');
     }
 
-    dest[len] = '\0';
-
-    removeCR(dest);
-
-    c = fgetc(f);
-    if (c == '\r')
-    {
-        int next = fgetc(f);
-        (void)next;
-        return 1;
-    }
-    if (c == '\n')
-        return 1;
-    if (c == EOF)
-        return 1;
-
-    return 0;
+    return result * sign;
 }
 
-int toInt(const char *s)
+void copyWord(Word *dest, Word src)
 {
-    int val = 0;
-    int neg = 0;
-    int any = 0;
-
-    while (*s == ' ' || *s == '\r' || *s == '\t')
-        s++;
-
-    if (*s == '-')
+    dest->Length = src.Length;
+    for (int i = 0; i < src.Length; i++)
     {
-        neg = 1;
-        s++;
+        dest->TabWord[i] = src.TabWord[i];
     }
-
-    while (*s >= '0' && *s <= '9')
-    {
-        val = val * 10 + (*s - '0');
-        any = 1;
-        s++;
-    }
-
-    return any ? (neg ? -val : val) : 0;
 }
 
-int strCmp(const char *s1, const char *s2)
+int isWordEmpty(Word w)
 {
-    int i = 0;
-    while (s1[i] != '\0' && s2[i] != '\0')
-    {
-        if (s1[i] != s2[i])
-            return s1[i] - s2[i];
-        i++;
-    }
-    return s1[i] - s2[i];
+    return (w.Length == 0);
 }
 
-int strLength(const char *s)
+void wordToString(char *out, Word w)
 {
-    int i = 0;
-    while (s[i] != '\0')
-        i++;
-    return i;
+    for (int i = 0; i < w.Length; i++)
+        out[i] = w.TabWord[i];
+    out[w.Length] = '\0';
 }
 
-void copyString(char *dst, const char *src, int maxlen)
-{
-    int i = 0;
-    while (src[i] != '\0' && i < maxlen - 1)
-    {
-        dst[i] = src[i];
-        i++;
-    }
-    dst[i] = '\0';
-}
-
-void copyStringDynamic(char **dst, const char *src)
-{
-    int len = strLength(src);
-    *dst = malloc(len + 1);
-    if (*dst == NULL)
-        return;
-
-    for (int i = 0; i < len; i++)
-    {
-        (*dst)[i] = src[i];
-    }
-    (*dst)[len] = '\0';
-}
-
-int ensureCapacity(void **arrPtr, int *capacity, size_t elemSize, int needed)
+int ensureCapacity(void **array, int *capacity, int elementSize, int needed)
 {
     if (needed <= *capacity)
         return 1;
-
-    int newCap = (*capacity == 0) ? 4 : (*capacity * 2);
+    int newCap = (*capacity == 0 ? 4 : (*capacity * 2));
     while (newCap < needed)
         newCap *= 2;
 
-    void *newArr = realloc(*arrPtr, newCap * elemSize);
-    if (!newArr)
+    void *newArr = realloc(*array, newCap * elementSize);
+    if (newArr == NULL)
         return 0;
 
-    *arrPtr = newArr;
+    *array = newArr;
     *capacity = newCap;
     return 1;
 }
 
-int wordToString(char *dest, Word w)
+int strCmp(const char *a, const char *b)
 {
-    int start = 0, end = w.Length - 1;
-
-    while (start <= end && (w.TabWord[start] == ' ' || w.TabWord[start] == '\n' || w.TabWord[start] == '\r'))
-        start++;
-
-    while (end >= start && (w.TabWord[end] == ' ' || w.TabWord[end] == '\n' || w.TabWord[end] == '\r'))
-        end--;
-
-    int len = 0;
-    for (int i = start; i <= end; i++)
-        dest[len++] = w.TabWord[i];
-
-    dest[len] = '\0';
-    return len;
+    int i = 0;
+    while (a[i] != '\0' && b[i] != '\0')
+    {
+        if (a[i] != b[i])
+            return a[i] - b[i];
+        i++;
+    }
+    return a[i] - b[i];
 }

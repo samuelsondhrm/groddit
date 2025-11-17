@@ -1,49 +1,58 @@
 #include "main.h"
 
-void printComments()
-{
-    printf("\n============== COMMENTS ==============\n");
-    for (int i = 0; i < COMMENT_COUNT; i++)
-    {
-        Comment c = COMMENTS[i];
-        printf("ID: %d | Post: %s | Author: %s | Parent: %d\n",
-               c.comment_id, c.post_id, c.author_id, c.parent_comment_id);
-        printf("Content: %s\n", c.content);
-        printf("Upvotes: %d | Downvotes: %d\n\n",
-               c.upvotes, c.downvotes);
-    }
-}
-
-// ======================== MAIN ========================
 int main()
 {
-    initialize(); // load data
+    initialize();
+    char commandStr[50];
+    boolean quit = false;
 
-    char command[50];
-
-    while (1)
+    while (!quit)
     {
-        printf("Masukkan perintah: ");
+        printf("\nMasukkan perintah: ");
+        fflush(stdout);
 
-        IgnoreBlanks();
-        IgnoreNewline();
-        STARTWORD();
-        IgnoreBlanks();
-        IgnoreNewline();
+        STARTWORD_INPUT();
 
-        wordToString(command, currentWord);
+        if (currentWord.Length == 0)
+        {
+            continue;
+        }
 
-        // cek perintah
-        if (strCmp(command, "PRINTCOMMENTS") == 0)
+        wordToString(commandStr, currentWord);
+
+        if (strCmp(commandStr, "PRINTCOMMENTS") == 0)
         {
             printComments();
         }
+        else if (strCmp(commandStr, "PRINTPOSTS") == 0)
+        {
+            printPosts();
+        }
+        else if (strCmp(commandStr, "PRINTUSERS") == 0)
+        {
+            printUsers();
+        }
+        else if (strCmp(commandStr, "PRINTSUBGRODDITS") == 0)
+        {
+            printSubGroddits();
+        }
+        else if (strCmp(commandStr, "PRINTSOCIALS") == 0)
+        {
+            printSocials();
+        }
+        else if (strCmp(commandStr, "PRINTVOTINGS") == 0)
+        {
+            printVotings();
+        }
+        else if (strCmp(commandStr, "EXIT") == 0 || strCmp(commandStr, "QUIT") == 0)
+        {
+            printf("Keluar dari program.\n");
+            quit = true;
+        }
         else
         {
-            printf("Perintah '%s' tidak dikenali.\n", command);
+            printf("Perintah '%s' tidak dikenali.\n", commandStr);
         }
-
-        printf("\n");
     }
 
     return 0;

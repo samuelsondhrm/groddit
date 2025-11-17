@@ -1,27 +1,28 @@
-#include <stdio.h>
+#ifndef HELPER_H
+#define HELPER_H
+
+#include "../../adt/header/MesinKata.h"
 #include <stdlib.h>
-#include "../../adt/header/mesinkata.h"
 
-// Membaca field pada .csv
-int readField(char *dest, int maxLen, FILE *f);
+// Membandingkan dua Word
+int compareWord(Word a, Word b);
 
-// Mengubah string menjadi integer
-int toInt(const char *s);
+// Mengonversi Word ke integer
+int wordToInt(Word w);
 
-// Menentukan panjang string
-int strLength(const char *s);
+// Menyalin Word 
+void copyWord(Word *dest, Word src);
 
-// Membandingkan dua buah string apakah sama atau tidak
-int strCmp(const char *s1, const char *s2);
+// Memeriksa apakah Word kosong
+int isWordEmpty(Word w);
 
-// Menyalin suatu string statis
-void copyString(char *dst, const char *src, int maxlen);
+// Mengonversi Word ke string
+void wordToString(char *out, Word w);
 
-// Menyalin suatu string dinamis
-void copyStringDynamic(char **dst, const char *src);
+// Memastikan kapasitas array cukup, realloc jika perlu
+int ensureCapacity(void **array, int *capacity, int elementSize, int needed);
 
-// Menjamin kapasitas array dinamis. Jika kurang, akan diperbesar 2x lipat
-int ensureCapacity(void **arrPtr, int *capacity, size_t elemSize, int needed);
+// Membandingkan dua string
+int strCmp(const char *a, const char *b);
 
-// Konversi word ke string
-int wordToString(char *dest, Word w);
+#endif

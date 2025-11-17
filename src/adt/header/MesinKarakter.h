@@ -1,26 +1,34 @@
-#ifndef __MESIN_KAR_H_
-#define __MESIN_KAR_H_
+#ifndef MESINKARAKTER_H
+#define MESINKARAKTER_H
 
+#include <stdio.h>
 #include "boolean.h"
 
-#define MARK ';'
-/* State Mesin */
+#define CHAR_MARK ';'  
+#define BLANK ' '
+#define NEWLINE '\n' 
+
+#define MODE_INPUT 0
+#define MODE_CSV   1
+
 extern char currentChar;
 extern boolean EOP;
+extern FILE *pita;
+extern int MODE;
 
-void START();
-/* Mesin siap dioperasikan. Pita disiapkan untuk dibaca.
-   Karakter pertama yang ada pada pita posisinya adalah pada jendela.
-   I.S. : sembarang
-   F.S. : currentChar adalah karakter pertama pada pita
-          Jika currentChar != MARK maka EOP akan padam (false)
-          Jika currentChar = MARK maka EOP akan menyala (true) */
+// I
+void STARTINPUT();
+void ADVINPUT();
 
-void ADV();
-/* Pita dimajukan satu karakter.
-   I.S. : Karakter pada jendela = currentChar, currentChar != MARK
-   F.S. : currentChar adalah karakter berikutnya dari currentChar yang lama,
-          currentChar mungkin = MARK
-          Jika  currentChar = MARK maka EOP akan menyala (true) */
+// CSV MODE
+void STARTCSV(const char *filename);
+void ADVCSV();
+
+// General
+void CLOSEPITA();
+
+// Helper
+void IgnoreBlanks();
+void IgnoreNewline();
 
 #endif
