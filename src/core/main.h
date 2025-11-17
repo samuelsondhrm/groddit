@@ -11,6 +11,5 @@
 #include "../utils/header/initialize.h"
 #include "../utils/header/load-config.h"
 #include "../utils/header/global-data.h"
-#include "../utils/header/user.h"
 
 #endif
