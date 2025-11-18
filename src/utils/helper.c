@@ -59,6 +59,17 @@ void wordToString(char *out, Word w)
     out[w.Length] = '\0';
 }
 
+void stringToWord(Word *out, const char *str)
+{
+    int i = 0;
+    while (str[i] != '\0' && i < NMax)
+    {
+        out->TabWord[i] = str[i];
+        i++;
+    }
+    out->Length = i;
+}
+
 int ensureCapacity(void **array, int *capacity, int elementSize, int needed)
 {
     if (needed <= *capacity)
@@ -88,13 +99,11 @@ int strCmp(const char *a, const char *b)
     return a[i] - b[i];
 }
 
-char *convertTimeToStr(time_t t)
+void timeToStr(char *out, time_t t)
 {
-    static char buf[20]; // "YYYY-MM-DD HH:MM:SS"
     struct tm *tm_info = localtime(&t);
 
-    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", tm_info);
-    return buf;
+    strftime(out, 20, "%Y-%m-%d %H:%M:%S", tm_info);
 }
 
 time_t parseTime(const char *str)

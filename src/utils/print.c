@@ -45,7 +45,7 @@ void printPosts()
         wordToString(authorId, p.author_id);
         wordToString(title, p.title);
         wordToString(content, p.content);
-        wordToString(createdAt, p.created_at);
+        timeToStr(createdAt, p.created_at);
 
         printf("ID: %s | SubGroddit: %s | Author: %s\n", postId, subId, authorId);
         printf("Title: %s\n", title);
@@ -71,7 +71,7 @@ void printUsers()
         wordToString(userId, u.user_id);
         wordToString(username, u.username);
         wordToString(password, u.password);
-        wordToString(createdAt, u.created_at);
+        timeToStr(createdAt, u.created_at);
 
         printf("ID: %s | Username: %s | Password: %s\n", userId, username, password);
         printf("Karma: %d | Created: %s\n\n", u.karma, createdAt);

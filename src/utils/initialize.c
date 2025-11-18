@@ -103,5 +103,4 @@ void initialize()
         printf("[Gagal] Memuat votings dari %s\n", pathVotings);
     else
         printf("[OK] Memuat %d votings dari %s\n", VOTING_COUNT, pathVotings);
-        
 }

@@ -22,7 +22,7 @@ typedef struct
     Word author_id;
     Word title;
     Word content;
-    Word created_at;
+    time_t created_at;
     int upvotes;
     int downvotes;
 } Post;
@@ -33,7 +33,7 @@ typedef struct
     Word username;
     Word password;
     int karma;
-    Word created_at;
+    time_t created_at;
 } User;
 
 typedef struct

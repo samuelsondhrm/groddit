@@ -5,12 +5,11 @@
 // #include <stdlib.h>
 // #include <string.h>
 
-// #include "../../adt/header/boolean.h"
+// #include "../../adt/header/Boolean.h"
 // #include "../../adt/header/Graph.h"
 // #include "../../adt/header/ADTSederhana.h"
 // #include "global-data.h"
 // #include "user.h"
-
 
 // /* ============================================================================
 //  *                          Fitur FOLLOW / UNFOLLOW

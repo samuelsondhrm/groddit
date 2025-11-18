@@ -4,8 +4,11 @@
 #include "../../adt/header/MesinKata.h"
 #include "helper.h"
 
-// Mengecek apakah username sebelumnya telah ada atau belum
-int findUsername(const char *username);
+// Mencari id berdasarkan username, return idx, -1 jika tidak ditemukan
+int findIdByUsername(const char *username);
+
+// Menghasilkan username dari USERS berdasarkan masukan index
+char *findUsernameById(int id);
 
 // Men-generate USERID yang baru
 void generateUserID(char *id, int num);
@@ -18,9 +21,3 @@ void loginUser();
 
 // User logout
 void logoutUser();
-
-// Search index user dari USERS berdasarkan masukan username
-int findUserIndexByUsername(const char *username);
-
-// Menghasilkan username dari USERS berdasarkan masukan index
-const char *getUsernameByIndex(int idx);

@@ -3,6 +3,7 @@
 int main()
 {
     initialize();
+    printUsers();
     char commandStr[50];
     boolean quit = false;
 
@@ -49,14 +50,14 @@ int main()
             printf("Keluar dari program.\n");
             quit = true;
         }
-        // else if (strCmp(commandStr, "LOGIN") == 0)
-        // {
-        //     loginUser();
-        // }
-        // else if (strCmp(commandStr, "LOGOUT") == 0)
-        // {
-        //     logoutUser();
-        // }
+        else if (strCmp(commandStr, "LOGIN") == 0)
+        {
+            loginUser();
+        }
+        else if (strCmp(commandStr, "LOGOUT") == 0)
+        {
+            logoutUser();
+        }
         else
         {
             printf("Perintah '%s' tidak dikenali.\n", commandStr);

@@ -1,159 +1,182 @@
-// #include "header/user.h"
+#include "header/user.h"
 
-// int findUsername(const char *username)
-// {
-//     for (int i = 0; i < USER_COUNT; i++)
-//     {
-//         if (strCmp(USERS[i].username, username) == 0)
-//             return i;
-//     }
-//     return -1;
-// }
+int findIdByUsername(const char *username)
+{
+    for (int i = 0; i < USER_COUNT; i++)
+    {
+        char currUsername[256];
+        wordToString(currUsername, USERS[i].username);
+        if (strCmp(currUsername, username) == 0)
+            return i;
+    }
+    return -1;
+}
 
-// void generateUserID(char *id, int num)
-// {
-//     id[0] = 'U';
-//     id[1] = 'S';
-//     id[2] = 'E';
-//     id[3] = 'R';
-//     int hundreds = (num / 100) % 10;
-//     int tens = (num / 10) % 10;
-//     int ones = num % 10;
-//     id[4] = '0' + hundreds;
-//     id[5] = '0' + tens;
-//     id[6] = '0' + ones;
-//     id[7] = '\0';
-// }
+char *findUsernameById(int id)
+{
+    static char buffer[256];
 
-// void registerUser()
-// {
-//     if (CURRENT_USER_INDEX != -1)
-//     {
-//         printf("Anda tidak dapat melakukan registrasi karena telah login sebagai %s\n", CURRENT_USER->username);
-//         return;
-//     }
+    if (id < 0 || id >= USER_COUNT)
+    {
+        buffer[0] = '\0';
+        return buffer;
+    }
 
-//     char username[256];
-//     char password[25];
+    wordToString(buffer, USERS[id].username);
+    return buffer;
+}
 
-//     printf("Masukkan username: ");
-//     STARTWORD();
-//     wordToString(username, currentWord);
-//     IgnoreNewline();
+void generateUserID(char *id, int num)
+{
+    id[0] = 'U';
+    id[1] = 'S';
+    id[2] = 'E';
+    id[3] = 'R';
+    int hundreds = (num / 100) % 10;
+    int tens = (num / 10) % 10;
+    int ones = num % 10;
+    id[4] = '0' + hundreds;
+    id[5] = '0' + tens;
+    id[6] = '0' + ones;
+    id[7] = '\0';
+}
 
-//     if (findUsername(username) != -1)
-//     {
-//         printf("Maaf, username %s sudah terdaftar :(. Harap pilih username yang lain.\n", username);
-//         return;
-//     }
+void registerUser()
+{
+    if (CURRENT_USER_INDEX != -1)
+    {
+        char *usn;
+        usn = findUsernameById(CURRENT_USER_INDEX);
+        printf("Anda tidak dapat melakukan registrasi karena telah login sebagai %s\n", usn);
+        return;
+    }
 
-//     printf("Masukkan kata sandi: ");
-//     STARTWORD();
-//     wordToString(password, currentWord);
-//     IgnoreNewline();
+    char username[256];
+    char password[25];
 
-//     int passLen = 0;
-//     while (password[passLen] != '\0')
-//         passLen++;
+    printf("Masukkan username: ");
+    STARTWORD_INPUT();
+    wordToString(username, currentWord);
+    IgnoreNewline();
 
-//     if (passLen < 8 || passLen > 20)
-//     {
-//         printf("Panjang kata sandi harus 8-20 karakter!\n");
-//         return;
-//     }
+    if (findIdByUsername(username) != -1)
+    {
+        printf("Maaf, username %s sudah terdaftar :(. Harap pilih username yang lain.\n", username);
+        return;
+    }
 
-//     if (!ensureCapacity((void **)&USERS, &USER_CAPACITY, sizeof(User), USER_COUNT + 1))
-//     {
-//         printf("Gagal menambah user, kapasitas penuh!\n");
-//         return;
-//     }
+    printf("Masukkan kata sandi: ");
+    STARTWORD_INPUT();
+    wordToString(password, currentWord);
+    IgnoreNewline();
 
-//     User *u = &USERS[USER_COUNT];
-//     generateUserID(u->user_id, USER_COUNT + 1);
-//     copyString(u->username, username, 256);
-//     copyString(u->password, password, 25);
-//     u->karma = 0;
-//     u->created_at = time(NULL);
+    int passLen = 0;
+    while (password[passLen] != '\0')
+        passLen++;
 
-//     USER_COUNT++;
+    if (passLen < 8 || passLen > 20)
+    {
+        printf("Panjang kata sandi harus 8-20 karakter!\n");
+        return;
+    }
 
-//     printf("Akun dengan username %s berhasil didaftarkan! Silahkan gunakan perintah LOGIN untuk mengakses fitur-fitur Groddit.\n", username);
-// }
+    if (!ensureCapacity((void **)&USERS, &USER_CAPACITY, sizeof(User), USER_COUNT + 1))
+    {
+        printf("Gagal menambah user, kapasitas penuh!\n");
+        return;
+    }
 
-// void loginUser()
-// {
-//     if (CURRENT_USER_INDEX != -1)
-//     {
-//         printf("Anda tidak dapat melakukan login karena telah login sebagai %s.\n", CURRENT_USER->username);
-//         return;
-//     }
+    User *u = &USERS[USER_COUNT];
 
-//     char username[256];
-//     char password[25];
+    char uid[8];
+    wordToString(uid, u->user_id);
+    generateUserID(uid, USER_COUNT + 1);
 
-//     printf("Masukkan username: ");
-//     STARTWORD();
-//     wordToString(username, currentWord);
-//     IgnoreNewline();
+    Word usn;
+    Word pw;
+    stringToWord(&usn, username);
+    stringToWord(&pw, password);
+    copyWord(&u->username, usn);
+    copyWord(&u->password, pw);
+    u->karma = 0;
+    u->created_at = time(NULL);
 
-//     int user_id = findUsername(username);
-//     if (user_id == -1)
-//     {
-//         printf("Maaf, username %s tidak ditemukan :(. Harap register terlebih dahulu.\n", username);
-//         return;
-//     }
+    USER_COUNT++;
 
-//     printf("Masukkan kata sandi: ");
-//     STARTWORD();
-//     wordToString(password, currentWord);
-//     IgnoreNewline();
+    printf("Akun dengan username %s berhasil didaftarkan! Silahkan gunakan perintah LOGIN untuk mengakses fitur-fitur Groddit.\n", username);
+}
 
-//     int passLen = 0;
-//     while (password[passLen] != '\0')
-//         passLen++;
+void loginUser()
+{
+    if (CURRENT_USER_INDEX != -1)
+    {
+        char *usn;
+        usn = findUsernameById(CURRENT_USER_INDEX);
+        printf("Anda tidak dapat melakukan login karena telah login sebagai %s.\n", usn);
+        return;
+    }
 
-//     if (passLen < 8 || passLen > 20)
-//     {
-//         printf("Panjang kata sandi harus 8-20 karakter!\n");
-//         return;
-//     }
+    char username[256];
+    char password[25];
 
-//     if (strCmp(password, USERS[user_id].password) != 0)
-//     {
-//         printf("Password salah!\n");
-//         return;
-//     }
+    printf("Masukkan username: ");
+    STARTWORD_INPUT();
+    wordToString(username, currentWord);
+    IgnoreNewline();
 
-//     CURRENT_USER = &USERS[user_id];
+    int user_id = findIdByUsername(username);
+    if (user_id == -1)
+    {
+        printf("Maaf, username %s tidak ditemukan :(. Harap register terlebih dahulu.\n", username);
+        return;
+    }
 
-//     printf("Akun dengan username %s berhasil login! Selamat datang di Groddit!\n", username);
-// }
+    printf("Masukkan kata sandi: ");
+    STARTWORD_INPUT();
+    wordToString(password, currentWord);
+    IgnoreNewline();
 
-// void logoutUser()
-// {
-//     if (CURRENT_USER == NULL)
-//     {
-//         printf("Anda belum login! Masuk terlebih dahulu untuk dapat mengakses Groddit.\n");
-//         return;
-//     }
+    int passLen = 0;
+    while (password[passLen] != '\0')
+        passLen++;
 
-//     CURRENT_USER = NULL;
+    if (passLen < 8 || passLen > 20)
+    {
+        printf("Panjang kata sandi harus 8-20 karakter!\n");
+        return;
+    }
 
-//     if (CURRENT_USER == NULL)
-//     {
-//         printf("Anda berhasil logout. Sampai jumpa di pertemuan berikutnya!\n");
-//     }
-//     else
-//     {
-//         printf("Gagal Logout!\n");
-//     }
+    char *pwStr;
+    wordToString(pwStr, USERS[user_id].password);
+    if (strCmp(password, pwStr) != 0)
+    {
+        printf("Password salah!\n");
+        return;
+    }
 
-//     return;
-// }
+    CURRENT_USER_INDEX = user_id;
 
-// int findUserIndexByUsername(const char *username){
-//     //TODO Implementasi fungsinya boy
-// }
-// const char *getUsernameByIndex(int idx){
-//     //TODO Implementasi fungsinya boy
-// }
+    printf("Akun dengan username %s berhasil login! Selamat datang di Groddit!\n", username);
+}
+
+void logoutUser()
+{
+    if (CURRENT_USER_INDEX == -1)
+    {
+        printf("Anda belum login! Masuk terlebih dahulu untuk dapat mengakses Groddit.\n");
+        return;
+    }
+
+    CURRENT_USER_INDEX = -1;
+
+    if (CURRENT_USER_INDEX == -1)
+    {
+        printf("Anda berhasil logout. Sampai jumpa di pertemuan berikutnya!\n");
+    }
+    else
+    {
+        printf("Gagal Logout!\n");
+    }
+
+    return;
+}

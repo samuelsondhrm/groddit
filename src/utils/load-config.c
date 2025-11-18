@@ -193,7 +193,9 @@ int loadUsers(const char *filepath, User **userPtr, int *capacityPtr)
                 U->karma = wordToInt(currentWord);
                 break;
             case 4:
-                copyWord(&U->created_at, currentWord);
+                char created_at_str[64];
+                copyWord(&created_at_str, currentWord);
+                U->created_at = parseTime(created_at_str);
                 break;
             }
             colidx++;

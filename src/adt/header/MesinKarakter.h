@@ -2,14 +2,14 @@
 #define MESINKARAKTER_H
 
 #include <stdio.h>
-#include "boolean.h"
+#include "Boolean.h"
 
-#define CHAR_MARK ';'  
+#define CHAR_MARK ';'
 #define BLANK ' '
-#define NEWLINE '\n' 
+#define NEWLINE '\n'
 
 #define MODE_INPUT 0
-#define MODE_CSV   1
+#define MODE_CSV 1
 
 extern char currentChar;
 extern boolean EOP;
