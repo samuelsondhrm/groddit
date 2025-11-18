@@ -27,7 +27,7 @@
 
 // void registerUser()
 // {
-//     if (CURRENT_USER != NULL)
+//     if (CURRENT_USER_INDEX != -1)
 //     {
 //         printf("Anda tidak dapat melakukan registrasi karena telah login sebagai %s\n", CURRENT_USER->username);
 //         return;
@@ -82,7 +82,7 @@
 
 // void loginUser()
 // {
-//     if (CURRENT_USER != NULL)
+//     if (CURRENT_USER_INDEX != -1)
 //     {
 //         printf("Anda tidak dapat melakukan login karena telah login sebagai %s.\n", CURRENT_USER->username);
 //         return;
