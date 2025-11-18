@@ -58,3 +58,28 @@ dkms.conf
 build/
 bin/
 obj/
+
+# VSCode
+.vscode/
+.vscode/*
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux temp files
+*~
+*.swp
+*.swo
+*.cache
+
+*.log
+*.tmp
+*.bak
+*.old

@@ -2,6 +2,8 @@
 #define GLOBAL_DATA_H
 
 #include "../../adt/header/ADTSederhana.h"
+#include "../../adt/header/Graph.h"
+#include "../../adt/header/ListBerkait.h"
 
 // Comments
 extern Comment *COMMENTS;
@@ -27,10 +29,15 @@ extern int SUBGRODDIT_COUNT;
 extern Social *SOCIALS;
 extern int SOCIAL_CAPACITY;
 extern int SOCIAL_COUNT;
+// Socials
+extern Graph SOCIAL_GRAPH;
 
 // Votings
 extern Voting *VOTINGS;
 extern int VOTING_CAPACITY;
 extern int VOTING_COUNT;
 
+// User saat ini
+extern int CURRENT_USER_INDEX;
+boolean isLoggedIn();
 #endif

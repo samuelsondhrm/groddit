@@ -22,11 +22,15 @@ int SUBGRODDIT_CAPACITY = 0;
 int SUBGRODDIT_COUNT = 0;
 
 // Social
-Social *SOCIALS = NULL;
-int SOCIAL_CAPACITY = 0;
-int SOCIAL_COUNT = 0;
+Graph SOCIAL_GRAPH;
 
 // Votings
 Voting *VOTINGS = NULL;
 int VOTING_CAPACITY = 0;
 int VOTING_COUNT = 0;
+
+// User saat ini
+int CURRENT_USER_INDEX = -1;
+boolean isLoggedIn() {
+    return (CURRENT_USER_INDEX != -1);
+}

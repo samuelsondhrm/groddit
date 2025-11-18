@@ -49,6 +49,14 @@ int main()
             printf("Keluar dari program.\n");
             quit = true;
         }
+        // else if (strCmp(command, "LOGIN") == 0)
+        // {
+        //     loginUser();
+        // }
+        // else if (strCmp(command, "LOGOUT") == 0)
+        // {
+        //     logoutUser();
+        // }
         else
         {
             printf("Perintah '%s' tidak dikenali.\n", commandStr);

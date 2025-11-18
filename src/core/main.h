@@ -7,6 +7,8 @@
 #include "../adt/header/MesinKata.h"
 #include "../adt/header/MesinKarakter.h"
 #include "../adt/header/ADTSederhana.h"
+#include "../adt/header/Graph.h"
+#include "../adt/header/ListBerkait.h"
 
 #include "../utils/header/initialize.h"
 #include "../utils/header/load-config.h"

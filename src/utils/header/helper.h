@@ -3,6 +3,7 @@
 
 #include "../../adt/header/MesinKata.h"
 #include <stdlib.h>
+#include <time.h>
 
 // Membandingkan dua Word
 int compareWord(Word a, Word b);
@@ -24,5 +25,11 @@ int ensureCapacity(void **array, int *capacity, int elementSize, int needed);
 
 // Membandingkan dua string
 int strCmp(const char *a, const char *b);
+
+// Mengubah format time_t ke string
+char *convertTimeToStr(time_t t);
+
+// Mengubah format string ke time_t
+time_t parseTime(const char *str);
 
 #endif
