@@ -49,7 +49,7 @@ static void printIndent(int d) {
 
 static void printNodeRec(AddrComment node, int depth) {
     printIndent(depth);
-    printf("- (%d) %s\n", node->data.comment_id, node->data.content.TabSentence);
+    printf("- (%d) %s\n", node->data.comment_id, node->data.content.TabWord);
 
     AddrChild p = node->children.head;
     while (p) {

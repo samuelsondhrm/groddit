@@ -1,13 +1,29 @@
 #include "header/user.h"
 
-int findUsername(const char *username)
+int findIdByUsername(const char *username)
 {
     for (int i = 0; i < USER_COUNT; i++)
     {
-        if (strCmp(USERS[i].username, username) == 0)
+        char currUsername[256];
+        wordToString(currUsername, USERS[i].username);
+        if (strCmp(currUsername, username) == 0)
             return i;
     }
     return -1;
+}
+
+char *findUsernameById(int id)
+{
+    static char buffer[256];
+
+    if (id < 0 || id >= USER_COUNT)
+    {
+        buffer[0] = '\0';
+        return buffer;
+    }
+
+    wordToString(buffer, USERS[id].username);
+    return buffer;
 }
 
 void generateUserID(char *id, int num)
@@ -27,9 +43,11 @@ void generateUserID(char *id, int num)
 
 void registerUser()
 {
-    if (CURRENT_USER != NULL)
+    if (CURRENT_USER_INDEX != -1)
     {
-        printf("Anda tidak dapat melakukan registrasi karena telah login sebagai %s\n", CURRENT_USER->username);
+        char *usn;
+        usn = findUsernameById(CURRENT_USER_INDEX);
+        printf("Anda tidak dapat melakukan registrasi karena telah login sebagai %s\n", usn);
         return;
     }
 
@@ -37,18 +55,18 @@ void registerUser()
     char password[25];
 
     printf("Masukkan username: ");
-    STARTWORD();
+    STARTWORD_INPUT();
     wordToString(username, currentWord);
     IgnoreNewline();
 
-    if (findUsername(username) != -1)
+    if (findIdByUsername(username) != -1)
     {
         printf("Maaf, username %s sudah terdaftar :(. Harap pilih username yang lain.\n", username);
         return;
     }
 
     printf("Masukkan kata sandi: ");
-    STARTWORD();
+    STARTWORD_INPUT();
     wordToString(password, currentWord);
     IgnoreNewline();
 
@@ -69,9 +87,17 @@ void registerUser()
     }
 
     User *u = &USERS[USER_COUNT];
-    generateUserID(u->user_id, USER_COUNT + 1);
-    copyString(u->username, username, 256);
-    copyString(u->password, password, 25);
+
+    char uid[8];
+    wordToString(uid, u->user_id);
+    generateUserID(uid, USER_COUNT + 1);
+
+    Word usn;
+    Word pw;
+    stringToWord(&usn, username);
+    stringToWord(&pw, password);
+    copyWord(&u->username, usn);
+    copyWord(&u->password, pw);
     u->karma = 0;
     u->created_at = time(NULL);
 
@@ -82,9 +108,11 @@ void registerUser()
 
 void loginUser()
 {
-    if (CURRENT_USER != NULL)
+    if (CURRENT_USER_INDEX != -1)
     {
-        printf("Anda tidak dapat melakukan login karena telah login sebagai %s.\n", CURRENT_USER->username);
+        char *usn;
+        usn = findUsernameById(CURRENT_USER_INDEX);
+        printf("Anda tidak dapat melakukan login karena telah login sebagai %s.\n", usn);
         return;
     }
 
@@ -92,11 +120,11 @@ void loginUser()
     char password[25];
 
     printf("Masukkan username: ");
-    STARTWORD();
+    STARTWORD_INPUT();
     wordToString(username, currentWord);
     IgnoreNewline();
 
-    int user_id = findUsername(username);
+    int user_id = findIdByUsername(username);
     if (user_id == -1)
     {
         printf("Maaf, username %s tidak ditemukan :(. Harap register terlebih dahulu.\n", username);
@@ -104,7 +132,7 @@ void loginUser()
     }
 
     printf("Masukkan kata sandi: ");
-    STARTWORD();
+    STARTWORD_INPUT();
     wordToString(password, currentWord);
     IgnoreNewline();
 
@@ -118,28 +146,30 @@ void loginUser()
         return;
     }
 
-    if (strCmp(password, USERS[user_id].password) != 0)
+    char *pwStr;
+    wordToString(pwStr, USERS[user_id].password);
+    if (strCmp(password, pwStr) != 0)
     {
         printf("Password salah!\n");
         return;
     }
 
-    CURRENT_USER = &USERS[user_id];
+    CURRENT_USER_INDEX = user_id;
 
     printf("Akun dengan username %s berhasil login! Selamat datang di Groddit!\n", username);
 }
 
 void logoutUser()
 {
-    if (CURRENT_USER == NULL)
+    if (CURRENT_USER_INDEX == -1)
     {
         printf("Anda belum login! Masuk terlebih dahulu untuk dapat mengakses Groddit.\n");
         return;
     }
 
-    CURRENT_USER = NULL;
+    CURRENT_USER_INDEX = -1;
 
-    if (CURRENT_USER == NULL)
+    if (CURRENT_USER_INDEX == -1)
     {
         printf("Anda berhasil logout. Sampai jumpa di pertemuan berikutnya!\n");
     }
@@ -149,11 +179,4 @@ void logoutUser()
     }
 
     return;
-}
-
-int findUserIndexByUsername(const char *username){
-    //TODO Implementasi fungsinya boy
-}
-const char *getUsernameByIndex(int idx){
-    //TODO Implementasi fungsinya boy
 }

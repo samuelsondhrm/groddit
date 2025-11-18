@@ -3,8 +3,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "boolean.h"
-#include "adt-sederhana.h"
+#include "Boolean.h"
+#include "ADTSederhana.h"
 
 /* ============================================================================
  *                          Element Variant Type
@@ -19,20 +19,23 @@
  * Setiap elemen memiliki tag type untuk identifikasi.
  */
 
-typedef enum {
+typedef enum
+{
     TYPE_USER,
     TYPE_POST,
     TYPE_COMMENT,
     TYPE_SUBGRODDIT
 } ElementType;
 
-typedef struct {
+typedef struct
+{
     ElementType type;
-    union {
+    union
+    {
         User user;
         Post post;
         Comment comment;
-        Subgroddit subgroddit;
+        SubGroddit subgroddit;
     } data;
 } ListElement;
 
@@ -40,19 +43,21 @@ typedef struct {
 ListElement makeUserElement(User u);
 ListElement makePostElement(Post p);
 ListElement makeCommentElement(Comment c);
-ListElement makeSubgrodditElement(Subgroddit s);
+ListElement makeSubgrodditElement(SubGroddit s);
 
 /* ============================================================================
  *                                 Node & List
  * ============================================================================
  */
 
-typedef struct Node {
+typedef struct Node
+{
     ListElement element;
     struct Node *next;
 } Node;
 
-typedef struct {
+typedef struct
+{
     Node *head;
 } List;
 
@@ -66,7 +71,7 @@ typedef struct {
  * @param elem  Elemen yang ingin dimasukkan ke node.
  * @return      Pointer ke Node baru; NULL jika alokasi gagal.
  */
-Node* newNode(ListElement elem);
+Node *newNode(ListElement elem);
 
 /* ============================================================================
  *                          Create & Validation
@@ -129,8 +134,7 @@ void deleteAtList(List *L, int idx, ListElement *out);
 int indexOfList(
     List L,
     ListElement target,
-    boolean (*cmp)(ListElement a, ListElement b)
-);
+    boolean (*cmp)(ListElement a, ListElement b));
 
 /* ============================================================================
  *                          Traversal / Display

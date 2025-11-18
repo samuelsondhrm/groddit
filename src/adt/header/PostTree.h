@@ -3,8 +3,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "boolean.h"
-#include "adt-sederhana.h"
+#include "Boolean.h"
+#include "ADTSederhana.h"
 
 /* ============================================================================
  *                              Comment Tree Node
@@ -27,24 +27,26 @@ typedef struct CommentNode *AddrComment;
 
 typedef struct ChildNode *AddrChild;
 
-typedef struct ChildNode {
-    AddrComment info;      /* pointer ke node komentar */
-    AddrChild next;        /* next sibling */
+typedef struct ChildNode
+{
+    AddrComment info; /* pointer ke node komentar */
+    AddrChild next;   /* next sibling */
 } ChildNode;
 
-typedef struct {
-    AddrChild head;        /* head of children list */
+typedef struct
+{
+    AddrChild head; /* head of children list */
 } CommentChildrenList;
 
 /* ============================================================================
  *                               Comment Node
  * ==========================================================================*/
 
-typedef struct CommentNode {
+typedef struct CommentNode
+{
     Comment data;                 /* data komentar (value) */
     CommentChildrenList children; /* daftar anak komentar */
 } CommentNode;
-
 
 /* ============================================================================
  *                                  PostTree
@@ -54,11 +56,11 @@ typedef struct CommentNode {
  * - children : daftar komentar level-1 (CommentNode*)
  * ==========================================================================*/
 
-typedef struct {
+typedef struct
+{
     Post root;                    /* data post (root) */
     CommentChildrenList children; /* komentar level pertama */
 } PostTree;
-
 
 /* ============================================================================
  *                                 PRIMITIVES
@@ -100,7 +102,7 @@ void AddCommentToNode(AddrComment parent, Comment c);
  * @brief Menambahkan komentar sesuai parent_comment_id.
  *
  * @param T Pointer ke PostTree
- * @param parent_comment_id -1 untuk komentar level pertama, 
+ * @param parent_comment_id -1 untuk komentar level pertama,
  *                          selain itu reply ke komentar tertentu
  * @param c Komentar baru
  */

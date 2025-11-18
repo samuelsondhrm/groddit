@@ -21,7 +21,7 @@ ListElement makeCommentElement(Comment c) {
     return e;
 }
 
-ListElement makeSubgrodditElement(Subgroddit s) {
+ListElement makeSubgrodditElement(SubGroddit s) {
     ListElement e;
     e.type = TYPE_SUBGRODDIT;
     e.data.subgroddit = s;

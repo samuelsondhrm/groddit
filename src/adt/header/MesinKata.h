@@ -1,49 +1,29 @@
-#ifndef __MESINKATA_H__
-#define __MESINKATA_H__
+#ifndef MESINKATA_H
+#define MESINKATA_H
 
-#include "boolean.h"
 #include "MesinKarakter.h"
 
-#define NMax 999
+#define NMax 200
 #define BLANK ' '
 
-typedef struct
-{
-   char TabWord[NMax]; /* container penyimpan kata, indeks yang dipakai [0..NMax-1] */
-   int Length;
+typedef struct {
+    char TabWord[NMax];
+    int Length;
 } Word;
 
-/* State Mesin Word */
-extern boolean EndWord;
 extern Word currentWord;
 
-void IgnoreBlanks();
-/* Mengabaikan satu atau beberapa BLANK
-   I.S. : currentChar sembarang
-   F.S. : currentChar ≠ BLANK atau currentChar = MARK */
+// INPUT MODE
+extern boolean EndWordInput;
+void STARTWORD_INPUT();
+void ADVWORD_INPUT();
 
-void IgnoreNewline();
-// Mengabaikan \n dan \r pada suatu kata
+// CSV MODE
+extern boolean EndWordCSV;
+void STARTWORD_CSV(const char *filename);
+void ADVWORD_CSV();
 
-void STARTWORD();
-/* I.S. : currentChar sembarang
-   F.S. : EndWord = true, dan currentChar = MARK;
-          atau EndWord = false, currentWord adalah kata yang sudah diakuisisi,
-          currentChar karakter pertama sesudah karakter terakhir kata */
-
-void ADVWORD();
-/* I.S. : currentChar adalah karakter pertama kata yang akan diakuisisi
-   F.S. : currentWord adalah kata terakhir yang sudah diakuisisi,
-          currentChar adalah karakter pertama dari kata berikutnya, mungkin MARK
-          Jika currentChar = MARK, EndWord = true.
-   Proses : Akuisisi kata menggunakan procedure SalinWord */
-
-void CopyWord();
-/* Mengakuisisi kata, menyimpan dalam currentWord
-   I.S. : currentChar adalah karakter pertama dari kata
-   F.S. : currentWord berisi kata yang sudah diakuisisi;
-          currentChar = BLANK atau currentChar = MARK;
-          currentChar adalah karakter sesudah karakter terakhir yang diakuisisi.
-          Jika panjang kata melebihi NMax, maka sisa kata "dipotong" */
+void CopyFieldCSV();
+void CopyWordInput();
 
 #endif

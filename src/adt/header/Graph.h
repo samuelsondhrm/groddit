@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "boolean.h"
+#include "Boolean.h"
 
 /* ============================================================================
  *                              Definisi Tipe
@@ -19,14 +19,16 @@
 
 typedef struct tAdjNode *AdjAddr;
 
-typedef struct tAdjNode {
-    int v;          /* index vertex tetangga (0..nVertex-1) */
-    AdjAddr next;   /* pointer ke node berikutnya */
+typedef struct tAdjNode
+{
+    int v;        /* index vertex tetangga (0..nVertex-1) */
+    AdjAddr next; /* pointer ke node berikutnya */
 } AdjNode;
 
-typedef struct {
-    int nVertex;    /* jumlah vertex saat ini (0..nVertex-1) */
-    AdjAddr *adj;   /* array of adjacency-list head, panjang nVertex */
+typedef struct
+{
+    int nVertex;  /* jumlah vertex saat ini (0..nVertex-1) */
+    AdjAddr *adj; /* array of adjacency-list head, panjang nVertex */
 } Graph;
 
 #define IDX_UNDEF (-1)

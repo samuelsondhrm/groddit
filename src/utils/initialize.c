@@ -1,9 +1,4 @@
-#include <stdio.h>
-#include "../../adt/header/MesinKata.h"
-#include "../../adt/header/adt-sederhana.h"
 #include "header/initialize.h"
-#include "header/load-config.h"
-#include "header/global-data.h"
 
 void buildPath(char *out, const char *folder, const char *file)
 {
@@ -31,45 +26,23 @@ void initialize()
 {
     printf("Selamat datang di Groddit!\n\n");
     printf("Masukkan folder konfigurasi untuk dimuat: ");
+    fflush(stdout);
 
-    STARTWORD();
-    IgnoreNewline();
-    IgnoreBlanks();
+    MODE = MODE_INPUT;
+    STARTWORD_INPUT();
+
+    if (currentWord.Length == 0)
+    {
+        printf("[Error] Nama folder tidak boleh kosong!\n");
+        printf("Masukkan folder konfigurasi untuk dimuat: ");
+        fflush(stdout);
+        STARTWORD_INPUT();
+    }
 
     printf("\n");
 
     char folder[50];
     wordToString(folder, currentWord);
-
-    // Users
-    char pathUsers[150];
-    buildPath(pathUsers, folder, "user.csv");
-
-    USER_COUNT = loadUsers(pathUsers, &USERS, &USER_CAPACITY);
-
-    if (USER_COUNT == -1)
-    {
-        printf("[Gagal] Memuat users dari %s\n", pathUsers);
-    }
-    else
-    {
-        printf("[OK] Memuat %d user\n", USER_COUNT);
-    }
-
-    // Posts
-    char pathPosts[150];
-    buildPath(pathPosts, folder, "post.csv");
-
-    POST_COUNT = loadPosts(pathPosts, &POSTS, &POST_CAPACITY);
-
-    if (POST_COUNT == -1)
-    {
-        printf("[Gagal] Memuat posts dari %s\n", pathPosts);
-    }
-    else
-    {
-        printf("[OK] Memuat %d post\n", POST_COUNT);
-    }
 
     // Comments
     char pathComments[150];
@@ -79,58 +52,55 @@ void initialize()
 
     if (COMMENT_COUNT == -1)
     {
-        printf("[Gagal] Memuat komentars dari %s\n", pathComments);
+        printf("[Gagal] Memuat komentar dari %s\n", pathComments);
     }
     else
     {
-        printf("[OK] Memuat %d komentar\n", COMMENT_COUNT);
+        printf("[OK] Memuat %d komentar dari %s\n", COMMENT_COUNT, pathComments);
     }
 
-    // Subgroddits
-    char pathSubgroddits[150];
-    buildPath(pathSubgroddits, folder, "subgroddit.csv");
+    // Posts
+    char pathPosts[150];
+    buildPath(pathPosts, folder, "post.csv");
+    POST_COUNT = loadPosts(pathPosts, &POSTS, &POST_CAPACITY);
+    if (POST_COUNT == -1)
+        printf("[Gagal] Memuat posts dari %s\n", pathPosts);
+    else
+        printf("[OK] Memuat %d posts dari %s\n", POST_COUNT, pathPosts);
 
-    SUBGRODDIT_COUNT = loadSubgroddits(pathSubgroddits, &SUBGRODDITS, &SUBGRODDIT_CAPACITY);
+    // Users
+    char pathUsers[150];
+    buildPath(pathUsers, folder, "user.csv");
+    USER_COUNT = loadUsers(pathUsers, &USERS, &USER_CAPACITY);
+    if (USER_COUNT == -1)
+        printf("[Gagal] Memuat users dari %s\n", pathUsers);
+    else
+        printf("[OK] Memuat %d users dari %s\n", USER_COUNT, pathUsers);
 
+    // SubGroddits
+    char pathSubs[150];
+    buildPath(pathSubs, folder, "subgroddit.csv");
+    SUBGRODDIT_COUNT = loadSubGroddits(pathSubs, &SUBGRODDITS, &SUBGRODDIT_CAPACITY);
     if (SUBGRODDIT_COUNT == -1)
-    {
-        printf("[Gagal] Memuat subgroddits dari %s\n", pathSubgroddits);
-    }
+        printf("[Gagal] Memuat subgroddits dari %s\n", pathSubs);
     else
-    {
-        printf("[OK] Memuat %d subgroddits\n", SUBGRODDIT_COUNT);
-    }
+        printf("[OK] Memuat %d subgroddits dari %s\n", SUBGRODDIT_COUNT, pathSubs);
 
     // Socials
-    char pathSocial[150];
-    buildPath(pathSocial, folder, "social.csv");
-
-    SOCIAL_COUNT = loadSocial(pathSocial, &SOCIALS, &SOCIAL_CAPACITY);
-
+    char pathSocials[150];
+    buildPath(pathSocials, folder, "social.csv");
+    SOCIAL_COUNT = loadSocials(pathSocials, &SOCIALS, &SOCIAL_CAPACITY);
     if (SOCIAL_COUNT == -1)
-    {
-        printf("[Gagal] Memuat social dari %s\n", pathSocial);
-    }
+        printf("[Gagal] Memuat socials dari %s\n", pathSocials);
     else
-    {
-        printf("[OK] Memuat %d relasi social\n", SOCIAL_COUNT);
-    }
+        printf("[OK] Memuat %d socials dari %s\n", SOCIAL_COUNT, pathSocials);
 
     // Votings
-    char pathVoting[150];
-    buildPath(pathVoting, folder, "voting.csv");
-
-    VOTING_COUNT = loadVoting(pathVoting, &VOTINGS, &VOTING_CAPACITY);
-
+    char pathVotings[150];
+    buildPath(pathVotings, folder, "voting.csv");
+    VOTING_COUNT = loadVotings(pathVotings, &VOTINGS, &VOTING_CAPACITY);
     if (VOTING_COUNT == -1)
-    {
-        printf("[Gagal] Memuat voting dari %s\n", pathVoting);
-    }
+        printf("[Gagal] Memuat votings dari %s\n", pathVotings);
     else
-    {
-        printf("[OK] Memuat %d voting\n", VOTING_COUNT);
-    }
-
-    printf("\nKonfigurasi selesai dimuat!\n");
-    printf(">> ");
+        printf("[OK] Memuat %d votings dari %s\n", VOTING_COUNT, pathVotings);
 }
