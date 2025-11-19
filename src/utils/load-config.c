@@ -126,7 +126,11 @@ int loadPosts(const char *filepath, Post **postPtr, int *capacityPtr)
                 copyWord(&P->content, currentWord);
                 break;
             case 5:
-                copyWord(&P->created_at, currentWord);
+            {
+                char created_at_str[64];
+                wordToString(created_at_str, currentWord);
+                P->created_at = parseTime(created_at_str);
+            }
                 break;
             case 6:
                 P->upvotes = wordToInt(currentWord);
@@ -193,9 +197,11 @@ int loadUsers(const char *filepath, User **userPtr, int *capacityPtr)
                 U->karma = wordToInt(currentWord);
                 break;
             case 4:
-                char created_at_str[64];
-                copyWord(&created_at_str, currentWord);
-                U->created_at = parseTime(created_at_str);
+                {
+                    char created_at_str[64];
+                    wordToString(created_at_str, currentWord);
+                    U->created_at = parseTime(created_at_str);
+                }
                 break;
             }
             colidx++;

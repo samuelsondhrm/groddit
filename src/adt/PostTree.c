@@ -1,4 +1,4 @@
-#include "PostTree.h"
+#include "header/PostTree.h"
 
 static void createChildrenList(CommentChildrenList *L) {
     L->head = NULL;
@@ -18,6 +18,7 @@ static void insertLastChild(CommentChildrenList *L, AddrComment node) {
     }
 }
 
+/*
 static void deleteChildNode(CommentChildrenList *L, AddrComment target) {
     AddrChild p = L->head, prev = NULL;
     while (p) {
@@ -31,6 +32,7 @@ static void deleteChildNode(CommentChildrenList *L, AddrComment target) {
         p = p->next;
     }
 }
+*/
 
 static void deleteRec(AddrComment node) {
     AddrChild p = node->children.head;
