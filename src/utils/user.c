@@ -89,8 +89,11 @@ void registerUser()
     User *u = &USERS[USER_COUNT];
 
     char uid[8];
-    wordToString(uid, u->user_id);
     generateUserID(uid, USER_COUNT + 1);
+
+    Word uidWord;
+    stringToWord(&uidWord, uid);
+    copyWord(&u->user_id, uidWord);
 
     Word usn;
     Word pw;
@@ -146,7 +149,7 @@ void loginUser()
         return;
     }
 
-    char *pwStr;
+    char pwStr[256];
     wordToString(pwStr, USERS[user_id].password);
     if (strCmp(password, pwStr) != 0)
     {

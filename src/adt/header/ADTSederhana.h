@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include "MesinKata.h"
+#include <time.h>
 
 typedef struct
 {

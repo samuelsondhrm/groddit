@@ -18,6 +18,7 @@ void initPost(Post *p)
     p->author_id.Length = 0;
     p->title.Length = 0;
     p->content.Length = 0;
+    p->created_at = 0;
     p->upvotes = 0;
     p->downvotes = 0;
 }
@@ -28,6 +29,7 @@ void initUser(User *u)
     u->username.Length = 0;
     u->password.Length = 0;
     u->karma = 0;
+    u->created_at = 0;
 }
 
 void initSubGroddit(SubGroddit *s)
