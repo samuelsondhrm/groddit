@@ -3,7 +3,6 @@
 int main()
 {
     initialize();
-    printUsers();
     char commandStr[50];
     boolean quit = false;
 
@@ -50,13 +49,48 @@ int main()
             printf("Keluar dari program.\n");
             quit = true;
         }
+        else if (strCmp(commandStr, "REGISTER") == 0)
+        {
+            registerUser();
+        }
         else if (strCmp(commandStr, "LOGIN") == 0)
         {
-            loginUser();
+            ADVWORD_INPUT();
+
+            if (currentWord.Length != 0) {
+                while (currentWord.Length != 0) {
+                    ADVWORD_INPUT();
+                }
+                printf("Format perintah LOGIN salah. Gunakan 'LOGIN;' tanpa argumen.\n");
+            } else {
+                loginUser();
+            }
         }
         else if (strCmp(commandStr, "LOGOUT") == 0)
         {
             logoutUser();
+        }
+        else if (strCmp(commandStr, "PROFILE") == 0)
+        {
+            ADVWORD_INPUT();
+
+            if (currentWord.Length == 0) {
+                printf("Username tidak boleh kosong.\n");
+            } else {
+                char username[256];
+                wordToString(username, currentWord);
+
+                ADVWORD_INPUT();
+
+                if (currentWord.Length != 0) {
+                    while (currentWord.Length != 0) {
+                        ADVWORD_INPUT();
+                    }
+                    printf("Format perintah PROFILE salah. Gunakan 'PROFILE <username>;' tanpa argumen lain.\n");
+                } else {
+                    showUserProfile(username);
+                }
+            }
         }
         else
         {

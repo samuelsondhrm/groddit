@@ -19,12 +19,15 @@ void ADVINPUT()
 {
        int ret = fscanf(pita, "%c", &currentChar);
 
-       if (ret == CHAR_MARK)
+       if (ret == EOF)
        {
               EOP = true;
+              currentChar = EOF;
        }
-       IgnoreBlanks();
-       IgnoreNewline();
+       else
+       {
+              EOP = false;
+       }
 }
 
 void STARTCSV(const char *filename)

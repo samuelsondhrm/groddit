@@ -21,6 +21,7 @@ void STARTWORD_INPUT()
     if (currentChar == CHAR_MARK)
     {
         EndWordInput = true;
+        currentWord.Length = 0;
     }
     else
     {
@@ -41,10 +42,12 @@ void ADVWORD_INPUT()
     if (currentChar == CHAR_MARK)
     {
         EndWordInput = true;
+        currentWord.Length = 0;
     }
     else if (EOP)
     {
         EndWordInput = true;
+        currentWord.Length = 0;
     }
     else
     {
