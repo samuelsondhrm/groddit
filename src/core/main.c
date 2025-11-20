@@ -48,12 +48,16 @@ int main()
         {
             ADVWORD_INPUT();
 
-            if (currentWord.Length != 0) {
-                while (currentWord.Length != 0) {
+            if (currentWord.Length != 0)
+            {
+                while (currentWord.Length != 0)
+                {
                     ADVWORD_INPUT();
                 }
                 printf("Format perintah POST salah. Gunakan 'POST;' tanpa argumen.\n");
-            } else {
+            }
+            else
+            {
                 commandPost();
             }
         }
@@ -78,12 +82,16 @@ int main()
         {
             ADVWORD_INPUT();
 
-            if (currentWord.Length != 0) {
-                while (currentWord.Length != 0) {
+            if (currentWord.Length != 0)
+            {
+                while (currentWord.Length != 0)
+                {
                     ADVWORD_INPUT();
                 }
                 printf("Format perintah LOGIN salah. Gunakan 'LOGIN;' tanpa argumen.\n");
-            } else {
+            }
+            else
+            {
                 loginUser();
             }
         }
@@ -95,22 +103,46 @@ int main()
         {
             ADVWORD_INPUT();
 
-            if (currentWord.Length == 0) {
+            if (currentWord.Length == 0)
+            {
                 printf("Username tidak boleh kosong.\n");
-            } else {
+            }
+            else
+            {
                 char username[256];
                 wordToString(username, currentWord);
 
                 ADVWORD_INPUT();
 
-                if (currentWord.Length != 0) {
-                    while (currentWord.Length != 0) {
+                if (currentWord.Length != 0)
+                {
+                    while (currentWord.Length != 0)
+                    {
                         ADVWORD_INPUT();
                     }
                     printf("Format perintah PROFILE salah. Gunakan 'PROFILE <username>;' tanpa argumen lain.\n");
-                } else {
+                }
+                else
+                {
                     showUserProfile(username);
                 }
+            }
+        }
+        else if (strCmp(commandStr, "LOAD") == 0)
+        {
+            ADVWORD_INPUT();
+
+            if (currentWord.Length != 0)
+            {
+                while (currentWord.Length != 0)
+                {
+                    ADVWORD_INPUT();
+                }
+                printf("Format perintah LOAD salah. Gunakan 'LOAD;' tanpa argumen.\n");
+            }
+            else
+            {
+                commandLoad();
             }
         }
         else

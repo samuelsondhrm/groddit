@@ -11,6 +11,9 @@
 // Membentuk path
 void buildPath(char *out, const char *folder, const char *file);
 
+// Validasi folder konfigurasi
+int isFolderValid(const char *folder);
+
 // Inisialisasi
 void initialize();
 

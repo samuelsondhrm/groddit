@@ -49,7 +49,7 @@ int isFolderValid(const char *folder)
 
 void initialize()
 {
-    system("clear");
+    // system("clear");
     printf("Selamat datang di Groddit!\n\n");
 
     char folder[50];
