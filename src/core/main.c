@@ -162,6 +162,71 @@ int main()
                 commandSave();
             }
         }
+        else if (strCmp(commandStr, "CREATE_SUBGRODDIT") == 0)
+        {
+            ADVWORD_INPUT();
+
+            if (currentWord.Length == 0)
+            {
+                printf("[Error] Nama subgroddit tidak boleh kosong!\n");
+            }
+            else
+            {
+                // Restore the word to currentWord for commandCreateSubgroddit
+                Word tempWord = currentWord;
+
+                ADVWORD_INPUT();
+
+                if (currentWord.Length != 0)
+                {
+                    while (currentWord.Length != 0)
+                    {
+                        ADVWORD_INPUT();
+                    }
+                    printf("Format perintah CREATE_SUBGRODDIT salah. Gunakan 'CREATE_SUBGRODDIT <NAME>;' tanpa argumen lain.\n");
+                }
+                else
+                {
+                    // Process subgroddit creation with the name
+                    char subgroddit_name[256];
+                    wordToString(subgroddit_name, tempWord);
+
+                    // Validate that name starts with "r/"
+                    if (tempWord.Length < 2 || subgroddit_name[0] != 'r' || subgroddit_name[1] != '/')
+                    {
+                        printf("[Error] Nama Subgroddit HARUS UNIK dan diawali dengan \"r/\".\n");
+                    }
+                    else if (findSubgrodditIndexByName(subgroddit_name) != -1)
+                    {
+                        printf("[Error] Nama Subgroddit HARUS UNIK dan diawali dengan \"r/\".\n");
+                    }
+                    else
+                    {
+                        // Create new subgroddit
+                        SubGroddit newSubgroddit;
+                        initSubGroddit(&newSubgroddit);
+
+                        // Generate subgroddit_id with format S00X
+                        char id_str[256];
+                        sprintf(id_str, "S%03d", SUBGRODDIT_COUNT + 1);
+                        stringToWord(&newSubgroddit.subgroddit_id, id_str);
+
+                        // Set name
+                        stringToWord(&newSubgroddit.name, subgroddit_name);
+
+                        // Insert into linked list
+                        ListElement elem;
+                        elem.type = TYPE_SUBGRODDIT;
+                        elem.data.subgroddit = newSubgroddit;
+                        insertLastList(&SUBGRODDITS, elem);
+
+                        SUBGRODDIT_COUNT++;
+
+                        printf("Subgroddit %s berhasil dibuat!\n", subgroddit_name);
+                    }
+                }
+            }
+        }
         else
         {
             printf("Perintah '%s' tidak dikenali.\n", commandStr);

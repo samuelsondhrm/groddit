@@ -20,5 +20,6 @@
 #include "../utils/User/User.h"
 #include "../utils/Profil/Profil.h"
 #include "../utils/Post/Post.h"
+#include "../utils/Subgroddit/Subgroddit.h"
 
 #endif
