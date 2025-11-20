@@ -4,9 +4,14 @@ int countUserPosts(int userIndex) {
     // Menghitung post milik user userIndex
     int count = 0;
     Word userId = USERS[userIndex].user_id;
-    for (int i = 0; i < POST_COUNT; i++) {
-        if (compareWord(POSTS[i].author_id, userId) == 0)
-            count++;
+    Node *p = POSTS.head;
+    while (p != NULL) {
+        if (p->element.type == TYPE_POST) {
+            Post post = p->element.data.post;
+            if (compareWord(post.author_id, userId) == 0)
+                count++;
+        }
+        p = p->next;
     }
     return count;
 }
@@ -67,12 +72,17 @@ int computeUserKarma(int userIndex) {
     Word userId = USERS[userIndex].user_id;
 
     // Hitung karma untuk post
-    for (int i = 0; i < POST_COUNT; i++) {
-        if (compareWord(POSTS[i].author_id, userId) == 0)
-        {
-            karma += POSTS[i].upvotes;
-            karma -= POSTS[i].downvotes;
+    Node *p = POSTS.head;
+    while (p != NULL) {
+        if (p->element.type == TYPE_POST) {
+            Post post = p->element.data.post;
+            if (compareWord(post.author_id, userId) == 0)
+            {
+                karma += post.upvotes;
+                karma -= post.downvotes;
+            }
         }
+        p = p->next;
     }
 
     // Hitung karma untuk komen
@@ -99,18 +109,24 @@ void findLatestPostsForUser(int userIndex, int indices[3], int *foundCount) {
         time_t bestTime = 0;
         int bestIdx = -1;
 
-        for (int i = 0; i < POST_COUNT; i++) {
-            if (compareWord(POSTS[i].author_id, userId) != 0)
-                continue;
-
-            // Jangan pilih post yang sudah dipilih sebelumnya
-            if ((k >= 1 && i == indices[0]) || (k >= 2 && i == indices[1]))
-                continue;
-
-            if (bestIdx == -1 || POSTS[i].created_at > bestTime) {
-                bestIdx = i;
-                bestTime = POSTS[i].created_at;
+        int idx = 0;
+        Node *p = POSTS.head;
+        while (p != NULL) {
+            if (p->element.type == TYPE_POST) {
+                Post post = p->element.data.post;
+                if (compareWord(post.author_id, userId) == 0)
+                {
+                    // Jangan pilih post yang sudah dipilih sebelumnya
+                    if (!((k >= 1 && idx == indices[0]) || (k >= 2 && idx == indices[1]))) {
+                        if (bestIdx == -1 || post.created_at > bestTime) {
+                            bestIdx = idx;
+                            bestTime = post.created_at;
+                        }
+                    }
+                }
+                idx++;
             }
+            p = p->next;
         }
 
         if (bestIdx == -1)
@@ -124,12 +140,16 @@ void findLatestPostsForUser(int userIndex, int indices[3], int *foundCount) {
 void getSubgrodditName(Word subId, char *out) {
     // default to ID jika tidak ketemu
     wordToString(out, subId);
-
-    for (int i = 0; i < SUBGRODDIT_COUNT; i++) {
-        if (compareWord(SUBGRODDITS[i].subgroddit_id, subId) == 0) {
-            wordToString(out, SUBGRODDITS[i].name);
-            return;
+    Node *p = SUBGRODDITS.head;
+    while (p != NULL) {
+        if (p->element.type == TYPE_SUBGRODDIT) {
+            SubGroddit s = p->element.data.subgroddit;
+            if (compareWord(s.subgroddit_id, subId) == 0) {
+                wordToString(out, s.name);
+                return;
+            }
         }
+        p = p->next;
     }
 }
 
@@ -185,7 +205,23 @@ void showUserProfile(const char *username) {
         printf("Post Terbaru:\n");
         for (int i = 0; i < foundCount; i++) {
             int pIdx = latestIdx[i];
-            Post *p = &POSTS[pIdx];
+
+            int idx = 0;
+            Node *pNode = POSTS.head;
+            while (pNode != NULL) {
+                if (pNode->element.type == TYPE_POST) {
+                    if (idx == pIdx) {
+                        break;
+                    }
+                    idx++;
+                }
+                pNode = pNode->next;
+            }
+            if (pNode == NULL || pNode->element.type != TYPE_POST) {
+                continue;
+            }
+
+            Post *p = &pNode->element.data.post;
 
             char subName[256];
             char titleStr[256];

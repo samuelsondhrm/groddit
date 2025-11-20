@@ -147,3 +147,39 @@ time_t parseTime(const char *str)
 
     return mktime(&t);
 }
+
+void readLineWord(Word *out)
+{
+    out->Length = 0;
+
+    STARTWORD_INPUT();
+
+    if (currentWord.Length == 0)
+    {
+        return;
+    }
+
+    // Salin kata pertama
+    copyWord(out, currentWord);
+
+    // Gabungkan token berikutnya hingga tanda ';' tercapai
+    while (!EndWordInput)
+    {
+        ADVWORD_INPUT();
+
+        if (EndWordInput || currentWord.Length == 0)
+        {
+            break;
+        }
+
+        if (out->Length < NMax)
+        {
+            out->TabWord[out->Length++] = ' ';
+        }
+
+        for (int i = 0; i < currentWord.Length && out->Length < NMax; i++)
+        {
+            out->TabWord[out->Length++] = currentWord.TabWord[i];
+        }
+    }
+}

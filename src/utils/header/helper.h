@@ -35,4 +35,7 @@ void timeToStr(char *out, time_t t);
 // Mengubah format string ke time_t
 time_t parseTime(const char *str);
 
+// Membaca satu baris input (bisa mengandung spasi) hingga tanda ';' dan menyimpannya ke Word
+void readLineWord(Word *out);
+
 #endif
