@@ -3,20 +3,20 @@
 
 #include <stdio.h>
 
-#include "../adt/header/Boolean.h"
-#include "../adt/header/MesinKata.h"
-#include "../adt/header/MesinKarakter.h"
-#include "../adt/header/ADTSederhana.h"
-#include "../adt/header/Graph.h"
-#include "../adt/header/ListBerkait.h"
+#include "../adt/Boolean/Boolean.h"
+#include "../adt/MesinKata/MesinKata.h"
+#include "../adt/MesinKarakter/MesinKarakter.h"
+#include "../adt/ADTSederhana/ADTSederhana.h"
+#include "../adt/Graph/Graph.h"
+#include "../adt/ListBerkait/ListBerkait.h"
 
-#include "../utils/header/initialize.h"
-#include "../utils/header/load-config.h"
-#include "../utils/header/global-data.h"
-#include "../utils/header/helper.h"
-#include "../utils/header/print.h"
-#include "../utils/header/user.h"
-#include "../utils/header/Profil.h"
-#include "../utils/header/Post.h"
+#include "../utils/Initialize/Initialize.h"
+#include "../utils/Load/Load.h"
+#include "../utils/GlobalData/GlobalData.h"
+#include "../utils/Helper/Helper.h"
+#include "../utils/Print/Print.h"
+#include "../utils/User/User.h"
+#include "../utils/Profil/Profil.h"
+#include "../utils/Post/Post.h"
 
 #endif

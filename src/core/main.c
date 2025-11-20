@@ -8,7 +8,7 @@ int main()
 
     while (!quit)
     {
-        printf("\nMasukkan perintah: ");
+        printf("Masukkan perintah: ");
         fflush(stdout);
 
         STARTWORD_INPUT();
