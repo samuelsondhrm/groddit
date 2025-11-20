@@ -1,6 +1,7 @@
 #include "header/Post.h"
 
 int findSubgrodditIndexByName(const char *subName) {
+    // Mencari index Subgroddit berdasarkan nama
     char nameBuf[256];
     int idx = 0;
     Node *p = SUBGRODDITS.head;
@@ -19,6 +20,7 @@ int findSubgrodditIndexByName(const char *subName) {
 }
 
 int findPostIndexById(const char *postId) {
+    // Mencari index Post berdasarkan ID
     char idBuf[256];
     int idx = 0;
     Node *p = POSTS.head;
@@ -35,6 +37,7 @@ int findPostIndexById(const char *postId) {
 }
 
 void generatePostID(char *id, int num) {
+    // Membuat ID Post dengan format "PXYZ"
     id[0] = 'P';
     int hundreds = (num / 100) % 10;
     int tens = (num / 10) % 10;
@@ -45,9 +48,8 @@ void generatePostID(char *id, int num) {
     id[4] = '\0';
 }
 
-/* Mengambil angka dari post_id dengan format "PXYZ" (3 digit).
- * Jika format tidak valid, mengembalikan 0. */
 int getPostNumberFromWord(Word postId) {
+    // Mengambil angka dari post_id dengan format "PXYZ" (3 digit).
     char buf[16];
     wordToString(buf, postId);
 
@@ -62,9 +64,8 @@ int getPostNumberFromWord(Word postId) {
     return hundreds * 100 + tens * 10 + ones;
 }
 
-/* Menghitung MEX (minimum excluded) dari nomor post yang sudah ada.
- * Dengan POST_COUNT = N, MEX selalu berada di [1, N+1]. */
 int getNextPostNumberMex() {
+    // Menghitung MEX (minimum excluded) dari nomor post yang sudah ada.
     int maxCheck = POST_COUNT + 2; // cukup untuk menjamin ada MEX
     int used[maxCheck];
     for (int i = 0; i < maxCheck; i++) used[i] = 0;
