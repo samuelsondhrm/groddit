@@ -62,7 +62,7 @@ void initialize()
     // Posts
     char pathPosts[150];
     buildPath(pathPosts, folder, "post.csv");
-    POST_COUNT = loadPosts(pathPosts, &POSTS, &POST_CAPACITY);
+    POST_COUNT = loadPosts(pathPosts, &POSTS);
     if (POST_COUNT == -1)
         printf("[Gagal] Memuat posts dari %s\n", pathPosts);
     else
@@ -80,7 +80,7 @@ void initialize()
     // SubGroddits
     char pathSubs[150];
     buildPath(pathSubs, folder, "subgroddit.csv");
-    SUBGRODDIT_COUNT = loadSubGroddits(pathSubs, &SUBGRODDITS, &SUBGRODDIT_CAPACITY);
+    SUBGRODDIT_COUNT = loadSubGroddits(pathSubs, &SUBGRODDITS);
     if (SUBGRODDIT_COUNT == -1)
         printf("[Gagal] Memuat subgroddits dari %s\n", pathSubs);
     else

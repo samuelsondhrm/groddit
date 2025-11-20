@@ -17,5 +17,6 @@
 #include "../utils/header/print.h"
 #include "../utils/header/user.h"
 #include "../utils/header/Profil.h"
+#include "../utils/header/Post.h"
 
 #endif

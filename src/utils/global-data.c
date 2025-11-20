@@ -7,8 +7,7 @@ int COMMENT_CAPACITY = 0;
 int COMMENT_COUNT = 0;
 
 // Posts
-Post *POSTS = NULL;
-int POST_CAPACITY = 0;
+List POSTS;
 int POST_COUNT = 0;
 
 // Users
@@ -17,8 +16,7 @@ int USER_CAPACITY = 0;
 int USER_COUNT = 0;
 
 // SubGroddits
-SubGroddit *SUBGRODDITS = NULL;
-int SUBGRODDIT_CAPACITY = 0;
+List SUBGRODDITS;
 int SUBGRODDIT_COUNT = 0;
 
 // Social

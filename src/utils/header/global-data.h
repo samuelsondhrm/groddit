@@ -10,9 +10,8 @@ extern Comment *COMMENTS;
 extern int COMMENT_CAPACITY;
 extern int COMMENT_COUNT;
 
-// Posts
-extern Post *POSTS;
-extern int POST_CAPACITY;
+// Posts (disimpan dalam ListBerkait)
+extern List POSTS;
 extern int POST_COUNT;
 
 // Users
@@ -20,9 +19,8 @@ extern User *USERS;
 extern int USER_CAPACITY;
 extern int USER_COUNT;
 
-// SubGroddits
-extern SubGroddit *SUBGRODDITS;
-extern int SUBGRODDIT_CAPACITY;
+// SubGroddits (disimpan dalam ListBerkait)
+extern List SUBGRODDITS;
 extern int SUBGRODDIT_COUNT;
 
 // Social

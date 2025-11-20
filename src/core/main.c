@@ -44,6 +44,27 @@ int main()
         {
             printVotings();
         }
+        else if (strCmp(commandStr, "POST") == 0)
+        {
+            ADVWORD_INPUT();
+
+            if (currentWord.Length != 0) {
+                while (currentWord.Length != 0) {
+                    ADVWORD_INPUT();
+                }
+                printf("Format perintah POST salah. Gunakan 'POST;' tanpa argumen.\n");
+            } else {
+                commandPost();
+            }
+        }
+        else if (strCmp(commandStr, "VIEW_POST") == 0)
+        {
+            commandViewPost();
+        }
+        else if (strCmp(commandStr, "DELETE_POST") == 0)
+        {
+            commandDeletePost();
+        }
         else if (strCmp(commandStr, "EXIT") == 0 || strCmp(commandStr, "QUIT") == 0)
         {
             printf("Keluar dari program.\n");

@@ -28,30 +28,34 @@ void printComments()
 void printPosts()
 {
     printf("\n============== POSTS ==============\n");
-
-    for (int i = 0; i < POST_COUNT; i++)
+    Node *p = POSTS.head;
+    while (p != NULL)
     {
-        Post p = POSTS[i];
+        if (p->element.type == TYPE_POST)
+        {
+            Post post = p->element.data.post;
 
-        char postId[201];
-        char subId[201];
-        char authorId[201];
-        char title[201];
-        char content[201];
-        char createdAt[201];
+            char postId[201];
+            char subId[201];
+            char authorId[201];
+            char title[201];
+            char content[201];
+            char createdAt[201];
 
-        wordToString(postId, p.post_id);
-        wordToString(subId, p.subgroddit_id);
-        wordToString(authorId, p.author_id);
-        wordToString(title, p.title);
-        wordToString(content, p.content);
-        timeToStr(createdAt, p.created_at);
+            wordToString(postId, post.post_id);
+            wordToString(subId, post.subgroddit_id);
+            wordToString(authorId, post.author_id);
+            wordToString(title, post.title);
+            wordToString(content, post.content);
+            timeToStr(createdAt, post.created_at);
 
-        printf("ID: %s | SubGroddit: %s | Author: %s\n", postId, subId, authorId);
-        printf("Title: %s\n", title);
-        printf("Content: %s\n", content);
-        printf("Created: %s | Upvotes: %d | Downvotes: %d\n\n",
-               createdAt, p.upvotes, p.downvotes);
+            printf("ID: %s | SubGroddit: %s | Author: %s\n", postId, subId, authorId);
+            printf("Title: %s\n", title);
+            printf("Content: %s\n", content);
+            printf("Created: %s | Upvotes: %d | Downvotes: %d\n\n",
+                   createdAt, post.upvotes, post.downvotes);
+        }
+        p = p->next;
     }
 }
 
@@ -81,18 +85,22 @@ void printUsers()
 void printSubGroddits()
 {
     printf("\n============== SUBGRODDITS ==============\n");
-
-    for (int i = 0; i < SUBGRODDIT_COUNT; i++)
+    Node *p = SUBGRODDITS.head;
+    while (p != NULL)
     {
-        SubGroddit s = SUBGRODDITS[i];
+        if (p->element.type == TYPE_SUBGRODDIT)
+        {
+            SubGroddit s = p->element.data.subgroddit;
 
-        char subId[201];
-        char name[201];
+            char subId[201];
+            char name[201];
 
-        wordToString(subId, s.subgroddit_id);
-        wordToString(name, s.name);
+            wordToString(subId, s.subgroddit_id);
+            wordToString(name, s.name);
 
-        printf("ID: %s | Name: %s\n\n", subId, name);
+            printf("ID: %s | Name: %s\n\n", subId, name);
+        }
+        p = p->next;
     }
 }
 

@@ -74,7 +74,7 @@ int loadComments(const char *filepath, Comment **commentPtr, int *capacityPtr)
     return count;
 }
 
-int loadPosts(const char *filepath, Post **postPtr, int *capacityPtr)
+int loadPosts(const char *filepath, List *postList)
 {
     STARTWORD_CSV(filepath);
     if (EndWordCSV)
@@ -87,23 +87,14 @@ int loadPosts(const char *filepath, Post **postPtr, int *capacityPtr)
     if (EOP)
         return 0;
 
+    createList(postList);
     int count = 0;
-    int capacity = *capacityPtr;
-    Post *posts = *postPtr;
 
     ADVWORD_CSV();
     while (!EndWordCSV)
     {
-        if (!ensureCapacity((void **)&posts, &capacity, sizeof(Post), count + 1))
-        {
-            CLOSEPITA();
-            return -1;
-        }
-        *postPtr = posts;
-        *capacityPtr = capacity;
-
-        initPost(&posts[count]);
-        Post *P = &posts[count];
+        Post P;
+        initPost(&P);
 
         int colidx = 0;
         while (!EndWordCSV && colidx < 8)
@@ -111,37 +102,39 @@ int loadPosts(const char *filepath, Post **postPtr, int *capacityPtr)
             switch (colidx)
             {
             case 0:
-                copyWord(&P->post_id, currentWord);
+                copyWord(&P.post_id, currentWord);
                 break;
             case 1:
-                copyWord(&P->subgroddit_id, currentWord);
+                copyWord(&P.subgroddit_id, currentWord);
                 break;
             case 2:
-                copyWord(&P->author_id, currentWord);
+                copyWord(&P.author_id, currentWord);
                 break;
             case 3:
-                copyWord(&P->title, currentWord);
+                copyWord(&P.title, currentWord);
                 break;
             case 4:
-                copyWord(&P->content, currentWord);
+                copyWord(&P.content, currentWord);
                 break;
             case 5:
             {
                 char created_at_str[64];
                 wordToString(created_at_str, currentWord);
-                P->created_at = parseTime(created_at_str);
+                P.created_at = parseTime(created_at_str);
             }
                 break;
             case 6:
-                P->upvotes = wordToInt(currentWord);
+                P.upvotes = wordToInt(currentWord);
                 break;
             case 7:
-                P->downvotes = wordToInt(currentWord);
+                P.downvotes = wordToInt(currentWord);
                 break;
             }
             colidx++;
             ADVWORD_CSV();
         }
+
+        insertLastList(postList, makePostElement(P));
         count++;
     }
     CLOSEPITA();
@@ -213,7 +206,7 @@ int loadUsers(const char *filepath, User **userPtr, int *capacityPtr)
     return count;
 }
 
-int loadSubGroddits(const char *filepath, SubGroddit **subPtr, int *capacityPtr)
+int loadSubGroddits(const char *filepath, List *subList)
 {
     STARTWORD_CSV(filepath);
     if (EndWordCSV)
@@ -226,23 +219,14 @@ int loadSubGroddits(const char *filepath, SubGroddit **subPtr, int *capacityPtr)
     if (EOP)
         return 0;
 
+    createList(subList);
     int count = 0;
-    int capacity = *capacityPtr;
-    SubGroddit *subs = *subPtr;
 
     ADVWORD_CSV();
     while (!EndWordCSV)
     {
-        if (!ensureCapacity((void **)&subs, &capacity, sizeof(SubGroddit), count + 1))
-        {
-            CLOSEPITA();
-            return -1;
-        }
-        *subPtr = subs;
-        *capacityPtr = capacity;
-
-        initSubGroddit(&subs[count]);
-        SubGroddit *S = &subs[count];
+        SubGroddit S;
+        initSubGroddit(&S);
 
         int colidx = 0;
         while (!EndWordCSV && colidx < 2)
@@ -250,15 +234,17 @@ int loadSubGroddits(const char *filepath, SubGroddit **subPtr, int *capacityPtr)
             switch (colidx)
             {
             case 0:
-                copyWord(&S->subgroddit_id, currentWord);
+                copyWord(&S.subgroddit_id, currentWord);
                 break;
             case 1:
-                copyWord(&S->name, currentWord);
+                copyWord(&S.name, currentWord);
                 break;
             }
             colidx++;
             ADVWORD_CSV();
         }
+
+        insertLastList(subList, makeSubgrodditElement(S));
         count++;
     }
     CLOSEPITA();
