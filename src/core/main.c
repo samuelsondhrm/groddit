@@ -145,6 +145,23 @@ int main()
                 commandLoad();
             }
         }
+        else if (strCmp(commandStr, "SAVE") == 0)
+        {
+            ADVWORD_INPUT();
+
+            if (currentWord.Length != 0)
+            {
+                while (currentWord.Length != 0)
+                {
+                    ADVWORD_INPUT();
+                }
+                printf("Format perintah SAVE salah. Gunakan 'SAVE;' tanpa argumen.\n");
+            }
+            else
+            {
+                commandSave();
+            }
+        }
         else
         {
             printf("Perintah '%s' tidak dikenali.\n", commandStr);
