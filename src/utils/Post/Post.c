@@ -88,6 +88,27 @@ int getNextPostNumberMex() {
 
     return mex;
 }
+Post* getPostById(const char *postId) {
+    Node *p = POSTS.head;
+    while (p!=NULL) {
+        if (p->element.type == TYPE_POST) {
+            Post *post = &(p->element.data.post);
+            char currentPostId[NMax + 1];
+            wordToString(currentPostId, post->post_id);
+            if (strCmp(currentPostId, postId) == 0) return post;
+        }
+        p = p->next;
+    }
+    return NULL;
+}
+
+const char* getPostAuthorId(const char *postId) {
+    Post *post = getPostById(postId);
+    if (post==NULL) return NULL;
+    static char authorId[NMax+1];
+    wordToString(authorId, post->author_id);
+    return authorId;
+}
 
 void commandPost() {
     if (!isLoggedIn()) {

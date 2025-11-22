@@ -12,9 +12,24 @@ int findSubgrodditIndexByName(const char *subName);
 int findPostIndexById(const char *postId);
 void generatePostID(char *id, int num);
 
+/**
+ * Mencari Post berdasarkan post_id.
+ * @param postId    Post ID yang dicari (e.g., "P001")
+ * @return          Pointer ke Post jika ditemukan, NULL jika tidak ada.
+ */
+Post* getPostById(const char *postId);
+
+/**
+ * Mencari author_id (User ID) dari sebuah Post.
+ * @param postId    Post ID yang dicari
+ * @return          String author_id (static buffer), NULL jika post tidak ada
+ */
+const char* getPostAuthorId(const char *postId);
+
 // Command utama fitur Post
-void commandPost();                
-void commandViewPost();            
-void commandDeletePost();          
+void commandPost();    
+void commandViewPost();
+void commandDeletePost();
+
 
 #endif

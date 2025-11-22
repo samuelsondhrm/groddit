@@ -20,6 +20,8 @@
 #include "../utils/User/User.h"
 #include "../utils/Profil/Profil.h"
 #include "../utils/Post/Post.h"
+#include "../utils/Comment/Comment.h"
 #include "../utils/Subgroddit/Subgroddit.h"
+#include "../utils/Voting/Voting.h"
 
 #endif
