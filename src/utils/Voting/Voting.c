@@ -42,12 +42,25 @@ void updateVote(int votingIdx, const char *newVoteType) {
     stringToWord(&VOTINGS[votingIdx].vote_type, newVoteType);
 }
 
-void removeVote(int votingIdx){
-    if (votingIdx<0 || votingIdx>=VOTING_COUNT) return;
-    for (int i=0; i<VOTING_COUNT-1; i++){
-        VOTINGS[i] = VOTINGS[i+1];
+void removeVote(int votingIdx) {
+    if (votingIdx < 0 || votingIdx >= VOTING_COUNT) return;
+    // printf("[DEBUG] Removing vote at index %d (VOTING_COUNT=%d)\n", votingIdx, VOTING_COUNT);
+    
+    for (int i = votingIdx; i < VOTING_COUNT - 1; i++) {
+        VOTINGS[i] = VOTINGS[i + 1];
     }
+    
     VOTING_COUNT--;
+    
+    if (VOTING_COUNT >= 0) {
+        Voting *lastVoting = &VOTINGS[VOTING_COUNT];
+        lastVoting->user_id.Length = 0;
+        lastVoting->target_id.Length = 0;
+        lastVoting->target_type.Length = 0;
+        lastVoting->vote_type.Length = 0;
+    }
+    // printf("[DEBUG] After remove: VOTING_COUNT=%d\n", VOTING_COUNT);
+
 }
 
 void updatePostVotes(const char *postId, int upvoteDelta, int downvoteDelta) {
