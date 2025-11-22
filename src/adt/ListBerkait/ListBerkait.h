@@ -6,19 +6,16 @@
 #include "../Boolean/Boolean.h"
 #include "../ADTSederhana/ADTSederhana.h"
 
-/* ============================================================================
- *                          Element Variant Type
- * ============================================================================
- * ListElement dapat menyimpan salah satu dari:
+/*
+ * ListElement dpt menyimpan salah satu dari:
  * - User
  * - Post
  * - Comment
  * - Subgroddit
  *
- * Elemen disimpan BY VALUE (bukan pointer), aman terhadap memory leak.
- * Setiap elemen memiliki tag type untuk identifikasi.
+ * Elemen disimpan BY VALUE (bukan pointer).
+ * Setiap elemen punya tag type buat identifikasi.
  */
-
 typedef enum
 {
     TYPE_USER,
@@ -39,16 +36,10 @@ typedef struct
     } data;
 } ListElement;
 
-/* Factory untuk membuat ListElement berdasarkan tipe */
 ListElement makeUserElement(User u);
 ListElement makePostElement(Post p);
 ListElement makeCommentElement(Comment c);
 ListElement makeSubgrodditElement(SubGroddit s);
-
-/* ============================================================================
- *                                 Node & List
- * ============================================================================
- */
 
 typedef struct Node
 {
@@ -61,22 +52,13 @@ typedef struct
     Node *head;
 } List;
 
-/* ============================================================================
- *                          Node Constructor / Initializer
- * ============================================================================
- */
-
 /**
  * Membuat node baru berisi satu ListElement.
  * @param elem  Elemen yang ingin dimasukkan ke node.
- * @return      Pointer ke Node baru; NULL jika alokasi gagal.
+ * @return      Pointer ke Node baru, NULL jika alokasi gagal.
  */
 Node *newNode(ListElement elem);
 
-/* ============================================================================
- *                          Create & Validation
- * ============================================================================
- */
 
 /**
  * Inisialisasi list kosong.
@@ -98,34 +80,48 @@ boolean isEmptyList(List L);
  */
 int listLength(List L);
 
-/* ============================================================================
- *                          Insertion Operations
- * ============================================================================
- */
 
+// INSERT OPS
 void insertFirstList(List *L, ListElement elem);
 void insertLastList(List *L, ListElement elem);
 void insertAtList(List *L, ListElement elem, int idx);
 
-/* ============================================================================
- *                          Deletion Operations
- * ============================================================================
- */
 
+// DELETE OPS
 void deleteFirstList(List *L, ListElement *out);
 void deleteLastList(List *L, ListElement *out);
 void deleteAtList(List *L, int idx, ListElement *out);
 
-/* ============================================================================
- *                          Search / Find Operations
- * ============================================================================
+
+// ELMT ACCESS OPS
+/**
+ * Mengambil elemen pada index tertentu.
+ * @param L     List yang akan diakses.
+ * @param idx   Index elemen (0-based).
+ * @param out   Output: elemen yang ditemukan.
+ * @return      true jika berhasil, false jika index invalid.
  */
+boolean getElementAt(List L, int idx, ListElement *out);
 
 /**
- * Mencari indeks elemen menggunakan comparator.
- * Comparator harus memiliki bentuk:
- *      boolean cmp(ListElement a, ListElement b)
- *
+ * Mengubah elemen pada index tertentu.
+ * @param L     Pointer ke List.
+ * @param idx   Index elemen (0-based).
+ * @param elem  Elemen baru yang akan menggantikan.
+ * @return      true jika berhasil, false jika index invalid.
+ * 
+ * Contoh buat update upvote:
+ *   ListElement elem;
+ *   getElementAt(POSTS, idx, &elem);
+ *   elem.data.post.upvotes++;
+ *   setElementAt(&POSTS, idx, elem);
+ */
+boolean setElementAt(List *L, int idx, ListElement elem);
+
+
+// SEARCH OPS
+/**
+ * Mencari indeks elmt pak comparator.
  * @param L         List yang dicari.
  * @param target    Elemen target.
  * @param cmp       Fungsi pembanding.
@@ -136,32 +132,106 @@ int indexOfList(
     ListElement target,
     boolean (*cmp)(ListElement a, ListElement b));
 
-/* ============================================================================
- *                          Traversal / Display
- * ============================================================================
+/**
+ * Mencari elemen dan return pointer ke elmt tsb.
+ * @param L      List yang dicari.
+ * @param target Elemen target.
+ * @param cmp    Fungsi pembanding.
+ * @return       Pointer ke ListElement (NULL jika tidak ketemu).
  */
+ListElement* findElement(
+    List L,
+    ListElement target,
+    boolean (*cmp)(ListElement a, ListElement b));
+
+
+// FILTER AND COLLECTION OPS
+/**
+ * Membuat list baru berisi elmt yang memenuhi predicate.
+ * @param L         List source
+ * @param predicate Fungsi filter
+ * @param context   param tambahan buat predicate (bisa NULL).
+ * @return          List baru hasil filter .
+ * 
+ * e.g:
+ *   boolean isPostByUser(ListElement e, void *ctx) {
+ *       const char *userId = (const char*)ctx;
+ *       if (e.type != TYPE_POST) return false;
+ *       return wordEquals(e.data.post.author_id, userId);
+ *   }
+ *   
+ *   List userPosts = filterList(POSTS, isPostByUser, "USER001");
+ */
+List filterList(
+    List L,
+    boolean (*predicate)(ListElement e, void *context),
+    void *context
+);
+
+/**
+ * Menghitung jumlah elemen yang memenuhi predicate.
+ * Parameter sama kek filterList.
+ */
+int countIf(
+    List L,
+    boolean (*predicate)(ListElement e, void *context),
+    void *context
+);
+
+// SORTING OPS
+/**
+ * Mengurutkan list menggunakan cmparator (inplace).
+ * @param L     Pointer ke List yang akan diurutkan.
+ * @param cmp   Fungsi compare.
+ * 
+ * e.g. buat sort post by upvotes (descending):
+ * 
+ *   int cmpPostByUpvotes(ListElement a, ListElement b) {
+ *       return b.data.post.upvotes - a.data.post.upvotes; 
+ *   }
+ *   
+ *   sortList(&POSTS, cmpPostByUpvotes);
+ */
+void sortList(List *L, int (*cmp)(ListElement a, ListElement b));
+
+/**
+ * Membuat copy list yang sudah diurut.
+ * List asli TIDAK berubah.
+ * 
+ * @return List baru teruru.
+ */
+List sortedCopyList(List L, int (*cmp)(ListElement a, ListElement b));
+
+/**
+ * Membuat deep copy dari list.
+ * Setiap node dialokasikan ulang, data disalin by value.
+ * 
+ * @param L List yang akan disalin.
+ * @return  List baru (HARUS di-free dengan freeList).
+ */
+List copyList(List L);
+
+/**
+ * Membalik urutan list (IN-PLACE).
+ * List asli akan berubah.
+ */
+void reverseList(List *L);
+
+/**
+ * Membuat copy list yang sudah dibalik.
+ * List asli TIDAK berubah.
+ */
+List reversedCopyList(List L);
 
 /**
  * Menampilkan seluruh elemen list menggunakan callback printer.
- * Callback print harus berbentuk:
- *      void printElement(ListElement e)
- *
- * @param L     List yang ingin ditampilkan.
+ * @param L     List yang ditampilkan
  * @param print Fungsi callback untuk menampilkan satu elemen.
  */
 void displayList(List L, void (*print)(ListElement e));
 
-/* ============================================================================
- *                          Utility Operations
- * ============================================================================
- */
 
 List concatList(List L1, List L2);
-
-/**
- * Menghapus semua node list TANPA menghapus data di dalamnya
- * (karena elemen disimpan by value, tidak butuh free).
- */
 void freeList(List *L);
 
 #endif

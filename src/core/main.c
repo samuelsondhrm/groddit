@@ -227,6 +227,29 @@ int main()
                 }
             }
         }
+        else if (strCmp(commandStr, "UPVOTE_POST") == 0)
+        {
+            commandUpvotePost();
+        }
+        else if (strCmp(commandStr, "DOWNVOTE_POST") == 0)
+        {
+            commandDownvotePost();
+        }
+        else if (strCmp(commandStr, "UNDO_VOTE_POST") == 0)
+        {
+            commandUndoVotePost();
+        }
+        else if (strCmp(commandStr, "UPVOTE_COMMENT") == 0)
+        {
+            commandUpvoteComment();
+        }
+        else if (strCmp(commandStr, "DOWNVOTE_COMMENT") == 0)
+        {
+            commandDownvoteComment();
+        }
+        else if (strCmp(commandStr, "UNDO_VOTE_COMMENT") == 0)
+        {
+            commandUndoVoteComment();
         else if (strCmp(commandStr, "FOLLOW") == 0)
         {
             ADVWORD_INPUT();
