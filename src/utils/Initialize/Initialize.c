@@ -115,11 +115,26 @@ void initialize()
         printf("[Gagal] Memuat subgroddits dari %s\n", pathSubs);
 
     // Socials
+    createGraph(&SOCIAL_GRAPH, USER_COUNT);
+    
     char pathSocials[150];
     buildPath(pathSocials, folder, "social.csv");
     SOCIAL_COUNT = loadSocials(pathSocials, &SOCIALS, &SOCIAL_CAPACITY);
-    if (SOCIAL_COUNT == -1)
-        printf("[Gagal] Memuat socials dari %s\n", pathSocials);
+    if (SOCIAL_COUNT == -1) printf("[Gagal] Memuat socials dari %s\n", pathSocials);
+    
+    // Proses memasukkan edge di global SOCIAL_GRAPH
+    for (int i = 0; i < SOCIAL_COUNT; i++) {
+        char uId[32], vId[32];
+        wordToString_safe(uId, sizeof(uId), SOCIALS[i].user_id);
+        wordToString_safe(vId, sizeof(vId), SOCIALS[i].following_id);
+
+        int u = findUserIndexById(uId);
+        int v = findUserIndexById(vId);
+
+        if (u != IDX_UNDEF && v != IDX_UNDEF && u != v) {
+            addEdge(&SOCIAL_GRAPH, u, v);
+        }
+    }
 
     // Votings
     char pathVotings[150];

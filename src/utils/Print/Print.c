@@ -52,7 +52,7 @@ void printPosts()
             printf("ID: %s | SubGroddit: %s | Author: %s\n", postId, subId, authorId);
             printf("Title: %s\n", title);
             printf("Content: %s\n", content);
-            printf("Created: %s | Upvotes: %d | Downvotes: %d\n\n",
+            printf("Created At: %s | Upvotes: %d | Downvotes: %d\n\n",
                    createdAt, post.upvotes, post.downvotes);
         }
         p = p->next;
@@ -78,7 +78,7 @@ void printUsers()
         timeToStr(createdAt, u.created_at);
 
         printf("ID: %s | Username: %s | Password: %s\n", userId, username, password);
-        printf("Karma: %d | Created: %s\n\n", u.karma, createdAt);
+        printf("Karma: %d | Created At: %s\n\n", u.karma, createdAt);
     }
 }
 

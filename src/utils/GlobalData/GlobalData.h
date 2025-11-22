@@ -24,11 +24,11 @@ extern List SUBGRODDITS;
 extern int SUBGRODDIT_COUNT;
 
 // Social
-extern Social *SOCIALS;
+extern Social *SOCIALS; // hanya buffer hasil parsing social.csv
 extern int SOCIAL_CAPACITY;
 extern int SOCIAL_COUNT;
-// Socials
-extern Graph SOCIAL_GRAPH;
+
+extern Graph SOCIAL_GRAPH; // Semua operasi Social akan terhubung ke graf ini
 
 // Votings
 extern Voting *VOTINGS;
