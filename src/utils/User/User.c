@@ -26,6 +26,17 @@ char *findUsernameById(int id)
     return buffer;
 }
 
+int findUserIndexById(const char *userId)
+{
+    if (userId == NULL || userId[0] == '\0') return IDX_UNDEF;
+    char idStr[16];
+    for (int i = 0; i < USER_COUNT; i++) {
+        wordToString_safe(idStr, sizeof(idStr), USERS[i].user_id);
+        if (strCmp(idStr, userId) == 0) return i;
+    }
+    return IDX_UNDEF;
+}
+
 void generateUserID(char *id, int num)
 {
     id[0] = 'U';
@@ -121,6 +132,7 @@ void registerUser()
     u->created_at = time(NULL);
 
     USER_COUNT++;
+    addVertex(&SOCIAL_GRAPH);
 
     printf("Akun dengan username %s berhasil didaftarkan! Silahkan gunakan perintah LOGIN untuk mengakses fitur-fitur Groddit.\n", username);
 }

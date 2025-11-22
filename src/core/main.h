@@ -21,5 +21,6 @@
 #include "../utils/Profil/Profil.h"
 #include "../utils/Post/Post.h"
 #include "../utils/Subgroddit/Subgroddit.h"
+#include "../utils/Social/Social.h"
 
 #endif
