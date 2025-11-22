@@ -250,6 +250,155 @@ int main()
         else if (strCmp(commandStr, "UNDO_VOTE_COMMENT") == 0)
         {
             commandUndoVoteComment();
+        else if (strCmp(commandStr, "FOLLOW") == 0)
+        {
+            ADVWORD_INPUT();
+
+            if (currentWord.Length == 0)
+            {
+                printf("Format perintah FOLLOW salah. Gunakan 'FOLLOW <username>;'\n");
+            }
+            else
+            {
+                Word tempWord = currentWord;
+
+                ADVWORD_INPUT();
+                if (currentWord.Length != 0)
+                {
+                    while (currentWord.Length != 0)
+                    {
+                        ADVWORD_INPUT();
+                    }
+                    printf("Format perintah FOLLOW salah. Gunakan 'FOLLOW <username>;'\n");
+                }
+                else
+                {
+                    char username[256];
+                    wordToString(username, tempWord);
+                    socialFollowUser(username);
+                }
+            }
+        }
+        else if (strCmp(commandStr, "UNFOLLOW") == 0)
+        {
+            ADVWORD_INPUT();
+
+            if (currentWord.Length == 0)
+            {
+                printf("Format perintah UNFOLLOW salah. Gunakan 'UNFOLLOW <username>;'\n");
+            }
+            else
+            {
+                Word tempWord = currentWord;
+
+                ADVWORD_INPUT();
+                if (currentWord.Length != 0)
+                {
+                    while (currentWord.Length != 0)
+                    {
+                        ADVWORD_INPUT();
+                    }
+                    printf("Format perintah UNFOLLOW salah. Gunakan 'UNFOLLOW <username>;'\n");
+                }
+                else
+                {
+                    char username[256];
+                    wordToString(username, tempWord);
+                    socialUnfollowUser(username);
+                }
+            }
+        }
+                else if (strCmp(commandStr, "FOLLOWING") == 0)
+        {
+            ADVWORD_INPUT();
+
+            if (currentWord.Length == 0)
+            {
+                if (!isLoggedIn())
+                {
+                    printf("Anda belum login. Silakan login terlebih dahulu.\n");
+                }
+                else
+                {
+                    socialShowFollowing(NULL);
+                }
+            }
+            else
+            {
+                if (!isLoggedIn())
+                {
+                    printf("Anda belum login. Silakan login terlebih dahulu.\n");
+
+                    while (currentWord.Length != 0)
+                        ADVWORD_INPUT();
+                }
+                else
+                {
+                    Word tempWord = currentWord;
+
+                    ADVWORD_INPUT();
+                    if (currentWord.Length != 0)
+                    {
+                        while (currentWord.Length != 0)
+                        {
+                            ADVWORD_INPUT();
+                        }
+                        printf("Format perintah FOLLOWING salah. Gunakan 'FOLLOWING;' atau 'FOLLOWING <username>;'\n");
+                    }
+                    else
+                    {
+                        char username[256];
+                        wordToString(username, tempWord);
+                        socialShowFollowing(username);
+                    }
+                }
+            }
+        }
+        else if (strCmp(commandStr, "FOLLOWERS") == 0)
+        {
+            ADVWORD_INPUT();
+
+            if (currentWord.Length == 0)
+            {
+                if (!isLoggedIn())
+                {
+                    printf("Anda belum login. Silakan login terlebih dahulu.\n");
+                }
+                else
+                {
+                    socialShowFollowers(NULL);
+                }
+            }
+            else
+            {
+                if (!isLoggedIn())
+                {
+                    printf("Anda belum login. Silakan login terlebih dahulu.\n");
+
+                    while (currentWord.Length != 0)
+                        ADVWORD_INPUT();
+                }
+                else
+                {
+                    Word tempWord = currentWord;
+
+                    ADVWORD_INPUT();
+                    if (currentWord.Length != 0)
+                    {
+                        while (currentWord.Length != 0)
+                        {
+                            ADVWORD_INPUT();
+                        }
+                        printf("Format perintah FOLLOWERS salah. Gunakan 'FOLLOWERS;' atau 'FOLLOWERS <username>;'\n");
+                    }
+                    else
+                    {
+                        char username[256];
+                        wordToString(username, tempWord);
+                        socialShowFollowers(username);
+                    }
+                }
+            }
         }
         else
         {

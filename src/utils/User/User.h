@@ -13,6 +13,9 @@ int findIdByUsername(const char *username);
 // Menghasilkan username dari USERS berdasarkan masukan index
 char *findUsernameById(int id);
 
+//  Mencari index user di USERS berdasarkan user_id
+int findUserIndexById(const char *userId);
+
 // Men-generate USERID yang baru
 void generateUserID(char *id, int num);
 

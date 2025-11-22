@@ -23,7 +23,7 @@ int SUBGRODDIT_COUNT = 0;
 Social *SOCIALS = NULL;
 int SOCIAL_CAPACITY = 0;
 int SOCIAL_COUNT = 0;
-Graph SOCIAL_GRAPH;
+Graph SOCIAL_GRAPH = {0, NULL};
 
 // Votings
 Voting *VOTINGS = NULL;

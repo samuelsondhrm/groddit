@@ -7,6 +7,7 @@
 #include "../Load/Load.h"
 #include "../Helper/Helper.h"
 #include "../GlobalData/GlobalData.h"
+#include "../User/User.h"
 
 // Membentuk path
 void buildPath(char *out, const char *folder, const char *file);
