@@ -227,6 +227,14 @@ int main()
                 }
             }
         }
+        else if (strCmp(commandStr, "COMMENT") == 0)
+        {
+            commandAddComment();
+        }
+        else if (strCmp(commandStr, "DELETE_COMMENT") == 0)
+        {
+            commandDeleteComment();
+        }
         else if (strCmp(commandStr, "UPVOTE_POST") == 0)
         {
             commandUpvotePost();
@@ -250,6 +258,7 @@ int main()
         else if (strCmp(commandStr, "UNDO_VOTE_COMMENT") == 0)
         {
             commandUndoVoteComment();
+        }
         else if (strCmp(commandStr, "FOLLOW") == 0)
         {
             ADVWORD_INPUT();
@@ -308,7 +317,7 @@ int main()
                 }
             }
         }
-                else if (strCmp(commandStr, "FOLLOWING") == 0)
+        else if (strCmp(commandStr, "FOLLOWING") == 0)
         {
             ADVWORD_INPUT();
 
