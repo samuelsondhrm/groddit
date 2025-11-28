@@ -24,5 +24,6 @@
 #include "../utils/Subgroddit/Subgroddit.h"
 #include "../utils/Voting/Voting.h"
 #include "../utils/Social/Social.h"
+#include "../utils/Feed/Feed.h"
 
 #endif
