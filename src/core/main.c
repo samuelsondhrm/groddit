@@ -408,9 +408,14 @@ int main()
                     }
                 }
             }
-        }else if (strCmp(commandStr, "SHOW_FEED") == 0)
+        }
+        else if (strCmp(commandStr, "SHOW_FEED") == 0)
         {
             commandShowFeed();
+        }
+        else if (strCmp(commandStr, "FRIEND_RECOMMENDATION") == 0)
+        {
+            commandFriendRecommendation();
         }
         else
         {
