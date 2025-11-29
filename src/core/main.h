@@ -25,5 +25,6 @@
 #include "../utils/Voting/Voting.h"
 #include "../utils/Social/Social.h"
 #include "../utils/Feed/Feed.h"
+#include "../utils/FollRec/FollRec.h"
 
 #endif
