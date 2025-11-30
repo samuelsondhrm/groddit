@@ -227,6 +227,10 @@ int main()
                 }
             }
         }
+        else if (strCmp(commandStr, "VIEW_SUBGRODDIT") == 0)
+        {
+            viewSubgroddit();
+        }
         else if (strCmp(commandStr, "COMMENT") == 0)
         {
             commandAddComment();

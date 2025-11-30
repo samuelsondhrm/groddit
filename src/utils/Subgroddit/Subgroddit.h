@@ -10,4 +10,7 @@
 // Membuat Subgroddit
 void createSubgroddit();
 
+// Melihat postingan Subgroddit
+void viewSubgroddit();
+
 #endif
