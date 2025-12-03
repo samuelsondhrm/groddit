@@ -26,5 +26,6 @@
 #include "../utils/Social/Social.h"
 #include "../utils/Feed/Feed.h"
 #include "../utils/FollRec/FollRec.h"
+#include "../utils/Trending/Trending.h"
 
 #endif
