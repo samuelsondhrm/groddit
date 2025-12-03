@@ -421,6 +421,10 @@ int main()
         {
             commandFriendRecommendation();
         }
+        else if (strCmp(commandStr, "TRENDING") == 0)
+        {
+            commandTrending();
+        }
         else
         {
             printf("Perintah '%s' tidak dikenali.\n", commandStr);
