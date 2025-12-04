@@ -52,7 +52,7 @@ boolean file_encryption_enabled(void) { return g_file_enc; }
 boolean enable_password_hashing(void)
 {
     if (g_pwd_hash)
-        return true; /* already enabled */
+        return true;
 
     g_pwd_hash = true;
 
@@ -95,7 +95,6 @@ static uint8_t next_keystream_byte(void)
 {
     // LCG params (glibc-like)
     g_keystream_state = (uint32_t)(g_keystream_state * 1664525u + 1013904223u);
-    // take high byte for more entropy
     return (uint8_t)(g_keystream_state >> 24);
 }
 
@@ -137,7 +136,6 @@ boolean write_encrypted_file(const char *path, const uint8_t *buf, size_t len)
     return true;
 }
 
-// returns malloc'd buffer (must free). out_len set. was_encrypted set accordingly.
 uint8_t *read_encrypted_file(const char *path, size_t *out_len, boolean *was_encrypted)
 {
     FILE *f = fopen(path, "rb");
@@ -154,7 +152,6 @@ uint8_t *read_encrypted_file(const char *path, size_t *out_len, boolean *was_enc
 
     if (fsize < 4)
     {
-        // too small → treat as plaintext
         *out_len = fsize;
         if (was_encrypted)
             *was_encrypted = false;
@@ -164,7 +161,6 @@ uint8_t *read_encrypted_file(const char *path, size_t *out_len, boolean *was_enc
     // Check magic
     if (!(disk[0] == 'G' && disk[1] == 'R' && disk[2] == 'E' && disk[3] == 'N'))
     {
-        // plaintext
         *out_len = fsize;
         if (was_encrypted)
             *was_encrypted = false;
@@ -178,32 +174,19 @@ uint8_t *read_encrypted_file(const char *path, size_t *out_len, boolean *was_enc
     if (fsize < 5)
     {
         free(disk);
-        return NULL; // malformed
+        return NULL;
     }
 
     uint8_t version = disk[4];
     if (version != 1)
     {
-        printf("[READ-DBG] Unsupported encryption version %u\n", version);
         free(disk);
         return NULL;
     }
 
-    // ciphertext begins AFTER version byte
     size_t payload_len = fsize - 5;
     uint8_t *cipher = disk + 5;
 
-    // Debug
-    printf("[READ-DBG] %s: fsize=%zu g_seed=%u\n", path, fsize, g_seed);
-    printf("[READ-DBG] raw first 8 bytes: %02X %02X %02X %02X %02X %02X %02X %02X\n",
-           disk[0], disk[1], disk[2], disk[3], disk[4], disk[5], disk[6], disk[7]);
-
-    printf("[READ-DBG] GREN detected. cipher first 24 bytes: ");
-    for (size_t i = 0; i < 24 && i < payload_len; i++)
-        printf("%02X ", cipher[i]);
-    printf("\n");
-
-    // decrypt into new buffer
     uint8_t *plain = malloc(payload_len);
     memcpy(plain, cipher, payload_len);
 
@@ -215,19 +198,16 @@ uint8_t *read_encrypted_file(const char *path, size_t *out_len, boolean *was_enc
 
 void migrate_passwords_in_memory(void)
 {
-    extern User *USERS;    // asumsi nama global di project
-    extern int USER_COUNT; // jumlah user saat ini
+    extern User *USERS;
+    extern int USER_COUNT;
 
     for (int i = 0; i < USER_COUNT; ++i)
     {
         char pwbuf[512];
-        /* ambil password yang sekarang (bisa plain atau already hashed) */
         wordToString_safe(pwbuf, sizeof(pwbuf), USERS[i].password);
 
-        /* compute hash on current string (this is irreversible) */
         uint32_t h = hash_password(pwbuf);
 
-        /* replace user.password word with decimal string of hash */
         uint32ToWord(&USERS[i].password, h);
     }
 }

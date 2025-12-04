@@ -57,7 +57,6 @@ void uint32ToWord(Word *out, uint32_t value)
 void copyWord(Word *dest, Word src)
 {
     dest->Length = src.Length;
-    // Ensure we don't exceed Word buffer size (NMax = 200)
     if (src.Length > NMax - 1)
     {
         dest->Length = NMax - 1;

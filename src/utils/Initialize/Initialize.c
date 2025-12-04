@@ -92,13 +92,12 @@ void initialize()
         printf("[Peringatan] Gagal memuat konfigurasi keamanan dari %s. Menggunakan pengaturan default.\n", pathConf);
     }
 
-    // Generic vars for buffered reads
     uint8_t *buf = NULL;
     size_t len = 0;
     boolean enc = false;
 
     // -------------------
-    // COMMENTS (already buffer approach)
+    // COMMENTS (buffer)
     // -------------------
     char pathComments[150];
     buildPath(pathComments, folder, "comment.csv");
@@ -200,7 +199,7 @@ void initialize()
     // -------------------
     // SOCIALS (buffer)
     // -------------------
-    createGraph(&SOCIAL_GRAPH, USER_COUNT); // buat graph setelah USER_COUNT tersedia
+    createGraph(&SOCIAL_GRAPH, USER_COUNT);
 
     char pathSocials[150];
     buildPath(pathSocials, folder, "social.csv");
@@ -224,7 +223,6 @@ void initialize()
         printf("[Gagal] Memuat socials dari %s\n", pathSocials);
     }
 
-    // Proses memasukkan edge di global SOCIAL_GRAPH
     for (int i = 0; i < SOCIAL_COUNT; i++)
     {
         char uId[32], vId[32];

@@ -17,6 +17,7 @@ int loadSubGroddits(const char *filepath, List *subList);
 int loadSocials(const char *filepath, Social **socialPtr, int *capacityPtr);
 int loadVotings(const char *filepath, Voting **votingPtr, int *capacityPtr);
 
+// Load from buffer for File Encryption
 int loadComments_Buffer(uint8_t *buffer, size_t len,
                         Comment **commentPtr, int *capacityPtr);
 int loadPosts_Buffer(uint8_t *buffer, size_t len, List *postList);

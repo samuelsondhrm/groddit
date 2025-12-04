@@ -12,7 +12,6 @@ static void ensure_buf_space(char **buf, size_t *cap, size_t need_pos)
         char *nb = realloc(*buf, newcap);
         if (!nb)
         {
-            // out of memory -> abort program (you can change to return an error)
             fprintf(stderr, "[FATAL] Out of memory in ensure_buf_space\n");
             exit(1);
         }
@@ -21,21 +20,17 @@ static void ensure_buf_space(char **buf, size_t *cap, size_t need_pos)
     }
 }
 
-// escape src into dst (dst must have dstsz bytes). Output is quoted CSV field.
-// If output longer than dstsz, it will be truncated safely.
 static void csv_escape_field(const char *src, char *dst, size_t dstsz)
 {
     if (dstsz == 0)
         return;
     size_t di = 0;
-    // opening quote
     if (di < dstsz - 1)
         dst[di++] = '"';
     for (size_t i = 0; src[i] != '\0' && di + 2 < dstsz; i++)
     {
         if (src[i] == '"')
         {
-            // double quote
             if (di + 2 >= dstsz)
                 break;
             dst[di++] = '"';
@@ -46,26 +41,23 @@ static void csv_escape_field(const char *src, char *dst, size_t dstsz)
             dst[di++] = src[i];
         }
     }
-    // closing quote
     if (di < dstsz - 1)
         dst[di++] = '"';
     dst[di] = '\0';
 }
 
-// helper: append formatted string to buffer (auto-grow)
 static void append_fmt(char **buf, size_t *cap, size_t *pos, const char *fmt, ...)
 {
     va_list ap;
     while (1)
     {
-        ensure_buf_space(buf, cap, *pos + 512); // make some headroom
+        ensure_buf_space(buf, cap, *pos + 512);
         va_start(ap, fmt);
         int written = vsnprintf(*buf + *pos, *cap - *pos, fmt, ap);
         va_end(ap);
 
         if (written < 0)
         {
-            // encoding error
             return;
         }
         if ((size_t)written < *cap - *pos)
@@ -73,7 +65,6 @@ static void append_fmt(char **buf, size_t *cap, size_t *pos, const char *fmt, ..
             *pos += (size_t)written;
             return;
         }
-        // not enough space, expand and retry
         ensure_buf_space(buf, cap, *pos + (size_t)written);
     }
 }
@@ -97,7 +88,6 @@ int createFolderIfNotExists(const char *folder)
         return 0;
     }
 
-    // Create folder
     if (mkdir(path, 0755) == 0)
     {
         return 1;
