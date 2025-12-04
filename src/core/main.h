@@ -28,5 +28,6 @@
 #include "../utils/FollRec/FollRec.h"
 #include "../utils/Trending/Trending.h"
 #include "../utils/AdvancedSearch/AdvancedSearch.h"
+#include "../utils/Security/Security.h"
 
 #endif

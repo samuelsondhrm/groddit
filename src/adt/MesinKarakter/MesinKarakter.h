@@ -2,6 +2,8 @@
 #define MESINKARAKTER_H
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
 #include "../Boolean/Boolean.h"
 
 #define CHAR_MARK ';'
@@ -9,20 +11,30 @@
 #define NEWLINE '\n'
 
 #define MODE_INPUT 0
-#define MODE_CSV 1
+#define MODE_CSV_FILE 1
+#define MODE_CONF_FILE 2
+#define MODE_CSV_BUFFER 3
 
 extern char currentChar;
 extern boolean EOP;
 extern FILE *pita;
 extern int MODE;
 
-// I
+// INPUT
 void STARTINPUT();
 void ADVINPUT();
 
-// CSV MODE
+// CSV
 void STARTCSV(const char *filename);
 void ADVCSV();
+
+// CONF
+void STARTCONF(const char *filename);
+void ADVCONF();
+
+// CSV buffer mode
+void STARTCSV_BUFFER(uint8_t *buffer, int len);
+void ADVCSV_BUFFER();
 
 // General
 void CLOSEPITA();

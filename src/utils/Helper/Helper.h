@@ -4,6 +4,7 @@
 #include "../../adt/MesinKata/MesinKata.h"
 #include <stdlib.h>
 #include <time.h>
+#include <stdint.h>
 
 // Membandingkan dua Word
 int compareWord(Word a, Word b);
@@ -40,5 +41,8 @@ time_t parseTime(const char *str);
 
 // Membaca satu baris input (bisa mengandung spasi) hingga tanda ';' dan menyimpannya ke Word
 void readLineWord(Word *out);
+
+// Mengonversi uint32_t ke Word
+void uint32ToWord(Word *out, uint32_t value);
 
 #endif

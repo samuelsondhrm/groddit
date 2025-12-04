@@ -28,11 +28,14 @@ char *findUsernameById(int id)
 
 int findUserIndexById(const char *userId)
 {
-    if (userId == NULL || userId[0] == '\0') return IDX_UNDEF;
+    if (userId == NULL || userId[0] == '\0')
+        return IDX_UNDEF;
     char idStr[16];
-    for (int i = 0; i < USER_COUNT; i++) {
+    for (int i = 0; i < USER_COUNT; i++)
+    {
         wordToString_safe(idStr, sizeof(idStr), USERS[i].user_id);
-        if (strCmp(idStr, userId) == 0) return i;
+        if (strCmp(idStr, userId) == 0)
+            return i;
     }
     return IDX_UNDEF;
 }
@@ -92,6 +95,7 @@ void registerUser()
         fflush(stdout);
         STARTWORD_INPUT();
         wordToString(password, currentWord);
+
         IgnoreNewline();
 
         int passLen = 0;
@@ -124,8 +128,16 @@ void registerUser()
 
     Word usn;
     Word pw;
+    if (password_hashing_enabled())
+    {
+        uint32_t h = hash_password(password);
+        uint32ToWord(&pw, h);
+    }
+    else
+    {
+        stringToWord(&pw, password);
+    }
     stringToWord(&usn, username);
-    stringToWord(&pw, password);
     copyWord(&u->username, usn);
     copyWord(&u->password, pw);
     u->karma = 0;
@@ -141,14 +153,13 @@ void loginUser()
 {
     if (CURRENT_USER_INDEX != -1)
     {
-        char *usn;
-        usn = findUsernameById(CURRENT_USER_INDEX);
+        char *usn = findUsernameById(CURRENT_USER_INDEX);
         printf("Anda tidak dapat melakukan login karena telah login sebagai %s.\n", usn);
         return;
     }
 
     char username[256];
-    char password[25];
+    char inputPw[256];
 
     printf("Masukkan username: ");
     STARTWORD_INPUT();
@@ -164,30 +175,76 @@ void loginUser()
 
     printf("Masukkan kata sandi: ");
     STARTWORD_INPUT();
-    wordToString(password, currentWord);
+    wordToString(inputPw, currentWord);
     IgnoreNewline();
 
-    int passLen = 0;
-    while (password[passLen] != '\0')
-        passLen++;
+    int len = 0;
+    while (inputPw[len] != '\0')
+        len++;
 
-    if (passLen < 8 || passLen > 20)
+    if (len < 8 || len > 20)
     {
         printf("Panjang kata sandi harus 8-20 karakter!\n");
         return;
     }
 
-    char pwStr[256];
-    wordToString(pwStr, USERS[user_id].password);
-    if (strCmp(password, pwStr) != 0)
+    char storedPw[256];
+    wordToString(storedPw, USERS[user_id].password);
+
+    int stored_is_digits = 1;
+    for (int i = 0; storedPw[i] != '\0'; i++)
     {
-        printf("Password salah!\n");
-        return;
+        if (storedPw[i] < '0' || storedPw[i] > '9')
+        {
+            stored_is_digits = 0;
+            break;
+        }
     }
 
-    CURRENT_USER_INDEX = user_id;
+    if (password_hashing_enabled())
+    {
+        uint32_t hashedInput = hash_password(inputPw);
 
-    printf("Akun dengan username %s berhasil login! Selamat datang di Groddit!\n", username);
+        if (stored_is_digits)
+        {
+            uint32_t storedHash = (uint32_t)wordToInt(USERS[user_id].password);
+
+            if (hashedInput != storedHash)
+            {
+                printf("Password salah!\n");
+                return;
+            }
+
+            CURRENT_USER_INDEX = user_id;
+            printf("Akun dengan username %s berhasil login! Selamat datang di Groddit!\n", username);
+            return;
+        }
+
+        if (!stored_is_digits)
+        {
+            if (strcmp(inputPw, storedPw) != 0)
+            {
+                printf("Password salah!\n");
+                return;
+            }
+
+            CURRENT_USER_INDEX = user_id;
+            printf("Akun dengan username %s berhasil login! (plaintext legacy)\n", username);
+            return;
+        }
+    }
+    else
+    {
+        if (strcmp(inputPw, storedPw) != 0)
+        {
+            printf("Password salah!\n");
+            return;
+        }
+
+        CURRENT_USER_INDEX = user_id;
+        printf("Akun dengan username %s berhasil login! Selamat datang di Groddit!\n", username);
+        return;
+    }
 }
 
 void logoutUser()
