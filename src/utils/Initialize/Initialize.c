@@ -50,7 +50,16 @@ int isFolderValid(const char *folder)
 void initialize()
 {
     // system("clear");
-    printf("Selamat datang di Groddit!\n\n");
+
+
+    printf("Loading in...............");
+    printf("\n");
+    loadingBarSmooth(30, 50000);
+
+    printf("\n\n");
+    printBanner();
+    printf("\n\n");
+    printf("Selamat datang di Groddit: CREDIT!\n");
 
     char folder[50];
     int folderValid = 0;
@@ -78,6 +87,9 @@ void initialize()
         }
 
         folderValid = 1;
+        printf("\nMemuat data dari folder '%s' ..........\n", folder);
+        loadingBarSmooth(30, 10000);
+        printf("\n");
     }
 
     printf("\n");

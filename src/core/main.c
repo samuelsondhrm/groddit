@@ -8,7 +8,9 @@ int main()
 
     while (!quit)
     {
-        printf("Masukkan perintah: ");
+        printf("Enter Command:\n");
+        printf("atau >> HELP; << untuk melihat daftar commands\n");
+        printf("█▒▒░░ ");
         fflush(stdout);
 
         STARTWORD_INPUT();
@@ -20,7 +22,11 @@ int main()
 
         wordToString(commandStr, currentWord);
 
-        if (strCmp(commandStr, "PRINTCOMMENTS") == 0)
+        if (strCmp(commandStr, "HELP") == 0)
+        {
+            printMenu();
+        }
+        else if (strCmp(commandStr, "PRINTCOMMENTS") == 0)
         {
             printComments();
         }
