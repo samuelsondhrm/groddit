@@ -262,4 +262,15 @@ void initialize()
     {
         printf("[Gagal] Memuat votings dari %s\n", pathVotings);
     }
+
+    // -------------------
+    // CONTENT MODERATION
+    // -------------------
+    char pathBlacklistWords[150];
+    buildPath(pathBlacklistWords, folder, "blacklisted_words.json");
+
+    if (!content_moderation_init(pathBlacklistWords))
+    {
+        printf("[Warning] Content moderation tidak aktif.\n");
+    }
 }

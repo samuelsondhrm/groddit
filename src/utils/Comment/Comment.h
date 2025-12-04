@@ -6,6 +6,7 @@
 #include "../User/User.h"
 #include "../Profil/Profil.h"
 #include "../Voting/Voting.h"
+#include "../ContentModeration/ContentModeration.h"
 
 /**
  * Mencari Comment berdasarkan comment_id dan post_id.

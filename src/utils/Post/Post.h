@@ -6,6 +6,7 @@
 #include "../Helper/Helper.h"
 #include "../User/User.h"
 #include "../Profil/Profil.h"
+#include "../ContentModeration/ContentModeration.h"
 
 // Helper untuk Post dan SubGroddit
 int findSubgrodditIndexByName(const char *subName);
@@ -17,19 +18,18 @@ void generatePostID(char *id, int num);
  * @param postId    Post ID yang dicari (e.g., "P001")
  * @return          Pointer ke Post jika ditemukan, NULL jika tidak ada.
  */
-Post* getPostById(const char *postId);
+Post *getPostById(const char *postId);
 
 /**
  * Mencari author_id (User ID) dari sebuah Post.
  * @param postId    Post ID yang dicari
  * @return          String author_id (static buffer), NULL jika post tidak ada
  */
-const char* getPostAuthorId(const char *postId);
+const char *getPostAuthorId(const char *postId);
 
 // Command utama fitur Post
-void commandPost();    
+void commandPost();
 void commandViewPost();
 void commandDeletePost();
-
 
 #endif
