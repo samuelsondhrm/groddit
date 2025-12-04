@@ -126,14 +126,8 @@ char *serialize_users(size_t *out_len)
         wordToString_safe(password, sizeof(password), USERS[i].password);
         timeToStr(created, USERS[i].created_at);
 
-        // escape username and password (they may contain commas/quotes)
-        char esc_username[1024];
-        char esc_password[1024];
-        csv_escape_field(username, esc_username, sizeof(esc_username));
-        csv_escape_field(password, esc_password, sizeof(esc_password));
-
         append_fmt(&buf, &cap, &pos, "%s,%s,%s,%d,%s\n",
-                   uid, esc_username, esc_password,
+                   uid, username, password,
                    USERS[i].karma,
                    created);
     }
@@ -254,10 +248,7 @@ char *serialize_subgroddits(size_t *out_len)
             wordToString_safe(sid, sizeof(sid), S.subgroddit_id);
             wordToString_safe(name_raw, sizeof(name_raw), S.name);
 
-            char esc_name[2048];
-            csv_escape_field(name_raw, esc_name, sizeof(esc_name));
-
-            append_fmt(&buf, &cap, &pos, "%s,%s\n", sid, esc_name);
+            append_fmt(&buf, &cap, &pos, "%s,%s\n", sid, name_raw);
         }
         current = current->next;
     }
@@ -285,12 +276,7 @@ char *serialize_socials(size_t *out_len)
         wordToString_safe(uid, sizeof(uid), SOCIALS[i].user_id);
         wordToString_safe(fid, sizeof(fid), SOCIALS[i].following_id);
 
-        // quote them for safety
-        char esc_uid[512], esc_fid[512];
-        csv_escape_field(uid, esc_uid, sizeof(esc_uid));
-        csv_escape_field(fid, esc_fid, sizeof(esc_fid));
-
-        append_fmt(&buf, &cap, &pos, "%s,%s\n", esc_uid, esc_fid);
+        append_fmt(&buf, &cap, &pos, "%s,%s\n", uid, fid);
     }
 
     *out_len = pos;
@@ -318,13 +304,7 @@ char *serialize_votings(size_t *out_len)
         wordToString_safe(tid, sizeof(tid), VOTINGS[i].target_id);
         wordToString_safe(vtype, sizeof(vtype), VOTINGS[i].vote_type);
 
-        char esc_uid[512], esc_ttype[256], esc_tid[512], esc_vtype[256];
-        csv_escape_field(uid, esc_uid, sizeof(esc_uid));
-        csv_escape_field(ttype, esc_ttype, sizeof(esc_ttype));
-        csv_escape_field(tid, esc_tid, sizeof(esc_tid));
-        csv_escape_field(vtype, esc_vtype, sizeof(esc_vtype));
-
-        append_fmt(&buf, &cap, &pos, "%s,%s,%s,%s\n", esc_uid, esc_ttype, esc_tid, esc_vtype);
+        append_fmt(&buf, &cap, &pos, "%s,%s,%s,%s\n", uid, ttype, tid, vtype);
     }
 
     *out_len = pos;
