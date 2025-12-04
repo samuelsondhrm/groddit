@@ -195,3 +195,127 @@ void IgnoreNewline()
                      break;
        }
 }
+
+char jsonChar = '\0';
+boolean JSON_EOF = false;
+static FILE *jsonPita = NULL;
+
+void STARTJSON(const char *filename)
+{
+       MODE = MODE_JSON_FILE;
+       jsonPita = fopen(filename, "rb");
+
+       if (jsonPita == NULL)
+       {
+              JSON_EOF = true;
+              jsonChar = '\0';
+              return;
+       }
+
+       JSON_EOF = false;
+       int c = fgetc(jsonPita);
+       if (c == EOF)
+       {
+              JSON_EOF = true;
+              jsonChar = '\0';
+       }
+       else
+       {
+              jsonChar = (char)c;
+       }
+}
+
+void ADVJSON()
+{
+       if (jsonPita == NULL)
+       {
+              JSON_EOF = true;
+              jsonChar = '\0';
+              return;
+       }
+
+       int c = fgetc(jsonPita);
+       if (c == EOF)
+       {
+              JSON_EOF = true;
+              jsonChar = '\0';
+              fclose(jsonPita);
+              jsonPita = NULL;
+       }
+       else
+       {
+              JSON_EOF = false;
+              jsonChar = (char)c;
+       }
+}
+
+void IgnoreWSJSON()
+{
+       while (!JSON_EOF && (jsonChar == ' ' || jsonChar == '\n' || jsonChar == '\t' || jsonChar == '\r'))
+       {
+              ADVJSON();
+       }
+}
+
+int CopyJSONString(char *out, int maxLen)
+{
+       if (jsonChar != '"')
+              return 0;
+
+       int idx = 0;
+       ADVJSON();
+
+       while (!JSON_EOF && jsonChar != '"')
+       {
+              if (jsonChar == '\\')
+              {
+                     ADVJSON();
+                     if (JSON_EOF)
+                            break;
+
+                     char esc = jsonChar;
+                     char put = '?';
+
+                     switch (esc)
+                     {
+                     case '"':
+                            put = '"';
+                            break;
+                     case '\\':
+                            put = '\\';
+                            break;
+                     case '/':
+                            put = '/';
+                            break;
+                     case 'n':
+                            put = '\n';
+                            break;
+                     case 'r':
+                            put = '\r';
+                            break;
+                     case 't':
+                            put = '\t';
+                            break;
+                     default:
+                            put = esc;
+                     }
+
+                     if (idx < maxLen - 1)
+                            out[idx++] = put;
+              }
+              else
+              {
+                     if (idx < maxLen - 1)
+                            out[idx++] = jsonChar;
+              }
+
+              ADVJSON();
+       }
+
+       if (JSON_EOF)
+              return 0;
+
+       out[idx] = '\0';
+       ADVJSON();
+       return 1;
+}
