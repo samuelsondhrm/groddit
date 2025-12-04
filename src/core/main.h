@@ -27,5 +27,6 @@
 #include "../utils/Feed/Feed.h"
 #include "../utils/FollRec/FollRec.h"
 #include "../utils/Trending/Trending.h"
+#include "../utils/AdvancedSearch/AdvancedSearch.h"
 
 #endif

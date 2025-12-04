@@ -425,6 +425,18 @@ int main()
         {
             commandTrending();
         }
+        else if (strCmp(commandStr, "SEARCH_USER") == 0)
+        {
+            commandSearchUser();
+        }
+        else if (strCmp(commandStr, "SEARCH_POST") == 0)
+        {
+            commandSearchPost();
+        }
+        else if (strCmp(commandStr, "SEARCH_SUBGRODDIT") == 0)
+        {
+            commandSearchSubgroddit();
+        }
         else
         {
             printf("Perintah '%s' tidak dikenali.\n", commandStr);
