@@ -27,170 +27,291 @@ int createFolderIfNotExists(const char *folder)
     return -1;
 }
 
+char *serialize_users(size_t *out_len)
+{
+    char *buf = malloc(USER_COUNT * 256 + 100);
+    int pos = 0;
+
+    pos += sprintf(buf + pos, "user_id,username,password,karma,created_at\n");
+
+    for (int i = 0; i < USER_COUNT; i++)
+    {
+        char uid[64], usn[64], pw[128], created[64];
+        wordToString(uid, USERS[i].user_id);
+        wordToString(usn, USERS[i].username);
+        wordToString(pw, USERS[i].password);
+        timeToStr(created, USERS[i].created_at);
+
+        pos += sprintf(buf + pos, "%s,%s,%s,%d,%s\n",
+                       uid, usn, pw,
+                       USERS[i].karma,
+                       created);
+    }
+
+    *out_len = pos;
+    return buf;
+}
+
+char *serialize_comments(size_t *out_len)
+{
+    char *buf = malloc(COMMENT_COUNT * 256 + 100);
+    int pos = 0;
+
+    pos += sprintf(buf + pos, "comment_id,post_id,author_id,parent_comment_id,content,upvotes,downvotes\n");
+
+    for (int i = 0; i < COMMENT_COUNT; i++)
+    {
+        char pid[64], aid[64], content[256];
+        wordToString(pid, COMMENTS[i].post_id);
+        wordToString(aid, COMMENTS[i].author_id);
+        wordToString(content, COMMENTS[i].content);
+
+        pos += sprintf(buf + pos, "%d,%s,%s,%d,%s,%d,%d\n",
+                       COMMENTS[i].comment_id,
+                       pid,
+                       aid,
+                       COMMENTS[i].parent_comment_id,
+                       content,
+                       COMMENTS[i].upvotes,
+                       COMMENTS[i].downvotes);
+    }
+
+    *out_len = pos;
+    return buf;
+}
+
+char *serialize_posts(size_t *out_len)
+{
+    size_t estimate = (size_t)POST_COUNT * 512 + 256;
+    char *buf = malloc(estimate);
+    if (!buf)
+    {
+        *out_len = 0;
+        return NULL;
+    }
+
+    int pos = 0;
+    pos += sprintf(buf + pos, "post_id,subgroddit_id,author_id,title,content,created_at,upvotes,downvotes\n");
+
+    Node *current = POSTS.head;
+    while (current != NULL)
+    {
+        if (current->element.type == TYPE_POST)
+        {
+            Post P = current->element.data.post;
+
+            char post_id[256], subgroddit_id[256], author_id[256], title[512], content[1024], created_at[64];
+            wordToString(post_id, P.post_id);
+            wordToString(subgroddit_id, P.subgroddit_id);
+            wordToString(author_id, P.author_id);
+            wordToString(title, P.title);
+            wordToString(content, P.content);
+            timeToStr(created_at, P.created_at);
+
+            if (pos + 2048 >= (int)estimate)
+            {
+                estimate *= 2;
+                char *newbuf = realloc(buf, estimate);
+                if (!newbuf)
+                {
+                    free(buf);
+                    *out_len = 0;
+                    return NULL;
+                }
+                buf = newbuf;
+            }
+
+            pos += sprintf(buf + pos, "%s,%s,%s,%s,%s,%s,%d,%d\n",
+                           post_id,
+                           subgroddit_id,
+                           author_id,
+                           title,
+                           content,
+                           created_at,
+                           P.upvotes,
+                           P.downvotes);
+        }
+        current = current->next;
+    }
+
+    *out_len = pos;
+    return buf;
+}
+
+char *serialize_subgroddits(size_t *out_len)
+{
+    size_t estimate = (size_t)(64) * (SUBGRODDIT_COUNT + 4) + 128;
+    char *buf = malloc(estimate);
+    if (!buf)
+    {
+        *out_len = 0;
+        return NULL;
+    }
+
+    int pos = 0;
+    pos += sprintf(buf + pos, "subgroddit_id,name\n");
+
+    Node *current = SUBGRODDITS.head;
+    while (current != NULL)
+    {
+        if (current->element.type == TYPE_SUBGRODDIT)
+        {
+            SubGroddit S = current->element.data.subgroddit;
+            char sid[256], name[256];
+            wordToString(sid, S.subgroddit_id);
+            wordToString(name, S.name);
+
+            if (pos + 512 >= (int)estimate)
+            {
+                estimate *= 2;
+                char *newbuf = realloc(buf, estimate);
+                if (!newbuf)
+                {
+                    free(buf);
+                    *out_len = 0;
+                    return NULL;
+                }
+                buf = newbuf;
+            }
+
+            pos += sprintf(buf + pos, "%s,%s\n", sid, name);
+        }
+        current = current->next;
+    }
+
+    *out_len = pos;
+    return buf;
+}
+
+char *serialize_socials(size_t *out_len)
+{
+    size_t estimate = (size_t)SOCIAL_COUNT * 128 + 128;
+    char *buf = malloc(estimate);
+    if (!buf)
+    {
+        *out_len = 0;
+        return NULL;
+    }
+
+    int pos = 0;
+    pos += sprintf(buf + pos, "user_id,following_id\n");
+
+    for (int i = 0; i < SOCIAL_COUNT; i++)
+    {
+        char uid[256], fid[256];
+        wordToString(uid, SOCIALS[i].user_id);
+        wordToString(fid, SOCIALS[i].following_id);
+
+        if (pos + 256 >= (int)estimate)
+        {
+            estimate *= 2;
+            char *newbuf = realloc(buf, estimate);
+            if (!newbuf)
+            {
+                free(buf);
+                *out_len = 0;
+                return NULL;
+            }
+            buf = newbuf;
+        }
+
+        pos += sprintf(buf + pos, "%s,%s\n", uid, fid);
+    }
+
+    *out_len = pos;
+    return buf;
+}
+
+char *serialize_votings(size_t *out_len)
+{
+    size_t estimate = (size_t)VOTING_COUNT * 160 + 128;
+    char *buf = malloc(estimate);
+    if (!buf)
+    {
+        *out_len = 0;
+        return NULL;
+    }
+
+    int pos = 0;
+    pos += sprintf(buf + pos, "user_id,target_type,target_id,vote_type\n");
+
+    for (int i = 0; i < VOTING_COUNT; i++)
+    {
+        char uid[256], ttype[64], tid[256], vtype[64];
+        wordToString(uid, VOTINGS[i].user_id);
+        wordToString(ttype, VOTINGS[i].target_type);
+        wordToString(tid, VOTINGS[i].target_id);
+        wordToString(vtype, VOTINGS[i].vote_type);
+
+        if (pos + 512 >= (int)estimate)
+        {
+            estimate *= 2;
+            char *newbuf = realloc(buf, estimate);
+            if (!newbuf)
+            {
+                free(buf);
+                *out_len = 0;
+                return NULL;
+            }
+            buf = newbuf;
+        }
+
+        pos += sprintf(buf + pos, "%s,%s,%s,%s\n", uid, ttype, tid, vtype);
+    }
+
+    *out_len = pos;
+    return buf;
+}
+
 void performSave(const char *folder)
 {
-    printf("Anda akan melakukan penyimpanan di %s.\n\n", folder);
-    printf("Mohon tunggu...\n");
+    printf("Menyimpan data ke folder %s...\n", folder);
 
-    for (int i = 1; i <= 3; i++)
-    {
-        printf("%d...\n", i);
-        sleep(1);
-    }
-    printf("\n");
+    char path[200];
+    size_t len;
+    char *buf;
 
-    // Save comments
-    char pathComments[150];
-    buildPath(pathComments, folder, "comment.csv");
-    FILE *fileComments = fopen(pathComments, "w");
-    if (fileComments != NULL)
-    {
-        fprintf(fileComments, "comment_id,post_id,author_id,parent_comment_id,content,upvotes,downvotes\n");
-        for (int i = 0; i < COMMENT_COUNT; i++)
-        {
-            char post_id[256], author_id[256], content[256];
-            wordToString(post_id, COMMENTS[i].post_id);
-            wordToString(author_id, COMMENTS[i].author_id);
-            wordToString(content, COMMENTS[i].content);
+    // 1. USERS
+    buildPath(path, folder, "user.csv");
+    buf = serialize_users(&len);
+    write_encrypted_file(path, (uint8_t *)buf, len);
+    free(buf);
 
-            fprintf(fileComments, "%d,%s,%s,%d,%s,%d,%d\n",
-                    COMMENTS[i].comment_id,
-                    post_id,
-                    author_id,
-                    COMMENTS[i].parent_comment_id,
-                    content,
-                    COMMENTS[i].upvotes,
-                    COMMENTS[i].downvotes);
-        }
-        fclose(fileComments);
-    }
+    // 2. COMMENTS
+    buildPath(path, folder, "comment.csv");
+    buf = serialize_comments(&len);
+    write_encrypted_file(path, (uint8_t *)buf, len);
+    free(buf);
 
-    // Save posts
-    char pathPosts[150];
-    buildPath(pathPosts, folder, "post.csv");
-    FILE *filePosts = fopen(pathPosts, "w");
-    if (filePosts != NULL)
-    {
-        fprintf(filePosts, "post_id,subgroddit_id,author_id,title,content,created_at,upvotes,downvotes\n");
-        Node *current = POSTS.head;
-        while (current != NULL)
-        {
-            if (current->element.type == TYPE_POST)
-            {
-                Post P = current->element.data.post;
-                char post_id[256], subgroddit_id[256], author_id[256], title[256], content[256], created_at[256];
-                wordToString(post_id, P.post_id);
-                wordToString(subgroddit_id, P.subgroddit_id);
-                wordToString(author_id, P.author_id);
-                wordToString(title, P.title);
-                wordToString(content, P.content);
-                timeToStr(created_at, P.created_at);
+    // 3. POSTS
+    buildPath(path, folder, "post.csv");
+    buf = serialize_posts(&len);
+    write_encrypted_file(path, (uint8_t *)buf, len);
+    free(buf);
 
-                fprintf(filePosts, "%s,%s,%s,%s,%s,%s,%d,%d\n",
-                        post_id,
-                        subgroddit_id,
-                        author_id,
-                        title,
-                        content,
-                        created_at,
-                        P.upvotes,
-                        P.downvotes);
-            }
+    // 4. SUBGRODDITS
+    buildPath(path, folder, "subgroddit.csv");
+    buf = serialize_subgroddits(&len);
+    write_encrypted_file(path, (uint8_t *)buf, len);
+    free(buf);
 
-            current = current->next;
-        }
-        fclose(filePosts);
-    }
+    // 5. SOCIALS
+    buildPath(path, folder, "social.csv");
+    buf = serialize_socials(&len);
+    write_encrypted_file(path, (uint8_t *)buf, len);
+    free(buf);
 
-    // Save users
-    char pathUsers[150];
-    buildPath(pathUsers, folder, "user.csv");
-    FILE *fileUsers = fopen(pathUsers, "w");
-    if (fileUsers != NULL)
-    {
-        fprintf(fileUsers, "user_id,username,password,karma,created_at\n");
-        for (int i = 0; i < USER_COUNT; i++)
-        {
-            char user_id[256], username[256], password[256], created_at[256];
-            wordToString(user_id, USERS[i].user_id);
-            wordToString(username, USERS[i].username);
-            wordToString(password, USERS[i].password);
-            timeToStr(created_at, USERS[i].created_at);
+    // 6. VOTINGS
+    buildPath(path, folder, "voting.csv");
+    buf = serialize_votings(&len);
+    write_encrypted_file(path, (uint8_t *)buf, len);
+    free(buf);
 
-            fprintf(fileUsers, "%s,%s,%s,%d,%s\n",
-                    user_id,
-                    username,
-                    password,
-                    USERS[i].karma,
-                    created_at);
-        }
-        fclose(fileUsers);
-    }
+    // 7. SAVE SECURITY.CONF
+    buildPath(path, folder, "security.conf");
+    save_security_conf(path);
 
-    // Save subgroddits
-    char pathSubs[150];
-    buildPath(pathSubs, folder, "subgroddit.csv");
-    FILE *fileSubs = fopen(pathSubs, "w");
-    if (fileSubs != NULL)
-    {
-        fprintf(fileSubs, "subgroddit_id,name\n");
-        Node *current = SUBGRODDITS.head;
-        while (current != NULL)
-        {
-            if (current->element.type == TYPE_SUBGRODDIT)
-            {
-                SubGroddit S = current->element.data.subgroddit;
-                char subgroddit_id[256], name[256];
-                wordToString(subgroddit_id, S.subgroddit_id);
-                wordToString(name, S.name);
-
-                fprintf(fileSubs, "%s,%s\n", subgroddit_id, name);
-            }
-
-            current = current->next;
-        }
-        fclose(fileSubs);
-    } 
-    
-    // Save socials
-    char pathSocials[150];
-    buildPath(pathSocials, folder, "social.csv");
-    FILE *fileSocials = fopen(pathSocials, "w");
-    if (fileSocials != NULL)
-    {
-        fprintf(fileSocials, "user_id,following_id\n");
-        for (int i = 0; i < SOCIAL_COUNT; i++)
-        {
-            char user_id[256], following_id[256];
-            wordToString(user_id, SOCIALS[i].user_id);
-            wordToString(following_id, SOCIALS[i].following_id);
-
-            fprintf(fileSocials, "%s,%s\n", user_id, following_id);
-        }
-        fclose(fileSocials);
-    }
-
-    // Save votings
-    char pathVotings[150];
-    buildPath(pathVotings, folder, "voting.csv");
-    FILE *fileVotings = fopen(pathVotings, "w");
-    if (fileVotings != NULL)
-    {
-        fprintf(fileVotings, "user_id,target_type,target_id,vote_type\n");
-        for (int i = 0; i < VOTING_COUNT; i++)
-        {
-            char user_id[256], target_type[256], target_id[256], vote_type[256];
-            wordToString(user_id, VOTINGS[i].user_id);
-            wordToString(target_type, VOTINGS[i].target_type);
-            wordToString(target_id, VOTINGS[i].target_id);
-            wordToString(vote_type, VOTINGS[i].vote_type);
-
-            fprintf(fileVotings, "%s,%s,%s,%s\n", user_id, target_type, target_id, vote_type);
-        }
-        fclose(fileVotings);
-    }
-
-    printf("Penyimpanan telah berhasil dilakukan!\n\n");
+    printf("Penyimpanan selesai!\n");
 }
 
 void commandSave()

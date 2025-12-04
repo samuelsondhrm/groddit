@@ -20,7 +20,16 @@ int main()
 
         wordToString(commandStr, currentWord);
 
-        if (strCmp(commandStr, "PRINTCOMMENTS") == 0)
+        if (strCmp(commandStr, "PRINTALL") == 0)
+        {
+            printComments();
+            printPosts();
+            printUsers();
+            printSubGroddits();
+            printSocials();
+            printVotings();
+        }
+        else if (strCmp(commandStr, "PRINTCOMMENTS") == 0)
         {
             printComments();
         }
@@ -43,6 +52,10 @@ int main()
         else if (strCmp(commandStr, "PRINTVOTINGS") == 0)
         {
             printVotings();
+        }
+        else if (strcmp(commandStr, "SET_SECURITY") == 0)
+        {
+            handleSecurityCommand();
         }
         else if (strCmp(commandStr, "POST") == 0)
         {
@@ -420,22 +433,6 @@ int main()
         else if (strCmp(commandStr, "FRIEND_RECOMMENDATION") == 0)
         {
             commandFriendRecommendation();
-        }
-        else if (strCmp(commandStr, "TRENDING") == 0)
-        {
-            commandTrending();
-        }
-        else if (strCmp(commandStr, "SEARCH_USER") == 0)
-        {
-            commandSearchUser();
-        }
-        else if (strCmp(commandStr, "SEARCH_POST") == 0)
-        {
-            commandSearchPost();
-        }
-        else if (strCmp(commandStr, "SEARCH_SUBGRODDIT") == 0)
-        {
-            commandSearchSubgroddit();
         }
         else
         {

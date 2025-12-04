@@ -38,6 +38,22 @@ int wordToInt(Word w)
     return result * sign;
 }
 
+void uint32ToWord(Word *out, uint32_t value)
+{
+    char buf[12]; // max "4294967295"
+    sprintf(buf, "%u", value);
+
+    out->Length = 0;
+
+    for (int i = 0; buf[i] != '\0' && i < NMax; i++)
+    {
+        out->TabWord[i] = buf[i];
+        out->Length++;
+    }
+
+    out->TabWord[out->Length] = '\0';
+}
+
 void copyWord(Word *dest, Word src)
 {
     dest->Length = src.Length;
