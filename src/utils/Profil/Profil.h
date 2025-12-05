@@ -7,8 +7,12 @@
 #include "../GlobalData/GlobalData.h"
 #include "../Helper/Helper.h"
 #include "../User/User.h"
+#include "../Kreativitas/Kreativitas.h"
 
 // Menampilkan profil lengkap untuk username tertentu.
 void showUserProfile(const char *username);
+
+// Helper untuk mendapatkan nama subgroddit berdasarkan ID
+void getSubgrodditName(Word subId, char *out);
 
 #endif

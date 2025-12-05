@@ -3,16 +3,16 @@
 int main()
 {
     initialize();
+    clearScreen();
+    printBanner();
+    
     char commandStr[50];
     boolean quit = false;
 
     while (!quit)
     {
-        printf("\n");
-        printf("Enter Command:\n");
-        printf("atau >> HELP; << untuk melihat daftar commands\n");
-        printf("█▒▒░░ ");
-        fflush(stdout);
+        printf("%s%s%s\n", DIM, "─────────────────────────────────────────────────────────────────────────────────", RESET);
+        printInputPrompt("COMMAND INPUT");
 
         STARTWORD_INPUT();
         printf("\n");
@@ -91,7 +91,38 @@ int main()
         }
         else if (strCmp(commandStr, "EXIT") == 0 || strCmp(commandStr, "QUIT") == 0)
         {
-            printf("Keluar dari program.\n");
+            clearScreen();
+            printBreadcrumb("Home > Exit");
+            
+            printHorizontalLine(80, DBOX_TL, DBOX_H, DBOX_TR);
+            printf("%s║%s                          %sFAREWELL%s                              %s║%s\n", 
+                   BOLD_CYAN, RESET, BOLD_WHITE, RESET, BOLD_CYAN, RESET);
+            printHorizontalLine(80, DBOX_BL, DBOX_H, DBOX_BR);
+            printf("%s\n", RESET);
+            
+            printf("\n");
+            printSectionHeader("", "THANK YOU");
+            printf("\n%s %sThank you for using %sGroddit%s!%s\n", 
+                   BOX_V, BOLD_WHITE, BOLD_CYAN, BOLD_WHITE, RESET);
+            printf("%s %sYour session has been terminated.%s\n", BOX_V, DIM, RESET);
+            printSectionDivider();
+            printf("\n");
+            
+            if (CURRENT_USER_INDEX != -1)
+            {
+                printWarning("You are still logged in");
+                printf("Don't forget to %sSAVE;%s your data before closing!\n\n", BOLD_YELLOW, RESET);
+            }
+            
+            spinnerAnimation("Shutting down", 8);
+            printf("\n\n");
+            printf("%s%s════════════════════════════════════════════════════════════════════════════════%s\n", 
+                   BOLD_CYAN, DIM, RESET);
+            printf("%s                            See you again!                             %s\n", 
+                   BOLD_WHITE, RESET);
+            printf("%s%s════════════════════════════════════════════════════════════════════════════════%s\n\n", 
+                   BOLD_CYAN, DIM, RESET);
+            
             quit = true;
         }
         else if (strCmp(commandStr, "REGISTER") == 0)
@@ -440,6 +471,22 @@ int main()
         else if (strCmp(commandStr, "FRIEND_RECOMMENDATION") == 0)
         {
             commandFriendRecommendation();
+        }
+        else if (strCmp(commandStr, "TRENDING") == 0)
+        {
+            commandTrending();
+        }
+        else if (strCmp(commandStr, "SEARCH_USER") == 0)
+        {
+            commandSearchUser();
+        }
+        else if (strCmp(commandStr, "SEARCH_POST") == 0)
+        {
+            commandSearchPost();
+        }
+        else if (strCmp(commandStr, "SEARCH_SUBGRODDIT") == 0)
+        {
+            commandSearchSubgroddit();
         }
         else
         {

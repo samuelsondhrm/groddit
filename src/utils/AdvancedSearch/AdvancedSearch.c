@@ -5,6 +5,7 @@
 #include "../../adt/Trie/Trie.h"
 #include "../GlobalData/GlobalData.h"
 #include "../Helper/Helper.h"
+#include "../Kreativitas/Kreativitas.h"
 #include "../../adt/ListBerkait/ListBerkait.h"
 
 static void getSubgrodditNameById(Word subId, char *out) {
@@ -23,9 +24,21 @@ static void getSubgrodditNameById(Word subId, char *out) {
 }
 
 void commandSearchUser() {
+    clearScreen();
+    printBreadcrumb("Home > Search User");
+    
+    printHorizontalLine(80, DBOX_TL, DBOX_H, DBOX_TR);
+    printf("%s║%s                          %sSEARCH USER%s                              %s║%s\n", 
+           BOLD_CYAN, RESET, BOLD_WHITE, RESET, BOLD_CYAN, RESET);
+    printHorizontalLine(80, DBOX_BL, DBOX_H, DBOX_BR);
+    printf("%s\n", RESET);
+
     ADVWORD_INPUT();
     if (currentWord.Length == 0) {
-        printf("Format perintah SEARCH_USER salah. Gunakan 'SEARCH_USER <prefix>;'\n");
+        printError("Invalid command format");
+        printf("Prefix is required.\n\n");
+        printf("%sUsage:%s %sSEARCH_USER <prefix>;%s\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
+        printf("%sExample:%s %sSEARCH_USER bob;%s\n", DIM, RESET, BOLD_WHITE, RESET);
         return;
     }
 
@@ -36,9 +49,14 @@ void commandSearchUser() {
         while (currentWord.Length != 0) {
             ADVWORD_INPUT();
         }
-        printf("Format perintah SEARCH_USER salah. Gunakan 'SEARCH_USER <prefix>;'\n");
+        printError("Invalid command format");
+        printf("Too many arguments provided.\n\n");
+        printf("%sUsage:%s %sSEARCH_USER <prefix>;%s\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
         return;
     }
+
+    printf("\n");
+    spinnerAnimation("Searching users", 8);
 
     Trie T;
     createTrie(&T);
@@ -53,10 +71,15 @@ void commandSearchUser() {
     char prefixStr[NMax + 1];
     wordToString(prefixStr, prefixWord);
 
-    printf("Menampilkan hasil pencarian user dengan prefix \"%s\"\n", prefixStr);
+    printf("\n");
+    printSectionHeader("", "SEARCH RESULTS");
+    printf("\n%s %sPrefix:%s %s\"%s\"%s\n", BOX_V, BOLD_WHITE, RESET, BOLD_CYAN, prefixStr, RESET);
+    printSectionDivider();
+    printf("\n");
 
     if (indices == NULL || outCount == 0) {
-        printf("(Tidak ada hasil)\n");
+        printf("%s %s(No users found)%s\n", BOX_V, DIM, RESET);
+        printSectionDivider();
         freeTrie(&T);
         if (indices != NULL)
             free(indices);
@@ -70,8 +93,12 @@ void commandSearchUser() {
 
         char username[256];
         wordToString(username, USERS[idx].username);
-        printf("%d. %s\n", i + 1, username);
+        printf("%s %s%d.%s %s@%s%s\n", BOX_V, BOLD_WHITE, i + 1, RESET, BOLD_CYAN, username, RESET);
     }
+    printSectionDivider();
+    printf("\n");
+    printInfo("Total results: ");
+    printf("%s%d%s users\n", BOLD_WHITE, outCount, RESET);
 
     freeTrie(&T);
     free(indices);
@@ -158,9 +185,21 @@ void commandSearchPost() {
 }
 
 void commandSearchSubgroddit() {
+    clearScreen();
+    printBreadcrumb("Home > Search Subgroddit");
+    
+    printHorizontalLine(80, DBOX_TL, DBOX_H, DBOX_TR);
+    printf("%s║%s                       %sSEARCH SUBGRODDIT%s                          %s║%s\n", 
+           BOLD_CYAN, RESET, BOLD_WHITE, RESET, BOLD_CYAN, RESET);
+    printHorizontalLine(80, DBOX_BL, DBOX_H, DBOX_BR);
+    printf("%s\n", RESET);
+
     ADVWORD_INPUT();
     if (currentWord.Length == 0) {
-        printf("Format perintah SEARCH_SUBGRODDIT salah. Gunakan 'SEARCH_SUBGRODDIT <prefix>;'\n");
+        printError("Invalid command format");
+        printf("Name prefix is required.\n\n");
+        printf("%sUsage:%s %sSEARCH_SUBGRODDIT <prefix>;%s\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
+        printf("%sExample:%s %sSEARCH_SUBGRODDIT r/prog;%s\n", DIM, RESET, BOLD_WHITE, RESET);
         return;
     }
 
@@ -171,9 +210,14 @@ void commandSearchSubgroddit() {
         while (currentWord.Length != 0) {
             ADVWORD_INPUT();
         }
-        printf("Format perintah SEARCH_SUBGRODDIT salah. Gunakan 'SEARCH_SUBGRODDIT <prefix>;'\n");
+        printError("Invalid command format");
+        printf("Too many arguments provided.\n\n");
+        printf("%sUsage:%s %sSEARCH_SUBGRODDIT <prefix>;%s\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
         return;
     }
+
+    printf("\n");
+    spinnerAnimation("Searching subgroddits", 8);
 
     Trie T;
     createTrie(&T);
@@ -188,7 +232,9 @@ void commandSearchSubgroddit() {
             if (!ensureCapacity((void **)&subArr, &arrCap, sizeof(SubGroddit *), subCount + 1)) {
                 freeTrie(&T);
                 free(subArr);
-                printf("Gagal alokasi memori untuk Advanced Search subgroddit.\n");
+                printf("\n");
+                printError("Memory allocation failed");
+                printf("Could not allocate memory for search.\n");
                 return;
             }
 
@@ -206,10 +252,15 @@ void commandSearchSubgroddit() {
     char prefixStr[NMax + 1];
     wordToString(prefixStr, prefixWord);
 
-    printf("Menampilkan hasil pencarian subgroddit untuk prefix \"%s\"\n", prefixStr);
+    printf("\n");
+    printSectionHeader("", "SEARCH RESULTS");
+    printf("\n%s %sName prefix:%s %s\"%s\"%s\n", BOX_V, BOLD_WHITE, RESET, BOLD_CYAN, prefixStr, RESET);
+    printSectionDivider();
+    printf("\n");
 
     if (indices == NULL || outCount == 0) {
-        printf("(Tidak ada hasil)\n");
+        printf("%s %s(No subgroddits found)%s\n", BOX_V, DIM, RESET);
+        printSectionDivider();
         freeTrie(&T);
         free(subArr);
         if (indices != NULL)
@@ -226,8 +277,12 @@ void commandSearchSubgroddit() {
 
         char name[256];
         wordToString(name, sub->name);
-        printf("%d. %s\n", i + 1, name);
+        printf("%s %s%d.%s %s%s%s\n", BOX_V, BOLD_WHITE, i + 1, RESET, BOLD_MAGENTA, name, RESET);
     }
+    printSectionDivider();
+    printf("\n");
+    printInfo("Total results: ");
+    printf("%s%d%s subgroddits\n", BOLD_WHITE, outCount, RESET);
 
     freeTrie(&T);
     free(subArr);

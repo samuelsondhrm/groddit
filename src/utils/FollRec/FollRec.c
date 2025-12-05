@@ -25,20 +25,37 @@ static void buildFollowedArray(boolean *followed, int n, int src) {
 
 // Cetak rekomendasi kosong
 static void printNoRecommendation(const char *username) {
-    printf("Menampilkan rekomendasi teman untuk pengguna %s...\n\n", username);
-    printf("Tidak ada rekomendasi teman yang dapat ditampilkan.\n");
+    printf("\n");
+    printSectionHeader("", "RECOMMENDATIONS");
+    printf("\n%s %sUser:%s %s@%s%s\n", BOX_V, BOLD_WHITE, RESET, BOLD_CYAN, username, RESET);
+    printSectionDivider();
+    printf("\n%s %s(No recommendations available)%s\n", BOX_V, DIM, RESET);
+    printSectionDivider();
+    printf("\n");
+    printInfo("Follow more users to get recommendations");
 }
 
 
 // Implementasi utama
 
 void commandFriendRecommendation() {
+    clearScreen();
+    printBreadcrumb("Home > Friend Recommendation");
+    
+    printHorizontalLine(80, DBOX_TL, DBOX_H, DBOX_TR);
+    printf("%s║%s                     %sFRIEND RECOMMENDATION%s                        %s║%s\n", 
+           BOLD_CYAN, RESET, BOLD_WHITE, RESET, BOLD_CYAN, RESET);
+    printHorizontalLine(80, DBOX_BL, DBOX_H, DBOX_BR);
+    printf("%s\n", RESET);
+
     // Jika belum login, bersihkan kata dan beri pesan error
     if (!isLoggedIn()) {
         while (currentWord.Length != 0) {
             ADVWORD_INPUT();
         }
-        printf("Anda belum login! Masuk terlebih dahulu untuk dapat mengakses Groddit.\n");
+        printError("Authentication required");
+        printf("You must be logged in to view recommendations.\n\n");
+        printf("%sTip:%s Use %sLOGIN;%s to access your account.\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
         return;
     }
 
@@ -48,9 +65,14 @@ void commandFriendRecommendation() {
         while (currentWord.Length != 0) {
             ADVWORD_INPUT();
         }
-        printf("Format perintah FRIEND_RECOMMENDATION salah. Gunakan 'FRIEND_RECOMMENDATION;'\n");
+        printError("Invalid command format");
+        printf("This command takes no arguments.\n\n");
+        printf("%sUsage:%s %sFRIEND_RECOMMENDATION;%s\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
         return;
     }
+
+    printf("\n");
+    spinnerAnimation("Analyzing your network", 10);
 
     int n = USER_COUNT;
     int src = CURRENT_USER_INDEX;
@@ -160,7 +182,11 @@ void commandFriendRecommendation() {
             }
     }
 
-    printf("Menampilkan rekomendasi teman untuk pengguna %s...\n\n", currName);
+    printf("\n");
+    printSectionHeader("", "TOP RECOMMENDATIONS");
+    printf("\n%s %sBased on mutual connections%s\n", BOX_V, DIM, RESET);
+    printSectionDivider();
+    printf("\n");
 
     int rank = 1;
     while (rank <= MAX_REC_RESULTS && !isHeapEmpty(H)) {
@@ -175,9 +201,13 @@ void commandFriendRecommendation() {
         char uname[256];
         wordToString(uname, USERS[v].username);
 
-        printf("%d. %s (%d mutual connections)\n", rank, uname, m);
+        printf("%s %s%d.%s %s@%s%s %s(%d mutual)%s\n", 
+               BOX_V, BOLD_WHITE, rank, RESET, BOLD_CYAN, uname, RESET, DIM, m, RESET);
         rank++;
     }
+    printSectionDivider();
+    printf("\n");
+    printInfo("Recommendations based on BFS graph traversal");
 
     deallocateHeap(&H);
     free(depth); free(visited); free(followed); free(mutual); free(queue);

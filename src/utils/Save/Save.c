@@ -303,88 +303,158 @@ char *serialize_votings(size_t *out_len)
 
 void performSave(const char *folder)
 {
-    printf("Menyimpan data ke folder %s...\n", folder);
+    printSectionHeader("", "SAVING PROCESS");
+    printf("\n%s %sDestination folder:%s %s%s%s\n", BOX_V, BOLD_WHITE, RESET, BOLD_CYAN, folder, RESET);
+    printSectionDivider();
+    printf("\n");
+    spinnerAnimation("Preparing to save data", 10);
+    printf("\n");
 
     char path[200];
     size_t len;
     char *buf;
 
     // 1. USERS
+    printf("%s %sSaving users...%s", BOX_V, DIM, RESET);
+    fflush(stdout);
     buildPath(path, folder, "user.csv");
     buf = serialize_users(&len);
     if (buf)
     {
         write_encrypted_file(path, (uint8_t *)buf, len);
+        printf(" %s[OK] %d users%s\n", GREEN, USER_COUNT, RESET);
         free(buf);
+    }
+    else
+    {
+        printf(" %s[FAILED]%s\n", BOLD_RED, RESET);
     }
 
     // 2. COMMENTS
+    printf("%s %sSaving comments...%s", BOX_V, DIM, RESET);
+    fflush(stdout);
     buildPath(path, folder, "comment.csv");
     buf = serialize_comments(&len);
     if (buf)
     {
         write_encrypted_file(path, (uint8_t *)buf, len);
+        printf(" %s[OK] %d comments%s\n", GREEN, COMMENT_COUNT, RESET);
         free(buf);
+    }
+    else
+    {
+        printf(" %s[FAILED]%s\n", BOLD_RED, RESET);
     }
 
     // 3. POSTS
+    printf("%s %sSaving posts...%s", BOX_V, DIM, RESET);
+    fflush(stdout);
     buildPath(path, folder, "post.csv");
     buf = serialize_posts(&len);
     if (buf)
     {
         write_encrypted_file(path, (uint8_t *)buf, len);
+        printf(" %s[OK] %d posts%s\n", GREEN, POST_COUNT, RESET);
         free(buf);
+    }
+    else
+    {
+        printf(" %s[FAILED]%s\n", BOLD_RED, RESET);
     }
 
     // 4. SUBGRODDITS
+    printf("%s %sSaving subgroddits...%s", BOX_V, DIM, RESET);
+    fflush(stdout);
     buildPath(path, folder, "subgroddit.csv");
     buf = serialize_subgroddits(&len);
     if (buf)
     {
         write_encrypted_file(path, (uint8_t *)buf, len);
+        printf(" %s[OK] %d subgroddits%s\n", GREEN, SUBGRODDIT_COUNT, RESET);
         free(buf);
+    }
+    else
+    {
+        printf(" %s[FAILED]%s\n", BOLD_RED, RESET);
     }
 
     // 5. SOCIALS
+    printf("%s %sSaving social connections...%s", BOX_V, DIM, RESET);
+    fflush(stdout);
     buildPath(path, folder, "social.csv");
     buf = serialize_socials(&len);
     if (buf)
     {
         write_encrypted_file(path, (uint8_t *)buf, len);
+        printf(" %s[OK] %d connections%s\n", GREEN, SOCIAL_COUNT, RESET);
         free(buf);
+    }
+    else
+    {
+        printf(" %s[FAILED]%s\n", BOLD_RED, RESET);
     }
 
     // 6. VOTINGS
+    printf("%s %sSaving votes...%s", BOX_V, DIM, RESET);
+    fflush(stdout);
     buildPath(path, folder, "voting.csv");
     buf = serialize_votings(&len);
     if (buf)
     {
         write_encrypted_file(path, (uint8_t *)buf, len);
+        printf(" %s[OK] %d votes%s\n", GREEN, VOTING_COUNT, RESET);
         free(buf);
+    }
+    else
+    {
+        printf(" %s[FAILED]%s\n", BOLD_RED, RESET);
     }
 
     // 7. SAVE SECURITY.CONF
+    printf("%s %sSaving security config...%s", BOX_V, DIM, RESET);
+    fflush(stdout);
     buildPath(path, folder, "security.conf");
     save_security_conf(path);
+    printf(" %s[DONE]%s\n", GREEN, RESET);
 
-    printf("Penyimpanan selesai!\n");
+    printSectionDivider();
+    printf("\n");
+    printSuccess("Data saved successfully!");
+    printf("All data has been saved to %s%s%s\n", BOLD_CYAN, folder, RESET);
 }
 
 void commandSave()
 {
+    clearScreen();
+    printBreadcrumb("Home > Save Data");
+    
+    printHorizontalLine(80, DBOX_TL, DBOX_H, DBOX_TR);
+    printf("%s║%s                           %sSAVE DATA%s                               %s║%s\n", 
+           BOLD_CYAN, RESET, BOLD_WHITE, RESET, BOLD_CYAN, RESET);
+    printHorizontalLine(80, DBOX_BL, DBOX_H, DBOX_BR);
+    printf("%s\n", RESET);
+
     int folderValid = 0;
     char folder[50];
 
     while (!folderValid)
     {
-        printf("Masukkan nama folder penyimpanan.\n");
+        printf("\n");
+        printSectionHeader("", "FOLDER SELECTION");
+        printf("\n%s %sEnter destination folder name:%s\n", BOX_V, BOLD_WHITE, RESET);
+        printSectionDivider();
+        printInputPrompt("FOLDER NAME");
         fflush(stdout);
 
         STARTWORD_INPUT();
+        printf("\n");
 
         if (currentWord.Length == 0)
         {
-            printf("[Error] Nama folder tidak boleh kosong!\n");
+            printError("Empty folder name");
+            printf("Folder name cannot be empty!\n\n");
+            printf("%sExample:%s %sconfig-new, backup-2024, etc.%s\n", 
+                   DIM, RESET, BOLD_WHITE, RESET);
             continue;
         }
 
@@ -394,18 +464,23 @@ void commandSave()
 
         if (folderStatus == 1)
         {
-            printf("Belum terdapat %s. Akan dilakukan pembuatan %s terlebih dahulu.\n\n", folder, folder);
-            printf("Mohon tunggu...\n");
-            for (int i = 1; i <= 3; i++)
-            {
-                printf("%d...\n", i);
-                sleep(1);
-            }
-            printf("\n%s sudah berhasil dibuat.\n\n", folder);
+            printf("\n");
+            printWarning("Creating new folder");
+            printf("Folder \"%s%s%s\" does not exist. Creating it now...\n\n", 
+                   BOLD_YELLOW, folder, RESET);
+            spinnerAnimation("Creating folder structure", 10);
+            printf("\n\n");
+            printSuccess("Folder created!");
+            printf("Directory %s%s%s is ready for saving.\n", 
+                   BOLD_CYAN, folder, RESET);
         }
         else if (folderStatus == -1)
         {
-            printf("[Error] Gagal membuat folder %s!\n", folder);
+            printError("Failed to create folder");
+            printf("Could not create directory: %s%s%s\n\n", 
+                   BOLD_RED, folder, RESET);
+            printf("%sTip:%s Check write permissions or try a different name.\n", 
+                   BOLD_CYAN, RESET);
             continue;
         }
 

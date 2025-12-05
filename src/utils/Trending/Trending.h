@@ -13,6 +13,7 @@
 #include "../GlobalData/GlobalData.h"
 #include "../Subgroddit/Subgroddit.h"
 #include "../Helper/Helper.h"
+#include "../Kreativitas/Kreativitas.h"
 
 // struktur buat simpan keyword dan freq
 typedef struct {

@@ -7,6 +7,7 @@
 #include "../User/User.h"
 #include "../Profil/Profil.h"
 #include "../ContentModeration/ContentModeration.h"
+#include "../Kreativitas/Kreativitas.h"
 
 // Helper untuk Post dan SubGroddit
 int findSubgrodditIndexByName(const char *subName);

@@ -139,18 +139,34 @@ void commandPost()
 {
     if (!isLoggedIn())
     {
-        printf("Anda belum login! Masuk terlebih dahulu untuk dapat mengakses Groddit.\n");
+        printError("Not logged in");
+        printf("You must be logged in to create posts.\n");
+        printf("\nUse %sLOGIN;%s to sign in to your account.\n", BOLD_WHITE, RESET);
         return;
     }
 
-    printf("Masukkan nama Subgroddit:\n");
+    clearScreen();
+    printBreadcrumb("Main Menu > Create Post");
+
+    printf("\n");
+    printf("%s", BOLD_CYAN);
+    printHorizontalLine(80, DBOX_TL, DBOX_H, DBOX_TR);
+    printf("%s                          CREATE NEW POST                            %s\n", DBOX_V, DBOX_V);
+    printHorizontalLine(80, DBOX_BL, DBOX_H, DBOX_BR);
+    printf("%s\n", RESET);
+
+    printSectionHeader("", "SUBGRODDIT SELECTION");
+    printf("\n%s %sEnter subgroddit name (must start with r/):%s\n", BOX_V, BOLD_WHITE, RESET);
+    printf("%s %s└─▶%s ", BOX_V, BOLD_CYAN, RESET);
 
     Word subNameWord;
     readLineWord(&subNameWord);
 
     if (subNameWord.Length == 0)
     {
-        printf("Nama Subgroddit tidak boleh kosong!\n");
+        printf("\n");
+        printError("Empty subgroddit name");
+        printf("Subgroddit name cannot be empty!\n");
         return;
     }
 
@@ -160,8 +176,11 @@ void commandPost()
     int subIdx = findSubgrodditIndexByName(subNameStr);
     if (subIdx == -1)
     {
-        printf("Subgroddit %s belum ditemukan!\n", subNameStr);
-        printf("Gunakan perintah CREATE_SUBGRODDIT terlebih dahulu untuk membuatnya.\n");
+        printf("\n");
+        printError("Subgroddit not found");
+        printf("Subgroddit %s%s%s doesn't exist.\n", BOLD_YELLOW, subNameStr, RESET);
+        printf("\n%sTip:%s Use %sCREATE_SUBGRODDIT;%s to create it first.\n", 
+               BOLD_CYAN, RESET, BOLD_WHITE, RESET);
         return;
     }
 
@@ -185,29 +204,43 @@ void commandPost()
         subIdWord = p->element.data.subgroddit.subgroddit_id;
     }
 
-    printf("Masukkan judul post:\n");
+    printf("\n");
+    printSectionDivider();
+    printSectionHeader("", "POST CONTENT");
+    printf("\n%s %sEnter post title:%s\n", BOX_V, BOLD_WHITE, RESET);
+    printf("%s %s└─▶%s ", BOX_V, BOLD_CYAN, RESET);
+    
     Word titleW;
     readLineWord(&titleW);
 
     if (titleW.Length == 0)
     {
-        printf("Judul post tidak boleh kosong!\n");
+        printf("\n");
+        printError("Empty title");
+        printf("Post title cannot be empty!\n");
         return;
     }
 
-    printf("Masukkan konten post:\n");
+    printf("\n%s %sEnter post content:%s\n", BOX_V, BOLD_WHITE, RESET);
+    printf("%s %s└─▶%s ", BOX_V, BOLD_CYAN, RESET);
+    
     Word contentW;
     readLineWord(&contentW);
 
     if (contentW.Length == 0)
     {
-        printf("Konten post tidak boleh kosong!\n");
+        printf("\n");
+        printError("Empty content");
+        printf("Post content cannot be empty!\n");
         return;
     }
 
     // ===========================
     // MODERASI KONTEN POST
     // ===========================
+    printf("\n");
+    spinnerAnimation("Checking content moderation", 8);
+    
     char titleStr[256], contentStr[512];
     wordToString(titleStr, titleW);
     wordToString(contentStr, contentW);
@@ -218,16 +251,21 @@ void commandPost()
     if (CheckBlacklistedContent(titleStr, foundWords, &foundCount) ||
         CheckBlacklistedContent(contentStr, foundWords, &foundCount))
     {
-        printf("Post gagal dibuat karena mengandung kata terlarang: ");
+        printf("\n");
+        printError("Content moderation failed");
+        printf("Post contains blacklisted words: %s", BOLD_RED);
         for (int i = 0; i < foundCount; i++)
         {
             printf("%s", foundWords[i]);
             if (i + 1 < foundCount)
                 printf(", ");
         }
-        printf(".\n");
+        printf("%s\n", RESET);
         return;
     }
+
+    printf("\n");
+    printSuccess("Content approved");
 
     Post newPost;
     initPost(&newPost);
@@ -251,7 +289,14 @@ void commandPost()
     insertLastList(&POSTS, makePostElement(newPost));
     POST_COUNT++;
 
-    printf("Post berhasil dibuat dengan ID: %s di Subgroddit %s!\n", postIdStr, subNameStr);
+    printf("\n");
+    spinnerAnimation("Creating post", 8);
+    printf("\n");
+    printSuccess("Post created successfully");
+    printf("%s╭─────────────────────────────────────────────╮%s\n", BOLD_CYAN, RESET);
+    printf("%s│%s Post ID       : %s%s%s\n", BOLD_CYAN, RESET, BOLD_WHITE, postIdStr, RESET);
+    printf("%s│%s Subgroddit   : %s%s%s\n", BOLD_CYAN, RESET, BOLD_YELLOW, subNameStr, RESET);
+    printf("%s╰─────────────────────────────────────────────╯%s\n", BOLD_CYAN, RESET);
 }
 
 void printPostHeader(const Post *p)
@@ -316,7 +361,8 @@ void commandViewPost()
     if (currentWord.Length == 0)
     {
         // Tidak ada ID setelah VIEW_POST
-        printf("Format perintah VIEW_POST salah. Gunakan 'VIEW_POST <ID>;' tanpa argumen lain.\n");
+        printError("Missing post ID");
+        printf("Use: %sVIEW_POST <ID>;%s\n", BOLD_WHITE, RESET);
         return;
     }
 
@@ -331,14 +377,16 @@ void commandViewPost()
         {
             ADVWORD_INPUT();
         }
-        printf("Format perintah VIEW_POST salah. Gunakan 'VIEW_POST <ID>;' tanpa argumen lain.\n");
+        printError("Too many arguments");
+        printf("Use: %sVIEW_POST <ID>;%s (without additional arguments)\n", BOLD_WHITE, RESET);
         return;
     }
 
     int idx = findPostIndexById(postIdStr);
     if (idx == -1)
     {
-        printf("Post dengan ID %s tidak ditemukan!\n", postIdStr);
+        printError("Post not found");
+        printf("Post with ID %s%s%s doesn't exist.\n", BOLD_YELLOW, postIdStr, RESET);
         return;
     }
 
@@ -356,14 +404,83 @@ void commandViewPost()
 
     Post *p = &node->element.data.post;
 
-    printPostHeader(p);
+    // Clear screen and show header
+    clearScreen();
+    char breadcrumbPath[512];
+    char subName[256];
+    getSubgrodditName(p->subgroddit_id, subName);
+    sprintf(breadcrumbPath, "Main Menu > %s > Post", subName);
+    printBreadcrumb(breadcrumbPath);
+
+    // Get post details
+    char titleStr[256];
+    char contentStr[512];
+    char createdStr[256];
+    char authorIdStr[256];
+
+    wordToString(titleStr, p->title);
+    wordToString(contentStr, p->content);
+    timeToStr(createdStr, p->created_at);
+    wordToString(authorIdStr, p->author_id);
+
+    int authorIndex = -1;
+    for (int i = 0; i < USER_COUNT; i++)
+    {
+        if (compareWord(USERS[i].user_id, p->author_id) != 0)
+        {
+            authorIndex = i;
+            break;
+        }
+    }
+
+    char authorUsername[256];
+    if (authorIndex != -1)
+    {
+        wordToString(authorUsername, USERS[authorIndex].username);
+    }
+    else
+    {
+        wordToString(authorUsername, p->author_id);
+    }
+
+    printf("\n");
+    printf("%s", BOLD_CYAN);
+    printHorizontalLine(80, DBOX_TL, DBOX_H, DBOX_TR);
+    printf("%s                        📝  POST : %s%-25s%s    %s\n", 
+           DBOX_V, BOLD_WHITE, postIdStr, RESET, DBOX_V);
+    printHorizontalLine(80, DBOX_BL, DBOX_H, DBOX_BR);
+    printf("%s\n", RESET);
+
+    printSectionHeader("", "POST DETAILS");
+    printf("\n");
+    printf("%s %sSubgroddit:%s   %s%s%s\n", BOX_V, BOLD_WHITE, RESET, BOLD_MAGENTA, subName, RESET);
+    printf("%s %sTitle:%s        %s%s%s\n", BOX_V, BOLD_WHITE, RESET, BOLD_WHITE, titleStr, RESET);
+    printf("%s %sAuthor:%s       %s@%s%s\n", BOX_V, BOLD_WHITE, RESET, BOLD_CYAN, authorUsername, RESET);
+    printf("%s %sPosted:%s       %s%s%s\n", BOX_V, BOLD_WHITE, RESET, DIM, createdStr, RESET);
+    
+    printSectionDivider();
+    printSectionHeader("", "CONTENT");
+    printf("\n");
+    printf("%s %s%s%s\n", BOX_V, RESET, contentStr, RESET);
+    
+    printSectionDivider();
+    printSectionHeader("", "VOTING");
+    printf("\n");
+    printf("%s %s↑ Upvotes:%s   %s%d%s\n", BOX_V, GREEN, RESET, BOLD_WHITE, p->upvotes, RESET);
+    printf("%s %s↓ Downvotes:%s %s%d%s\n", BOX_V, RED, RESET, BOLD_WHITE, p->downvotes, RESET);
+
+    printSectionDivider();
 
     PostTree T;
     buildPostTree(p, &T);
 
-    printf("Komentar:\n");
+    printSectionHeader("", "COMMENTS");
+    printf("\n");
     PrintPostTree(&T);
-    printf("=======================================\n");
+    
+    printSectionDivider();
+    printf("\n");
+    printInfo("Post loaded successfully");
 }
 
 void deleteCommentsForPost(const Word postIdWord)
@@ -383,12 +500,31 @@ void deleteCommentsForPost(const Word postIdWord)
 
 void commandDeletePost()
 {
+    clearScreen();
+    printBreadcrumb("Home > Delete Post");
+    
+    printHorizontalLine(80, DBOX_TL, DBOX_H, DBOX_TR);
+    printf("%s║%s                           %sDELETE POST%s                             %s║%s\n", 
+           BOLD_CYAN, RESET, BOLD_WHITE, RESET, BOLD_CYAN, RESET);
+    printHorizontalLine(80, DBOX_BL, DBOX_H, DBOX_BR);
+    printf("%s\n", RESET);
+
+    if (!isLoggedIn())
+    {
+        printError("Authentication required");
+        printf("You must be logged in to delete posts.\n\n");
+        printf("%sTip:%s Use %sLOGIN;%s to access your account.\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
+        return;
+    }
+
     ADVWORD_INPUT();
 
     if (currentWord.Length == 0)
     {
-        // Tidak ada ID setelah DELETE_POST
-        printf("Format perintah DELETE_POST salah. Gunakan 'DELETE_POST <ID>;' tanpa argumen lain.\n");
+        printError("Invalid command format");
+        printf("Post ID is required.\n\n");
+        printf("%sUsage:%s %sDELETE_POST <post_id>;%s\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
+        printf("%sExample:%s %sDELETE_POST P123;%s\n", DIM, RESET, BOLD_WHITE, RESET);
         return;
     }
 
@@ -398,26 +534,26 @@ void commandDeletePost()
     ADVWORD_INPUT();
     if (currentWord.Length != 0)
     {
-        // Ada argumen berlebih setelah ID
         while (currentWord.Length != 0)
         {
             ADVWORD_INPUT();
         }
-        printf("Format perintah DELETE_POST salah. Gunakan 'DELETE_POST <ID>;' tanpa argumen lain.\n");
+        printError("Invalid command format");
+        printf("Too many arguments provided.\n\n");
+        printf("%sUsage:%s %sDELETE_POST <post_id>;%s\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
         return;
     }
+
+    printf("\n");
+    spinnerAnimation("Locating post", 6);
 
     int idx = findPostIndexById(postIdStr);
     if (idx == -1)
     {
-        printf("Post [%s] tidak ditemukan!\n", postIdStr);
-        printf("Anda tidak bisa menghapus fakta bahwa dia tidak dengan mu </3!!\n");
-        return;
-    }
-
-    if (!isLoggedIn())
-    {
-        printf("Anda belum login! Masuk terlebih dahulu untuk dapat mengakses Groddit\n");
+        printf("\n");
+        printError("Post not found");
+        printf("No post exists with ID: %s%s%s\n\n", BOLD_RED, postIdStr, RESET);
+        printf("%sTip:%s Use %sSHOW_FEED;%s to view available posts.\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
         return;
     }
 
@@ -437,15 +573,26 @@ void commandDeletePost()
 
     if (compareWord(p->author_id, USERS[CURRENT_USER_INDEX].user_id) == 0)
     {
-        printf("Anda bukan pembuat post [%s]!\n", postIdStr);
-        printf("Hanya pembuat post yang dapat menghapus postingan ini.\n");
+        printf("\n");
+        printError("Authorization failed");
+        printf("Only the post author can delete this post.\n\n");
+        printf("%sPost ID:%s %s%s%s\n", BOLD_WHITE, RESET, BOLD_RED, postIdStr, RESET);
         return;
     }
 
     char titleStr[256];
     wordToString(titleStr, p->title);
 
-    printf("Apakah Anda yakin ingin menghapus post [%s] \"%s\"? (Y/N)\n", postIdStr, titleStr);
+    printf("\n");
+    printSectionHeader("", "CONFIRMATION REQUIRED");
+    printf("\n");
+    printf("%s %sPost ID:%s  %s%s%s\n", BOX_V, BOLD_WHITE, RESET, BOLD_YELLOW, postIdStr, RESET);
+    printf("%s %sTitle:%s    %s%s%s\n", BOX_V, BOLD_WHITE, RESET, BOLD_WHITE, titleStr, RESET);
+    printf("%s\n", BOX_V);
+    printf("%s %sThis will permanently delete the post and ALL its comments!%s\n", BOX_V, BOLD_RED, RESET);
+    printSectionDivider();
+    printf("\n");
+    printf("%s└─▶ %sAre you sure? (Y/N):%s ", BOLD_CYAN, BOLD_WHITE, RESET);
 
     STARTWORD_INPUT();
     char answer[8];
@@ -454,9 +601,14 @@ void commandDeletePost()
 
     if (answer[0] != 'Y' && answer[0] != 'y')
     {
-        printf("Penghapusan post dibatalkan.\n");
+        printf("\n");
+        printWarning("Deletion cancelled");
+        printf("Post %s%s%s has been preserved.\n", BOLD_CYAN, postIdStr, RESET);
         return;
     }
+
+    printf("\n");
+    spinnerAnimation("Deleting post and comments", 10);
 
     deleteCommentsForPost(p->post_id);
 
@@ -464,5 +616,10 @@ void commandDeletePost()
     deleteAtList(&POSTS, idx, &deletedElem);
     POST_COUNT--;
 
-    printf("Post [%s] dan seluruh komentar terkait berhasil dihapus.\n", postIdStr);
+    printf("\n");
+    printSuccess("Post deleted successfully");
+    printf("%s╭─────────────────────────────────────────────╮%s\n", BOLD_CYAN, RESET);
+    printf("%s│%s Deleted Post: %s%s%s\n", BOLD_CYAN, RESET, BOLD_RED, postIdStr, RESET);
+    printf("%s│%s Comments removed: All associated comments  %s│%s\n", BOLD_CYAN, RESET, BOLD_CYAN, RESET);
+    printf("%s╰─────────────────────────────────────────────╯%s\n", BOLD_CYAN, RESET);
 }

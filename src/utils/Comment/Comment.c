@@ -107,16 +107,31 @@ void deleteCommentRecursive(int commentId, const char *postId)
 
 void commandAddComment()
 {
+    clearScreen();
+    printBreadcrumb("Home > Add Comment");
+    
+    printHorizontalLine(80, DBOX_TL, DBOX_H, DBOX_TR);
+    printf("%s║%s                           %sADD COMMENT%s                              %s║%s\n", 
+           BOLD_CYAN, RESET, BOLD_WHITE, RESET, BOLD_CYAN, RESET);
+    printHorizontalLine(80, DBOX_BL, DBOX_H, DBOX_BR);
+    printf("%s\n", RESET);
+
     if (!isLoggedIn())
     {
-        printf("Anda belum login! Masuk terlebih dahulu untuk dapat mengomentari.\n");
+        printError("Authentication required");
+        printf("You must be logged in to comment.\n\n");
+        printf("%sTip:%s Use %sLOGIN;%s to access your account.\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
         return;
     }
 
     ADVWORD_INPUT();
     if (currentWord.Length == 0)
     {
-        printf("Format salah. Gunakan: COMMENT <POST_ID> <COMMENT_ID>;\n");
+        printError("Invalid command format");
+        printf("Post ID and Parent Comment ID are required.\n\n");
+        printf("%sUsage:%s %sCOMMENT <post_id> <parent_id>;%s\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
+        printf("%sNote:%s Use %s-1%s for parent_id to comment directly on the post.\n", 
+               DIM, RESET, BOLD_YELLOW, RESET);
         return;
     }
 
@@ -126,7 +141,9 @@ void commandAddComment()
     ADVWORD_INPUT();
     if (currentWord.Length == 0)
     {
-        printf("Format salah. Gunakan: COMMENT <POST_ID> <COMMENT_ID>;\n");
+        printError("Invalid command format");
+        printf("Parent Comment ID is required.\n\n");
+        printf("%sUsage:%s %sCOMMENT <post_id> <parent_id>;%s\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
         return;
     }
     int parentId = wordToInt(currentWord);
@@ -136,18 +153,71 @@ void commandAddComment()
     {
         while (currentWord.Length != 0)
             ADVWORD_INPUT();
-        printf("Format salah. Gunakan: COMMENT <POST_ID> <COMMENT_ID>;\n");
+        printError("Invalid command format");
+        printf("Too many arguments provided.\n\n");
+        printf("%sUsage:%s %sCOMMENT <post_id> <parent_id>;%s\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
         return;
     }
 
-    printf("Masukkan isi komentar:\n");
+    printf("\n");
+    spinnerAnimation("Validating post", 6);
+
+    Post *post = getPostById(postId);
+    if (post == NULL)
+    {
+        printf("\n");
+        printError("Post not found");
+        printf("No post exists with ID: %s%s%s\n\n", BOLD_RED, postId, RESET);
+        printf("%sTip:%s Use %sSHOW_FEED;%s to view available posts.\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
+        return;
+    }
+
+    if (getCommentById(postId, parentId) == NULL && parentId != -1)
+    {
+        printf("\n");
+        printError("Parent comment not found");
+        printf("No comment #%s%d%s exists on post %s%s%s\n\n", 
+               BOLD_RED, parentId, RESET, BOLD_YELLOW, postId, RESET);
+        printf("%sTip:%s Use %sVIEW_POST %s;%s to see existing comments.\n", 
+               BOLD_CYAN, RESET, BOLD_WHITE, postId, RESET);
+        return;
+    }
+
+    printf("\n");
+    printSectionHeader("", "COMMENT CONTENT");
+    printf("\n");
+    if (parentId == -1)
+    {
+        printf("%s %sCommenting on post:%s %s%s%s\n", BOX_V, BOLD_WHITE, RESET, BOLD_CYAN, postId, RESET);
+    }
+    else
+    {
+        printf("%s %sReplying to comment:%s %s#%d%s on post %s%s%s\n", 
+               BOX_V, BOLD_WHITE, RESET, BOLD_CYAN, parentId, RESET, BOLD_YELLOW, postId, RESET);
+    }
+    printSectionDivider();
+    printf("\n");
+    printf("%s└─▶ %sEnter your comment:%s\n", BOLD_CYAN, BOLD_WHITE, RESET);
+    printf("    ");
+    
     IgnoreNewline();
     Word contentW;
     readLineWord(&contentW);
 
+    if (contentW.Length == 0)
+    {
+        printf("\n");
+        printError("Invalid input");
+        printf("Comment content cannot be empty.\n");
+        return;
+    }
+
     // ===========================
     // MODERASI KOMENTAR
     // ===========================
+    printf("\n");
+    spinnerAnimation("Checking content moderation", 8);
+    
     char commentStr[512];
     wordToString(commentStr, contentW);
 
@@ -156,29 +226,15 @@ void commandAddComment()
 
     if (CheckBlacklistedContent(commentStr, foundWordsC, &foundCountC))
     {
-        printf("Komentar ditolak karena mengandung kata terlarang: \"%s\".\n",
-               foundWordsC[0]);
+        printf("\n");
+        printError("Content moderation failed");
+        printf("Comment contains blacklisted word: %s\"%s\"%s\n", 
+               BOLD_RED, foundWordsC[0], RESET);
         return;
     }
 
-    if (contentW.Length == 0)
-    {
-        printf("Konten komentar tidak boleh kosong!\n");
-        return;
-    }
-
-    Post *post = getPostById(postId);
-    if (post == NULL)
-    {
-        printf("Post dengan ID %s tidak ditemukan!\n", postId);
-        return;
-    }
-
-    if (getCommentById(postId, parentId) == NULL && parentId != -1)
-    {
-        printf("Komentar induk dengan ID #%d tidak ditemukan pada post [%s]!\n", parentId, postId);
-        return;
-    }
+    printf("\n");
+    printSuccess("Content approved");
 
     if (COMMENT_COUNT >= COMMENT_CAPACITY)
     {
@@ -187,7 +243,9 @@ void commandAddComment()
             newCap = 10;
         if (!ensureCapacity((void **)&COMMENTS, &COMMENT_CAPACITY, sizeof(Comment), newCap))
         {
-            printf("Error: gagal allocating memori untuk komentar baru.\n");
+            printf("\n");
+            printError("Memory allocation failed");
+            printf("Could not allocate memory for new comment.\n");
             return;
         }
     }
@@ -205,24 +263,47 @@ void commandAddComment()
     COMMENTS[COMMENT_COUNT] = newC;
     COMMENT_COUNT++;
 
+    printf("\n");
+    spinnerAnimation("Posting comment", 8);
+    printf("\n");
+    printSuccess("Comment posted successfully");
+    printf("%s╭─────────────────────────────────────────────╮%s\n", BOLD_CYAN, RESET);
+    printf("%s│%s Comment ID : %s#%d%s\n", BOLD_CYAN, RESET, BOLD_WHITE, newC.comment_id, RESET);
+    printf("%s│%s Post ID    : %s%s%s\n", BOLD_CYAN, RESET, BOLD_YELLOW, postId, RESET);
     if (parentId == -1)
-        printf("Komentar berhasil ditambahkan ke post %s.\n", postId);
+        printf("%s│%s Type       : %sDirect comment%s\n", BOLD_CYAN, RESET, BOLD_GREEN, RESET);
     else
-        printf("Balasan berhasil ditambahkan ke komentar #%d.\n", parentId);
+        printf("%s│%s Type       : %sReply to #%d%s\n", BOLD_CYAN, RESET, BOLD_GREEN, parentId, RESET);
+    printf("%s╰─────────────────────────────────────────────╯%s\n", BOLD_CYAN, RESET);
 }
 
 void commandDeleteComment()
 {
+    clearScreen();
+    printBreadcrumb("Home > Delete Comment");
+    
+    printHorizontalLine(80, DBOX_TL, DBOX_H, DBOX_TR);
+    printf("%s║%s                         %sDELETE COMMENT%s                            %s║%s\n", 
+           BOLD_CYAN, RESET, BOLD_WHITE, RESET, BOLD_CYAN, RESET);
+    printHorizontalLine(80, DBOX_BL, DBOX_H, DBOX_BR);
+    printf("%s\n", RESET);
+
     if (!isLoggedIn())
     {
-        printf("Anda belum login! Masuk terlebih dahulu untuk dapat menghapus komentar.\n");
+        printError("Authentication required");
+        printf("You must be logged in to delete comments.\n\n");
+        printf("%sTip:%s Use %sLOGIN;%s to access your account.\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
         return;
     }
 
     ADVWORD_INPUT();
     if (currentWord.Length == 0)
     {
-        printf("Format salah. Gunakan: DELETE_COMMENT <POST_ID> <COMMENT_ID>;\n");
+        printError("Invalid command format");
+        printf("Post ID and Comment ID are required.\n\n");
+        printf("%sUsage:%s %sDELETE_COMMENT <post_id> <comment_id>;%s\n", 
+               BOLD_CYAN, RESET, BOLD_WHITE, RESET);
+        printf("%sExample:%s %sDELETE_COMMENT P001 5;%s\n", DIM, RESET, BOLD_WHITE, RESET);
         return;
     }
     char postId[NMax + 1];
@@ -231,7 +312,10 @@ void commandDeleteComment()
     ADVWORD_INPUT();
     if (currentWord.Length == 0)
     {
-        printf("Format salah. Gunakan: DELETE_COMMENT <POST_ID> <COMMENT_ID>;\n");
+        printError("Invalid command format");
+        printf("Comment ID is required.\n\n");
+        printf("%sUsage:%s %sDELETE_COMMENT <post_id> <comment_id>;%s\n", 
+               BOLD_CYAN, RESET, BOLD_WHITE, RESET);
         return;
     }
     int commentId = wordToInt(currentWord);
@@ -241,21 +325,38 @@ void commandDeleteComment()
     {
         while (currentWord.Length != 0)
             ADVWORD_INPUT();
-        printf("Format salah. Gunakan: DELETE_COMMENT <POST_ID> <COMMENT_ID>;\n");
+        printError("Invalid command format");
+        printf("Too many arguments provided.\n\n");
+        printf("%sUsage:%s %sDELETE_COMMENT <post_id> <comment_id>;%s\n", 
+               BOLD_CYAN, RESET, BOLD_WHITE, RESET);
         return;
     }
+
+    printf("\n");
+    spinnerAnimation("Validating post", 6);
 
     Post *post = getPostById(postId);
     if (post == NULL)
     {
-        printf("Post dengan ID %s tidak ditemukan!\n", postId);
+        printf("\n");
+        printError("Post not found");
+        printf("No post exists with ID: %s%s%s\n\n", BOLD_RED, postId, RESET);
+        printf("%sTip:%s Use %sSHOW_FEED;%s to view available posts.\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
         return;
     }
+
+    printf("\n");
+    spinnerAnimation("Locating comment", 6);
 
     Comment *c = getCommentById(postId, commentId);
     if (c == NULL)
     {
-        printf("Komentar #%d tidak ditemukan pada post [%s]!\n", commentId, postId);
+        printf("\n");
+        printError("Comment not found");
+        printf("No comment #%s%d%s exists on post %s%s%s\n\n", 
+               BOLD_RED, commentId, RESET, BOLD_YELLOW, postId, RESET);
+        printf("%sTip:%s Use %sVIEW_POST %s;%s to see existing comments.\n", 
+               BOLD_CYAN, RESET, BOLD_WHITE, postId, RESET);
         return;
     }
 
@@ -264,13 +365,29 @@ void commandDeleteComment()
     const char *authorId = getCommentAuthorId(postId, commentId);
     if (authorId == NULL || strCmp(currentUserId, authorId) != 0)
     {
-        printf("Anda bukan pembuat komentar ini! Hanya pembuat yang dapat menghapus komentar.\n");
+        printf("\n");
+        printError("Authorization failed");
+        printf("Only the comment author can delete this comment.\n\n");
+        printf("%sComment ID:%s %s#%d%s on post %s%s%s\n", 
+               BOLD_WHITE, RESET, BOLD_RED, commentId, RESET, BOLD_YELLOW, postId, RESET);
         return;
     }
 
     char contentStr[NMax + 1];
     wordToString(contentStr, c->content);
-    printf("Apakah Anda yakin ingin menghapus komentar #%d: \"%s\"? (Y/N)\n", commentId, contentStr);
+    
+    printf("\n");
+    printSectionHeader("", "CONFIRMATION REQUIRED");
+    printf("\n");
+    printf("%s %sPost ID:%s     %s%s%s\n", BOX_V, BOLD_WHITE, RESET, BOLD_YELLOW, postId, RESET);
+    printf("%s %sComment ID:%s  %s#%d%s\n", BOX_V, BOLD_WHITE, RESET, BOLD_CYAN, commentId, RESET);
+    printf("%s %sContent:%s     %s%s%s\n", BOX_V, BOLD_WHITE, RESET, DIM, contentStr, RESET);
+    printf("%s\n", BOX_V);
+    printf("%s %sThis will permanently delete the comment and ALL its replies!%s\n", 
+           BOX_V, BOLD_RED, RESET);
+    printSectionDivider();
+    printf("\n");
+    printf("%s└─▶ %sAre you sure? (Y/N):%s ", BOLD_CYAN, BOLD_WHITE, RESET);
 
     STARTWORD_INPUT();
     char answer[8];
@@ -278,11 +395,22 @@ void commandDeleteComment()
 
     if (answer[0] != 'Y' && answer[0] != 'y')
     {
-        printf("Penghapusan komentar dibatalkan.\n");
+        printf("\n");
+        printWarning("Deletion cancelled");
+        printf("Comment #%s%d%s has been preserved.\n", BOLD_CYAN, commentId, RESET);
         return;
     }
 
+    printf("\n");
+    spinnerAnimation("Deleting comment and replies", 10);
+
     deleteCommentRecursive(commentId, postId);
 
-    printf("Komentar #%d di post [%s] berhasil dihapus.\n", commentId, postId);
+    printf("\n");
+    printSuccess("Comment deleted successfully");
+    printf("%s╭─────────────────────────────────────────────╮%s\n", BOLD_CYAN, RESET);
+    printf("%s│%s Deleted Comment: %s#%d%s\n", BOLD_CYAN, RESET, BOLD_RED, commentId, RESET);
+    printf("%s│%s From Post: %s%s%s\n", BOLD_CYAN, RESET, BOLD_YELLOW, postId, RESET);
+    printf("%s│%s Replies removed: All nested replies        %s│%s\n", BOLD_CYAN, RESET, BOLD_CYAN, RESET);
+    printf("%s╰─────────────────────────────────────────────╯%s\n", BOLD_CYAN, RESET);
 }

@@ -9,14 +9,33 @@ typedef struct
 
 void createSubgroddit()
 {
-    printf("Masukkan nama subgroddit.\n");
+    clearScreen();
+    printBreadcrumb("Home > Create Subgroddit");
+    
+    printHorizontalLine(80, DBOX_TL, DBOX_H, DBOX_TR);
+    printf("%s║%s                     %sCREATE SUBGRODDIT%s                          %s║%s\n", 
+           BOLD_CYAN, RESET, BOLD_WHITE, RESET, BOLD_CYAN, RESET);
+    printHorizontalLine(80, DBOX_BL, DBOX_H, DBOX_BR);
+    printf("%s\n", RESET);
+
+    printSectionHeader("", "SUBGRODDIT NAME");
+    printf("\n");
+    printf("%s %sFormat:%s Must start with %sr/%s\n", BOX_V, BOLD_WHITE, RESET, BOLD_YELLOW, RESET);
+    printf("%s %sExample:%s %sr/programming%s, %sr/datascience%s\n", BOX_V, DIM, RESET, BOLD_CYAN, RESET, BOLD_CYAN, RESET);
+    printSectionDivider();
+    printf("\n");
+    printf("%s└─▶ %sEnter name:%s ", BOLD_CYAN, BOLD_WHITE, RESET);
     fflush(stdout);
 
     STARTWORD_INPUT();
 
     if (currentWord.Length == 0)
     {
-        printf("Nama subgroddit tidak boleh kosong!\n");
+        printf("\n");
+        printError("Invalid input");
+        printf("Subgroddit name cannot be empty.\n\n");
+        printf("%sTip:%s Names must start with %sr/%s followed by the community name.\n", 
+               BOLD_CYAN, RESET, BOLD_YELLOW, RESET);
         return;
     }
 
@@ -25,13 +44,23 @@ void createSubgroddit()
 
     if (currentWord.Length < 2 || subgroddit_name[0] != 'r' || subgroddit_name[1] != '/')
     {
-        printf("Nama Subgroddit HARUS UNIK dan diawali dengan \"r/\".\n");
+        printf("\n");
+        printError("Invalid format");
+        printf("Name must start with %sr/%s\n\n", BOLD_YELLOW, RESET);
+        printf("%sYou entered:%s %s%s%s\n", BOLD_WHITE, RESET, BOLD_RED, subgroddit_name, RESET);
+        printf("%sCorrect format:%s %sr/yourname%s\n", BOLD_WHITE, RESET, BOLD_GREEN, RESET);
         return;
     }
 
+    printf("\n");
+    spinnerAnimation("Checking name availability", 6);
+
     if (findSubgrodditIndexByName(subgroddit_name) != -1)
     {
-        printf("Nama Subgroddit HARUS UNIK dan diawali dengan \"r/\".\n");
+        printf("\n");
+        printError("Name already exists");
+        printf("The subgroddit %s%s%s is already taken.\n\n", BOLD_RED, subgroddit_name, RESET);
+        printf("%sTip:%s Choose a unique name for your community.\n", BOLD_CYAN, RESET);
         return;
     }
 
@@ -51,7 +80,14 @@ void createSubgroddit()
 
     SUBGRODDIT_COUNT++;
 
-    printf("Subgroddit %s berhasil dibuat!\n", subgroddit_name);
+    printf("\n");
+    spinnerAnimation("Creating subgroddit", 8);
+    printf("\n");
+    printSuccess("Subgroddit created successfully");
+    printf("%s╭─────────────────────────────────────────────╮%s\n", BOLD_CYAN, RESET);
+    printf("%s│%s Name : %s%s%s\n", BOLD_CYAN, RESET, BOLD_GREEN, subgroddit_name, RESET);
+    printf("%s│%s ID   : %s%s%s\n", BOLD_CYAN, RESET, BOLD_WHITE, id_str, RESET);
+    printf("%s╰─────────────────────────────────────────────╯%s\n", BOLD_CYAN, RESET);
 }
 
 void viewSubgroddit()
@@ -59,7 +95,8 @@ void viewSubgroddit()
     ADVWORD_INPUT();
     if (currentWord.Length == 0)
     {
-        printf("Format perintah VIEW_SUBGRODDIT salah. Gunakan 'VIEW_SUBGRODDIT <NAME> <MODE> <ORDER>;'.\n");
+        printError("Invalid command format");
+        printf("Use: %sVIEW_SUBGRODDIT <NAME> <MODE> <ORDER>;%s\n", BOLD_WHITE, RESET);
         return;
     }
 
@@ -69,7 +106,8 @@ void viewSubgroddit()
     ADVWORD_INPUT();
     if (currentWord.Length == 0)
     {
-        printf("Format perintah VIEW_SUBGRODDIT salah. Gunakan 'VIEW_SUBGRODDIT <NAME> <MODE> <ORDER>;'.\n");
+        printError("Missing MODE parameter");
+        printf("Use: %sVIEW_SUBGRODDIT <NAME> <MODE> <ORDER>;%s\n", BOLD_WHITE, RESET);
         return;
     }
 
@@ -79,7 +117,8 @@ void viewSubgroddit()
     ADVWORD_INPUT();
     if (currentWord.Length == 0)
     {
-        printf("Format perintah VIEW_SUBGRODDIT salah. Gunakan 'VIEW_SUBGRODDIT <NAME> <MODE> <ORDER>;'.\n");
+        printError("Missing ORDER parameter");
+        printf("Use: %sVIEW_SUBGRODDIT <NAME> <MODE> <ORDER>;%s\n", BOLD_WHITE, RESET);
         return;
     }
 
@@ -93,26 +132,34 @@ void viewSubgroddit()
         {
             ADVWORD_INPUT();
         }
-        printf("Format perintah VIEW_SUBGRODDIT salah. Gunakan 'VIEW_SUBGRODDIT <NAME> <MODE> <ORDER>;'.\n");
+        printError("Too many arguments");
+        printf("Use: %sVIEW_SUBGRODDIT <NAME> <MODE> <ORDER>;%s\n", BOLD_WHITE, RESET);
         return;
     }
 
     if (strCmp(mode, "HOT") != 0 && strCmp(mode, "NEW") != 0)
     {
-        printf("Mode %s tidak dikenali!\nGunakan HOT atau NEW sebagai mode yang valid.\n", mode);
+        printError("Invalid MODE");
+        printf("Mode %s%s%s not recognized. Use %sHOT%s or %sNEW%s.\n", 
+               BOLD_YELLOW, mode, RESET, BOLD_WHITE, RESET, BOLD_WHITE, RESET);
         return;
     }
 
     if (strCmp(order, "INCR") != 0 && strCmp(order, "DECR") != 0)
     {
-        printf("Order %s tidak dikenali!\nGunakan INCR atau DECR sebagai order yang valid.\n", order);
+        printError("Invalid ORDER");
+        printf("Order %s%s%s not recognized. Use %sINCR%s or %sDECR%s.\n", 
+               BOLD_YELLOW, order, RESET, BOLD_WHITE, RESET, BOLD_WHITE, RESET);
         return;
     }
 
     int subIdx = findSubgrodditIndexByName(subgrodditName);
     if (subIdx == -1)
     {
-        printf("Subgroddit %s belum ditemukan!\nGunakan perintah CREATE_SUBGRODDIT untuk membuatnya terlebih dahulu.\n", subgrodditName);
+        printError("Subgroddit not found");
+        printf("Subgroddit %s%s%s doesn't exist.\n", BOLD_YELLOW, subgrodditName, RESET);
+        printf("\n%sTip:%s Use %sCREATE_SUBGRODDIT;%s to create it first.\n", 
+               BOLD_CYAN, RESET, BOLD_WHITE, RESET);
         return;
     }
 
@@ -196,24 +243,40 @@ void viewSubgroddit()
         }
     }
 
-    if (strCmp(mode, "HOT") == 0)
-    {
-        printf("\xF0\x9F\x94\xA5  Subgroddit: %s (sorted by %s %c)\n", subgrodditName, mode,
-               strCmp(order, "INCR") == 0 ? 24 : 25);
-    }
-    else
-    {
-        printf("\xE2\x9A\xAB  Subgroddit: %s (sorted by %s %c)\n", subgrodditName, mode,
-               strCmp(order, "INCR") == 0 ? 24 : 25);
-    }
-    printf("=======================================\n");
+    // Clear screen and show header
+    clearScreen();
+    char breadcrumbPath[512];
+    sprintf(breadcrumbPath, "Main Menu > Subgroddit > %s", subgrodditName);
+    printBreadcrumb(breadcrumbPath);
+
+    printf("\n");
+    printf("%s", BOLD_MAGENTA);
+    printHorizontalLine(80, DBOX_TL, DBOX_H, DBOX_TR);
+    printf("%s              %s  SUBGRODDIT : %s%-30s%s  %s\n", 
+           DBOX_V, strCmp(mode, "HOT") == 0 ? "🔥" : "⚫", 
+           BOLD_WHITE, subgrodditName, RESET, DBOX_V);
+    printHorizontalLine(80, DBOX_BL, DBOX_H, DBOX_BR);
+    printf("%s\n", RESET);
+
+    printf("%s%s ⚡ Sort Mode:%s %s%s%s  %s🔽 Order:%s %s%s %s%s\n", 
+           BOX_V, BOLD_WHITE, RESET, 
+           BOLD_CYAN, mode, RESET,
+           BOLD_WHITE, RESET,
+           BOLD_CYAN, order, 
+           strCmp(order, "INCR") == 0 ? "↑" : "↓", RESET);
+    printSectionDivider();
 
     if (postCount == 0)
     {
-        printf("(Tidak ada postingan)\n");
+        printf("\n");
+        printWarning("No posts in this subgroddit");
+        printf("This subgroddit doesn't have any posts yet.\n");
+        printf("\n%sTip:%s Use %sPOST;%s to create the first post!\n", 
+               BOLD_CYAN, RESET, BOLD_WHITE, RESET);
     }
     else
     {
+        printf("\n");
         for (int i = 0; i < postCount; i++)
         {
             Post *post = &posts[i].post;
@@ -244,16 +307,29 @@ void viewSubgroddit()
                 wordToString(authorUsername, post->author_id);
             }
 
-            printf("%d. [%s] %s (%d%c / %d%c) - oleh %s\n",
-                   i + 1, postIdStr, titleStr,
-                   post->upvotes, 24,
-                   post->downvotes, 25,
-                   authorUsername);
+            printf("%s %s%d.%s [%s%s%s] %s%s%s\n",
+                   BOX_V, BOLD_CYAN, i + 1, RESET,
+                   BOLD_MAGENTA, postIdStr, RESET,
+                   BOLD_WHITE, titleStr, RESET);
+            printf("%s    %s↑ %d%s %s│%s %s↓ %d%s %s│%s by %s@%s%s %s│%s %s%s%s\n",
+                   BOX_V, GREEN, post->upvotes, RESET,
+                   DIM, RESET,
+                   RED, post->downvotes, RESET,
+                   DIM, RESET, BOLD_CYAN, authorUsername, RESET,
+                   DIM, RESET, DIM, createdStr, RESET);
+            
+            if (i < postCount - 1) {
+                printf("%s\n", BOX_V);
+            }
         }
     }
 
-    printf("=======================================\n");
-    printf("Gunakan VIEW_POST <ID> untuk melihat detail postingan.\n");
+    printf("\n");
+    printSectionDivider();
+    printf("\n");
+    printInfo("Subgroddit loaded successfully");
+    printf("%sTip:%s Use %sVIEW_POST <ID>;%s to view post details.\n", 
+           BOLD_CYAN, RESET, BOLD_WHITE, RESET);
 
     free(posts);
 }
