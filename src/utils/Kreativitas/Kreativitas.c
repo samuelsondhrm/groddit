@@ -1,6 +1,7 @@
 #include "Kreativitas.h"
 
-void printBanner() {
+void printBanner()
+{
     printf(
         "    █░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░█         ██░░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░\n"
         "  ▒▓▓▓▓▓▓▓▓▓▓▓▓▒██       █▒█▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒█          ██▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒\n"
@@ -23,13 +24,13 @@ void printBanner() {
         "      ██         █████      ███  █      ████  ██████   █████ ██████          \n"
         "        ███████████████████               ███                                \n"
         "                                         ██                                 \n"
-        "                                  ██████                                    \n"
-    );
+        "                                  ██████                                    \n");
 }
 
-
-void loadingBar(int length, int duration) {
-    for (int i = 0; i < length; i++) {
+void loadingBar(int length, int duration)
+{
+    for (int i = 0; i < length; i++)
+    {
         printf("\r[");
         for (int j = 0; j < i; j++)
             printf(GREEN "█" RESET);
@@ -45,23 +46,24 @@ void loadingBar(int length, int duration) {
     printf("] 100%%\n");
 }
 
+const char *phases[] = {"░", "▒", "▓", "█"};
+void loadingBarSmooth(int length, int delayMicroseconds)
+{
+    int totalPhases = 4;
 
-const char *phases[] = { "░", "▒", "▓", "█" };
-void loadingBarSmooth(int length, int delayMicroseconds) {
-    int totalPhases = 4;  
-
-    for (int i = 0; i < length * totalPhases; i++) {
+    for (int i = 0; i < length * totalPhases; i++)
+    {
         int filledBlocks = i / totalPhases;
-        int phaseIndex   = i % totalPhases;
+        int phaseIndex = i % totalPhases;
 
         printf("\r[");
-        
+
         for (int j = 0; j < filledBlocks; j++)
             printf("█");
 
         if (filledBlocks < length)
             printf("%s", phases[phaseIndex]);
-        
+
         for (int j = filledBlocks + 1; j < length; j++)
             printf(" ");
 
@@ -72,7 +74,8 @@ void loadingBarSmooth(int length, int delayMicroseconds) {
     printf("\n");
 }
 
-void printMenu() {
+void printMenu()
+{
     printf("\n[ 📘 DAFTAR COMMAND GRODDIT :  ]\n");
 
     printf("🔐  AKUN\n");
@@ -123,6 +126,11 @@ void printMenu() {
     printf("💾  DATA MANAGEMENT\n");
     printf("   • LOAD;\n");
     printf("   • SAVE;\n\n");
+
+    printf("🛡️  SECURITY\n");
+    printf("   • SET_SECURITY PASSWORD;        // Mengaktifkan password hashing (irreversible)\n");
+    printf("   • SET_SECURITY FILE ON;         // Menyalakan file encryption\n");
+    printf("   • SET_SECURITY FILE OFF;        // Mematikan file encryption\n\n");
 
     printf("🚪  KELUAR PROGRAM\n");
     printf("   • EXIT;\n");

@@ -26,7 +26,8 @@ int main()
         if (strCmp(commandStr, "HELP") == 0)
         {
             printMenu();
-        if (strCmp(commandStr, "PRINTALL") == 0)
+        }
+        else if (strCmp(commandStr, "PRINTALL") == 0)
         {
             printComments();
             printPosts();
