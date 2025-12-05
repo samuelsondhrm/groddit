@@ -144,6 +144,23 @@ void commandAddComment()
     IgnoreNewline();
     Word contentW;
     readLineWord(&contentW);
+
+    // ===========================
+    // MODERASI KOMENTAR
+    // ===========================
+    char commentStr[512];
+    wordToString(commentStr, contentW);
+
+    char foundWordsC[1][MAX_WORD_LEN];
+    int foundCountC = 0;
+
+    if (CheckBlacklistedContent(commentStr, foundWordsC, &foundCountC))
+    {
+        printf("Komentar ditolak karena mengandung kata terlarang: \"%s\".\n",
+               foundWordsC[0]);
+        return;
+    }
+
     if (contentW.Length == 0)
     {
         printf("Konten komentar tidak boleh kosong!\n");

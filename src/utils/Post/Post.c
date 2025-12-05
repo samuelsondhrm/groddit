@@ -1,15 +1,19 @@
 #include "Post.h"
 
-int findSubgrodditIndexByName(const char *subName) {
+int findSubgrodditIndexByName(const char *subName)
+{
     // Mencari index Subgroddit berdasarkan nama
     char nameBuf[256];
     int idx = 0;
     Node *p = SUBGRODDITS.head;
-    while (p != NULL) {
-        if (p->element.type == TYPE_SUBGRODDIT) {
+    while (p != NULL)
+    {
+        if (p->element.type == TYPE_SUBGRODDIT)
+        {
             SubGroddit s = p->element.data.subgroddit;
             wordToString(nameBuf, s.name);
-            if (strCmp(nameBuf, subName) == 0) {
+            if (strCmp(nameBuf, subName) == 0)
+            {
                 return idx;
             }
             idx++;
@@ -19,16 +23,20 @@ int findSubgrodditIndexByName(const char *subName) {
     return -1;
 }
 
-int findPostIndexById(const char *postId) {
+int findPostIndexById(const char *postId)
+{
     // Mencari index Post berdasarkan ID
     char idBuf[256];
     int idx = 0;
     Node *p = POSTS.head;
-    while (p != NULL) {
-        if (p->element.type == TYPE_POST) {
+    while (p != NULL)
+    {
+        if (p->element.type == TYPE_POST)
+        {
             Post post = p->element.data.post;
             wordToString(idBuf, post.post_id);
-            if (strCmp(idBuf, postId) == 0) return idx;
+            if (strCmp(idBuf, postId) == 0)
+                return idx;
             idx++;
         }
         p = p->next;
@@ -36,7 +44,8 @@ int findPostIndexById(const char *postId) {
     return -1;
 }
 
-void generatePostID(char *id, int num) {
+void generatePostID(char *id, int num)
+{
     // Membuat ID Post dengan format "PXYZ"
     id[0] = 'P';
     int hundreds = (num / 100) % 10;
@@ -48,34 +57,44 @@ void generatePostID(char *id, int num) {
     id[4] = '\0';
 }
 
-int getPostNumberFromWord(Word postId) {
+int getPostNumberFromWord(Word postId)
+{
     // Mengambil angka dari post_id dengan format "PXYZ" (3 digit).
     char buf[16];
     wordToString(buf, postId);
 
-    if (buf[0] != 'P') return 0;
-    if (buf[1] < '0' || buf[1] > '9') return 0;
-    if (buf[2] < '0' || buf[2] > '9') return 0;
-    if (buf[3] < '0' || buf[3] > '9') return 0;
+    if (buf[0] != 'P')
+        return 0;
+    if (buf[1] < '0' || buf[1] > '9')
+        return 0;
+    if (buf[2] < '0' || buf[2] > '9')
+        return 0;
+    if (buf[3] < '0' || buf[3] > '9')
+        return 0;
 
     int hundreds = buf[1] - '0';
-    int tens     = buf[2] - '0';
-    int ones     = buf[3] - '0';
+    int tens = buf[2] - '0';
+    int ones = buf[3] - '0';
     return hundreds * 100 + tens * 10 + ones;
 }
 
-int getNextPostNumberMex() {
+int getNextPostNumberMex()
+{
     // Menghitung MEX (minimum excluded) dari nomor post yang sudah ada.
     int maxCheck = POST_COUNT + 2; // cukup untuk menjamin ada MEX
     int used[maxCheck];
-    for (int i = 0; i < maxCheck; i++) used[i] = 0;
+    for (int i = 0; i < maxCheck; i++)
+        used[i] = 0;
 
     Node *p = POSTS.head;
-    while (p != NULL) {
-        if (p->element.type == TYPE_POST) {
+    while (p != NULL)
+    {
+        if (p->element.type == TYPE_POST)
+        {
             Post post = p->element.data.post;
             int num = getPostNumberFromWord(post.post_id);
-            if (num >= 1 && num < maxCheck) {
+            if (num >= 1 && num < maxCheck)
+            {
                 used[num] = 1;
             }
         }
@@ -88,30 +107,38 @@ int getNextPostNumberMex() {
 
     return mex;
 }
-Post* getPostById(const char *postId) {
+Post *getPostById(const char *postId)
+{
     Node *p = POSTS.head;
-    while (p!=NULL) {
-        if (p->element.type == TYPE_POST) {
+    while (p != NULL)
+    {
+        if (p->element.type == TYPE_POST)
+        {
             Post *post = &(p->element.data.post);
             char currentPostId[NMax + 1];
             wordToString(currentPostId, post->post_id);
-            if (strCmp(currentPostId, postId) == 0) return post;
+            if (strCmp(currentPostId, postId) == 0)
+                return post;
         }
         p = p->next;
     }
     return NULL;
 }
 
-const char* getPostAuthorId(const char *postId) {
+const char *getPostAuthorId(const char *postId)
+{
     Post *post = getPostById(postId);
-    if (post==NULL) return NULL;
-    static char authorId[NMax+1];
+    if (post == NULL)
+        return NULL;
+    static char authorId[NMax + 1];
     wordToString(authorId, post->author_id);
     return authorId;
 }
 
-void commandPost() {
-    if (!isLoggedIn()) {
+void commandPost()
+{
+    if (!isLoggedIn())
+    {
         printf("Anda belum login! Masuk terlebih dahulu untuk dapat mengakses Groddit.\n");
         return;
     }
@@ -121,7 +148,8 @@ void commandPost() {
     Word subNameWord;
     readLineWord(&subNameWord);
 
-    if (subNameWord.Length == 0) {
+    if (subNameWord.Length == 0)
+    {
         printf("Nama Subgroddit tidak boleh kosong!\n");
         return;
     }
@@ -130,7 +158,8 @@ void commandPost() {
     wordToString(subNameStr, subNameWord);
 
     int subIdx = findSubgrodditIndexByName(subNameStr);
-    if (subIdx == -1) {
+    if (subIdx == -1)
+    {
         printf("Subgroddit %s belum ditemukan!\n", subNameStr);
         printf("Gunakan perintah CREATE_SUBGRODDIT terlebih dahulu untuk membuatnya.\n");
         return;
@@ -139,16 +168,20 @@ void commandPost() {
     // Ambil Subgroddit ke-subIdx dari List
     Node *p = SUBGRODDITS.head;
     int idx = 0;
-    while (p != NULL && idx < subIdx) {
-        if (p->element.type == TYPE_SUBGRODDIT) {
+    while (p != NULL && idx < subIdx)
+    {
+        if (p->element.type == TYPE_SUBGRODDIT)
+        {
             idx++;
-            if (idx > subIdx) break;
+            if (idx > subIdx)
+                break;
         }
         p = p->next;
     }
 
     Word subIdWord;
-    if (p != NULL && p->element.type == TYPE_SUBGRODDIT) {
+    if (p != NULL && p->element.type == TYPE_SUBGRODDIT)
+    {
         subIdWord = p->element.data.subgroddit.subgroddit_id;
     }
 
@@ -156,7 +189,8 @@ void commandPost() {
     Word titleW;
     readLineWord(&titleW);
 
-    if (titleW.Length == 0) {
+    if (titleW.Length == 0)
+    {
         printf("Judul post tidak boleh kosong!\n");
         return;
     }
@@ -165,8 +199,33 @@ void commandPost() {
     Word contentW;
     readLineWord(&contentW);
 
-    if (contentW.Length == 0) {
+    if (contentW.Length == 0)
+    {
         printf("Konten post tidak boleh kosong!\n");
+        return;
+    }
+
+    // ===========================
+    // MODERASI KONTEN POST
+    // ===========================
+    char titleStr[256], contentStr[512];
+    wordToString(titleStr, titleW);
+    wordToString(contentStr, contentW);
+
+    char foundWords[MAX_FOUND][MAX_WORD_LEN];
+    int foundCount = 0;
+
+    if (CheckBlacklistedContent(titleStr, foundWords, &foundCount) ||
+        CheckBlacklistedContent(contentStr, foundWords, &foundCount))
+    {
+        printf("Post gagal dibuat karena mengandung kata terlarang: ");
+        for (int i = 0; i < foundCount; i++)
+        {
+            printf("%s", foundWords[i]);
+            if (i + 1 < foundCount)
+                printf(", ");
+        }
+        printf(".\n");
         return;
     }
 
@@ -195,7 +254,8 @@ void commandPost() {
     printf("Post berhasil dibuat dengan ID: %s di Subgroddit %s!\n", postIdStr, subNameStr);
 }
 
-void printPostHeader(const Post *p) {
+void printPostHeader(const Post *p)
+{
     char subIdStr[256];
     char titleStr[256];
     char contentStr[256];
@@ -209,17 +269,22 @@ void printPostHeader(const Post *p) {
     wordToString(authorIdStr, p->author_id);
 
     int authorIndex = -1;
-    for (int i = 0; i < USER_COUNT; i++) {
-        if (compareWord(USERS[i].user_id, p->author_id) != 0) {
+    for (int i = 0; i < USER_COUNT; i++)
+    {
+        if (compareWord(USERS[i].user_id, p->author_id) != 0)
+        {
             authorIndex = i;
             break;
         }
     }
 
     char authorUsername[256];
-    if (authorIndex != -1) {
+    if (authorIndex != -1)
+    {
         wordToString(authorUsername, USERS[authorIndex].username);
-    } else {
+    }
+    else
+    {
         wordToString(authorUsername, p->author_id);
     }
 
@@ -230,21 +295,26 @@ void printPostHeader(const Post *p) {
     printf("%c ↑%d %c ↓%d\n", 24, p->upvotes, 25, p->downvotes);
 }
 
-void buildPostTree(const Post *p, PostTree *T) {
+void buildPostTree(const Post *p, PostTree *T)
+{
     CreatePostTree(T, *p);
 
-    for (int i = 0; i < COMMENT_COUNT; i++) {
-        if (compareWord(COMMENTS[i].post_id, p->post_id) != 0) {
+    for (int i = 0; i < COMMENT_COUNT; i++)
+    {
+        if (compareWord(COMMENTS[i].post_id, p->post_id) != 0)
+        {
             Comment c = COMMENTS[i];
             AddComment(T, c.parent_comment_id, c);
         }
     }
 }
 
-void commandViewPost() {
+void commandViewPost()
+{
     ADVWORD_INPUT();
 
-    if (currentWord.Length == 0) {
+    if (currentWord.Length == 0)
+    {
         // Tidak ada ID setelah VIEW_POST
         printf("Format perintah VIEW_POST salah. Gunakan 'VIEW_POST <ID>;' tanpa argumen lain.\n");
         return;
@@ -254,9 +324,11 @@ void commandViewPost() {
     wordToString(postIdStr, currentWord);
 
     ADVWORD_INPUT();
-    if (currentWord.Length != 0) {
+    if (currentWord.Length != 0)
+    {
         // Ada argumen berlebih setelah ID
-        while (currentWord.Length != 0) {
+        while (currentWord.Length != 0)
+        {
             ADVWORD_INPUT();
         }
         printf("Format perintah VIEW_POST salah. Gunakan 'VIEW_POST <ID>;' tanpa argumen lain.\n");
@@ -264,18 +336,21 @@ void commandViewPost() {
     }
 
     int idx = findPostIndexById(postIdStr);
-    if (idx == -1) {
+    if (idx == -1)
+    {
         printf("Post dengan ID %s tidak ditemukan!\n", postIdStr);
         return;
     }
 
     Node *node = POSTS.head;
     int curIdx = 0;
-    while (node != NULL && curIdx < idx) {
+    while (node != NULL && curIdx < idx)
+    {
         node = node->next;
         curIdx++;
     }
-    if (node == NULL || node->element.type != TYPE_POST) {
+    if (node == NULL || node->element.type != TYPE_POST)
+    {
         return;
     }
 
@@ -291,10 +366,14 @@ void commandViewPost() {
     printf("=======================================\n");
 }
 
-void deleteCommentsForPost(const Word postIdWord) {
-    for (int i = COMMENT_COUNT - 1; i >= 0; i--) {
-        if (compareWord(COMMENTS[i].post_id, postIdWord) != 0) {
-            for (int j = i; j < COMMENT_COUNT - 1; j++) {
+void deleteCommentsForPost(const Word postIdWord)
+{
+    for (int i = COMMENT_COUNT - 1; i >= 0; i--)
+    {
+        if (compareWord(COMMENTS[i].post_id, postIdWord) != 0)
+        {
+            for (int j = i; j < COMMENT_COUNT - 1; j++)
+            {
                 COMMENTS[j] = COMMENTS[j + 1];
             }
             COMMENT_COUNT--;
@@ -302,10 +381,12 @@ void deleteCommentsForPost(const Word postIdWord) {
     }
 }
 
-void commandDeletePost() {
+void commandDeletePost()
+{
     ADVWORD_INPUT();
 
-    if (currentWord.Length == 0) {
+    if (currentWord.Length == 0)
+    {
         // Tidak ada ID setelah DELETE_POST
         printf("Format perintah DELETE_POST salah. Gunakan 'DELETE_POST <ID>;' tanpa argumen lain.\n");
         return;
@@ -315,9 +396,11 @@ void commandDeletePost() {
     wordToString(postIdStr, currentWord);
 
     ADVWORD_INPUT();
-    if (currentWord.Length != 0) {
+    if (currentWord.Length != 0)
+    {
         // Ada argumen berlebih setelah ID
-        while (currentWord.Length != 0) {
+        while (currentWord.Length != 0)
+        {
             ADVWORD_INPUT();
         }
         printf("Format perintah DELETE_POST salah. Gunakan 'DELETE_POST <ID>;' tanpa argumen lain.\n");
@@ -325,30 +408,35 @@ void commandDeletePost() {
     }
 
     int idx = findPostIndexById(postIdStr);
-    if (idx == -1) {
+    if (idx == -1)
+    {
         printf("Post [%s] tidak ditemukan!\n", postIdStr);
         printf("Anda tidak bisa menghapus fakta bahwa dia tidak dengan mu </3!!\n");
         return;
     }
 
-    if (!isLoggedIn()) {
+    if (!isLoggedIn())
+    {
         printf("Anda belum login! Masuk terlebih dahulu untuk dapat mengakses Groddit\n");
         return;
     }
 
     Node *node = POSTS.head;
     int curIdx = 0;
-    while (node != NULL && curIdx < idx) {
+    while (node != NULL && curIdx < idx)
+    {
         node = node->next;
         curIdx++;
     }
-    if (node == NULL || node->element.type != TYPE_POST) {
+    if (node == NULL || node->element.type != TYPE_POST)
+    {
         return;
     }
 
     Post *p = &node->element.data.post;
 
-    if (compareWord(p->author_id, USERS[CURRENT_USER_INDEX].user_id) == 0) {
+    if (compareWord(p->author_id, USERS[CURRENT_USER_INDEX].user_id) == 0)
+    {
         printf("Anda bukan pembuat post [%s]!\n", postIdStr);
         printf("Hanya pembuat post yang dapat menghapus postingan ini.\n");
         return;
@@ -364,7 +452,8 @@ void commandDeletePost() {
     wordToString(answer, currentWord);
     IgnoreNewline();
 
-    if (answer[0] != 'Y' && answer[0] != 'y') {
+    if (answer[0] != 'Y' && answer[0] != 'y')
+    {
         printf("Penghapusan post dibatalkan.\n");
         return;
     }

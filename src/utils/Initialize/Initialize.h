@@ -9,6 +9,8 @@
 #include "../GlobalData/GlobalData.h"
 #include "../User/User.h"
 #include "../Kreativitas/Kreativitas.h"
+#include "../Security/Security.h"
+#include "../ContentModeration/ContentModeration.h"
 
 // Membentuk path
 void buildPath(char *out, const char *folder, const char *file);

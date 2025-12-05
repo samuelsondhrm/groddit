@@ -96,48 +96,149 @@ void initialize()
 
     printf("\n");
 
-    // Comments
+    // Load security configuration
+    char pathConf[150];
+    buildPath(pathConf, folder, "security.conf");
+    strcpy(global_security_conf_path, pathConf);
+
+    if (!security_init(pathConf))
+    {
+        printf("[Peringatan] Gagal memuat konfigurasi keamanan dari %s. Menggunakan pengaturan default.\n", pathConf);
+    }
+
+    uint8_t *buf = NULL;
+    size_t len = 0;
+    boolean enc = false;
+
+    // -------------------
+    // COMMENTS (buffer)
+    // -------------------
     char pathComments[150];
     buildPath(pathComments, folder, "comment.csv");
 
-    COMMENT_COUNT = loadComments(pathComments, &COMMENTS, &COMMENT_CAPACITY);
+    buf = read_encrypted_file(pathComments, &len, &enc);
+    if (!buf)
+    {
+        COMMENT_COUNT = 0;
+    }
+    else
+    {
+        COMMENT_COUNT = loadComments_Buffer(buf, len, &COMMENTS, &COMMENT_CAPACITY);
+        free(buf);
+        buf = NULL;
+        len = 0;
+        enc = false;
+    }
 
     if (COMMENT_COUNT == -1)
     {
         printf("[Gagal] Memuat komentar dari %s\n", pathComments);
     }
 
-    // Posts
+    // -------------------
+    // POSTS (buffer)
+    // -------------------
     char pathPosts[150];
     buildPath(pathPosts, folder, "post.csv");
-    POST_COUNT = loadPosts(pathPosts, &POSTS);
-    if (POST_COUNT == -1)
-        printf("[Gagal] Memuat posts dari %s\n", pathPosts);
 
-    // Users
+    buf = read_encrypted_file(pathPosts, &len, &enc);
+    if (!buf)
+    {
+        POST_COUNT = 0;
+    }
+    else
+    {
+        POST_COUNT = loadPosts_Buffer(buf, len, &POSTS);
+        free(buf);
+        buf = NULL;
+        len = 0;
+        enc = false;
+    }
+
+    if (POST_COUNT == -1)
+    {
+        printf("[Gagal] Memuat posts dari %s\n", pathPosts);
+    }
+
+    // -------------------
+    // USERS (buffer)
+    // -------------------
     char pathUsers[150];
     buildPath(pathUsers, folder, "user.csv");
-    USER_COUNT = loadUsers(pathUsers, &USERS, &USER_CAPACITY);
-    if (USER_COUNT == -1)
-        printf("[Gagal] Memuat users dari %s\n", pathUsers);
 
-    // SubGroddits
+    buf = read_encrypted_file(pathUsers, &len, &enc);
+    if (!buf)
+    {
+        USER_COUNT = 0;
+    }
+    else
+    {
+        USER_COUNT = loadUsers_Buffer(buf, len, &USERS, &USER_CAPACITY);
+        free(buf);
+        buf = NULL;
+        len = 0;
+        enc = false;
+    }
+
+    if (USER_COUNT == -1)
+    {
+        printf("[Gagal] Memuat users dari %s\n", pathUsers);
+    }
+
+    // -------------------
+    // SUBGRODDITS (buffer)
+    // -------------------
     char pathSubs[150];
     buildPath(pathSubs, folder, "subgroddit.csv");
-    SUBGRODDIT_COUNT = loadSubGroddits(pathSubs, &SUBGRODDITS);
-    if (SUBGRODDIT_COUNT == -1)
-        printf("[Gagal] Memuat subgroddits dari %s\n", pathSubs);
 
-    // Socials
+    buf = read_encrypted_file(pathSubs, &len, &enc);
+    if (!buf)
+    {
+        SUBGRODDIT_COUNT = 0;
+    }
+    else
+    {
+        SUBGRODDIT_COUNT = loadSubGroddits_Buffer(buf, len, &SUBGRODDITS);
+        free(buf);
+        buf = NULL;
+        len = 0;
+        enc = false;
+    }
+
+    if (SUBGRODDIT_COUNT == -1)
+    {
+        printf("[Gagal] Memuat subgroddits dari %s\n", pathSubs);
+    }
+
+    // -------------------
+    // SOCIALS (buffer)
+    // -------------------
     createGraph(&SOCIAL_GRAPH, USER_COUNT);
-    
+
     char pathSocials[150];
     buildPath(pathSocials, folder, "social.csv");
-    SOCIAL_COUNT = loadSocials(pathSocials, &SOCIALS, &SOCIAL_CAPACITY);
-    if (SOCIAL_COUNT == -1) printf("[Gagal] Memuat socials dari %s\n", pathSocials);
-    
-    // Proses memasukkan edge di global SOCIAL_GRAPH
-    for (int i = 0; i < SOCIAL_COUNT; i++) {
+
+    buf = read_encrypted_file(pathSocials, &len, &enc);
+    if (!buf)
+    {
+        SOCIAL_COUNT = 0;
+    }
+    else
+    {
+        SOCIAL_COUNT = loadSocials_Buffer(buf, len, &SOCIALS, &SOCIAL_CAPACITY);
+        free(buf);
+        buf = NULL;
+        len = 0;
+        enc = false;
+    }
+
+    if (SOCIAL_COUNT == -1)
+    {
+        printf("[Gagal] Memuat socials dari %s\n", pathSocials);
+    }
+
+    for (int i = 0; i < SOCIAL_COUNT; i++)
+    {
         char uId[32], vId[32];
         wordToString_safe(uId, sizeof(uId), SOCIALS[i].user_id);
         wordToString_safe(vId, sizeof(vId), SOCIALS[i].following_id);
@@ -145,15 +246,45 @@ void initialize()
         int u = findUserIndexById(uId);
         int v = findUserIndexById(vId);
 
-        if (u != IDX_UNDEF && v != IDX_UNDEF && u != v) {
+        if (u != IDX_UNDEF && v != IDX_UNDEF && u != v)
+        {
             addEdge(&SOCIAL_GRAPH, u, v);
         }
     }
 
-    // Votings
+    // -------------------
+    // VOTINGS (buffer)
+    // -------------------
     char pathVotings[150];
     buildPath(pathVotings, folder, "voting.csv");
-    VOTING_COUNT = loadVotings(pathVotings, &VOTINGS, &VOTING_CAPACITY);
+
+    buf = read_encrypted_file(pathVotings, &len, &enc);
+    if (!buf)
+    {
+        VOTING_COUNT = 0;
+    }
+    else
+    {
+        VOTING_COUNT = loadVotings_Buffer(buf, len, &VOTINGS, &VOTING_CAPACITY);
+        free(buf);
+        buf = NULL;
+        len = 0;
+        enc = false;
+    }
+
     if (VOTING_COUNT == -1)
+    {
         printf("[Gagal] Memuat votings dari %s\n", pathVotings);
+    }
+
+    // -------------------
+    // CONTENT MODERATION
+    // -------------------
+    char pathBlacklistWords[150];
+    buildPath(pathBlacklistWords, folder, "blacklisted_words.json");
+
+    if (!content_moderation_init(pathBlacklistWords))
+    {
+        printf("[Warning] Content moderation tidak aktif.\n");
+    }
 }

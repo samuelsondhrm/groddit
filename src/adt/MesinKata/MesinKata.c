@@ -67,6 +67,7 @@ void CopyWordInput()
     {
         if (currentWord.Length < NMax)
             currentWord.TabWord[currentWord.Length++] = currentChar;
+
         ADVINPUT();
     }
 }
@@ -87,6 +88,19 @@ void STARTWORD_CSV(const char *filename)
     CopyFieldCSV();
 }
 
+void STARTWORD_CSV_BUFFER(uint8_t *buffer, int len)
+{
+    STARTCSV_BUFFER(buffer, len);
+
+    if (EOP)
+    {
+        EndWordCSV = true;
+        return;
+    }
+
+    EndWordCSV = false;
+}
+
 void ADVWORD_CSV()
 {
     if (EOP)
@@ -99,7 +113,10 @@ void ADVWORD_CSV()
     {
         while (!EOP && (currentChar == '\n' || currentChar == '\r'))
         {
-            ADVCSV();
+            if (MODE == MODE_CSV_BUFFER)
+                ADVCSV_BUFFER();
+            else
+                ADVCSV();
         }
 
         if (EOP)
@@ -115,11 +132,13 @@ void ADVWORD_CSV()
 
     if (currentChar == ',')
     {
-        ADVCSV();
+        if (MODE == MODE_CSV_BUFFER)
+            ADVCSV_BUFFER();
+        else
+            ADVCSV();
+
         if (!EOP && currentChar != '\n' && currentChar != '\r')
-        {
             CopyFieldCSV();
-        }
         return;
     }
 
@@ -132,20 +151,29 @@ void CopyFieldCSV()
 
     if (currentChar == '"')
     {
-        ADVCSV();
+        if (MODE == MODE_CSV_BUFFER)
+            ADVCSV_BUFFER();
+        else
+            ADVCSV();
 
         while (!EOP)
         {
-
             if (currentChar == '"')
             {
-                ADVCSV();
+                if (MODE == MODE_CSV_BUFFER)
+                    ADVCSV_BUFFER();
+                else
+                    ADVCSV();
 
                 if (currentChar == '"')
                 {
                     if (currentWord.Length < NMax)
                         currentWord.TabWord[currentWord.Length++] = '"';
-                    ADVCSV();
+
+                    if (MODE == MODE_CSV_BUFFER)
+                        ADVCSV_BUFFER();
+                    else
+                        ADVCSV();
                 }
                 else
                 {
@@ -156,23 +184,102 @@ void CopyFieldCSV()
             {
                 if (currentWord.Length < NMax)
                     currentWord.TabWord[currentWord.Length++] = currentChar;
-                ADVCSV();
+
+                if (MODE == MODE_CSV_BUFFER)
+                    ADVCSV_BUFFER();
+                else
+                    ADVCSV();
             }
         }
 
-        if (currentChar == '"')
-            ADVCSV();
+        if (!EOP && currentChar == '"')
+        {
+            if (MODE == MODE_CSV_BUFFER)
+                ADVCSV_BUFFER();
+            else
+                ADVCSV();
+        }
 
         return;
     }
 
-    while (!EOP && currentChar != ',' &&
-           currentChar != '\n' && currentChar != '\r')
+    while (!EOP &&
+           currentChar != ',' &&
+           currentChar != '\n' &&
+           currentChar != '\r')
     {
-
         if (currentWord.Length < NMax)
             currentWord.TabWord[currentWord.Length++] = currentChar;
 
-        ADVCSV();
+        if (MODE == MODE_CSV_BUFFER)
+            ADVCSV_BUFFER();
+        else
+            ADVCSV();
+    }
+}
+
+boolean EndWordCONF = false;
+
+void IgnoreSpacesCONF()
+{
+    while (!EOP && (currentChar == ' ' || currentChar == '\t'))
+    {
+        ADVCONF();
+    }
+}
+
+void STARTWORD_CONF(const char *filename)
+{
+    STARTCONF(filename);
+
+    if (EOP)
+    {
+        EndWordCONF = true;
+        currentWord.Length = 0;
+        return;
+    }
+
+    IgnoreSpacesCONF();
+
+    if (EOP || currentChar == '\n' || currentChar == '\r')
+    {
+        EndWordCONF = true;
+        currentWord.Length = 0;
+        return;
+    }
+
+    EndWordCONF = false;
+    CopyTokenCONF();
+}
+
+void ADVWORD_CONF()
+{
+    IgnoreSpacesCONF();
+
+    if (EOP || currentChar == '\n' || currentChar == '\r')
+    {
+        EndWordCONF = true;
+        currentWord.Length = 0;
+        return;
+    }
+
+    CopyTokenCONF();
+}
+
+void CopyTokenCONF()
+{
+    currentWord.Length = 0;
+
+    while (!EOP &&
+           currentChar != '=' &&
+           currentChar != ' ' &&
+           currentChar != '\t' &&
+           currentChar != '\n' &&
+           currentChar != '\r')
+    {
+        if (currentWord.Length < NMax)
+            currentWord.TabWord[currentWord.Length++] = currentChar;
+
+        ADVCONF();
     }
 }
