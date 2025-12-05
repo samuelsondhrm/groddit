@@ -73,7 +73,7 @@ void loadingBarSmooth(int length, int delayMicroseconds) {
 }
 
 void printMenu() {
-    printf("\n          [ 📘 DAFTAR COMMAND GRODDIT : CREDIT]\n");
+    printf("\n[ 📘 DAFTAR COMMAND GRODDIT :  ]\n");
 
     printf("🔐  AKUN\n");
     printf("   • REGISTER;\n");

@@ -87,8 +87,10 @@ void initialize()
         }
 
         folderValid = 1;
-        printf("\nMemuat data dari folder '%s' ..........\n", folder);
-        loadingBarSmooth(30, 10000);
+        printf("\nMemuat data dari folder '%s'..........\n", folder);
+        // loadingBarSmooth(30, 10000);
+        loadingBarSmooth(30, 50000);
+        printf("Data berhasil dimuat dari folder '%s'!\n", folder);
         printf("\n");
     }
 

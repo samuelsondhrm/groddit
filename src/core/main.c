@@ -8,13 +8,14 @@ int main()
 
     while (!quit)
     {
+        printf("\n");
         printf("Enter Command:\n");
         printf("atau >> HELP; << untuk melihat daftar commands\n");
         printf("█▒▒░░ ");
         fflush(stdout);
 
         STARTWORD_INPUT();
-
+        printf("\n");
         if (currentWord.Length == 0)
         {
             continue;
