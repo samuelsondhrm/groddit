@@ -284,7 +284,7 @@ void commandShowFeed() {
                BOX_V, BOLD_CYAN, printed + 1, RESET,
                BOLD_MAGENTA, postId, RESET,
                BOLD_WHITE, titleStr, RESET);
-        printf("%s    %sr/%s%s %s│%s by %s@%s%s %s│%s %s%s%s\n", 
+        printf("%s    %s%s%s %s│%s by %s@%s%s %s│%s %s%s%s\n", 
                BOX_V, BOLD_YELLOW, subName, RESET, 
                DIM, RESET, BOLD_CYAN, authorName, RESET,
                DIM, RESET, DIM, timeStr, RESET);
