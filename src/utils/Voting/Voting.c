@@ -122,6 +122,10 @@ void commandUpvotePost() {
     printf("%s\n", RESET);
 
     if (!isLoggedIn()) {
+        ADVWORD_INPUT();
+        while (currentWord.Length != 0) {
+            ADVWORD_INPUT();
+        }
         printError("Authentication required");
         printf("You must be logged in to vote.\n\n");
         printf("%sTip:%s Use %sLOGIN;%s to access your account.\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
@@ -219,6 +223,10 @@ void commandDownvotePost() {
     printf("%s\n", RESET);
 
     if (!isLoggedIn()) {
+        ADVWORD_INPUT();
+        while (currentWord.Length != 0) {
+            ADVWORD_INPUT();
+        }
         printError("Authentication required");
         printf("You must be logged in to vote.\n\n");
         printf("%sTip:%s Use %sLOGIN;%s to access your account.\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
@@ -314,6 +322,10 @@ void commandUndoVotePost() {
     printf("%s\n", RESET);
 
     if (!isLoggedIn()) {
+        ADVWORD_INPUT();
+        while (currentWord.Length != 0) {
+            ADVWORD_INPUT();
+        }
         printError("Authentication required");
         printf("You must be logged in to undo votes.\n\n");
         printf("%sTip:%s Use %sLOGIN;%s to access your account.\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
@@ -388,6 +400,10 @@ void commandUpvoteComment() {
     printf("%s\n", RESET);
 
     if (!isLoggedIn()) {
+        ADVWORD_INPUT();
+        while (currentWord.Length != 0) {
+            ADVWORD_INPUT();
+        }
         printError("Authentication required");
         printf("You must be logged in to vote.\n\n");
         printf("%sTip:%s Use %sLOGIN;%s to access your account.\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
@@ -508,6 +524,10 @@ void commandDownvoteComment() {
     printf("%s\n", RESET);
 
     if (!isLoggedIn()) {
+        ADVWORD_INPUT();
+        while (currentWord.Length != 0) {
+            ADVWORD_INPUT();
+        }
         printError("Authentication required");
         printf("You must be logged in to vote.\n\n");
         printf("%sTip:%s Use %sLOGIN;%s to access your account.\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
@@ -625,6 +645,10 @@ void commandUndoVoteComment() {
     printf("%s\n", RESET);
 
     if (!isLoggedIn()) {
+        ADVWORD_INPUT();
+        while (currentWord.Length != 0) {
+            ADVWORD_INPUT();
+        }
         printError("Authentication required");
         printf("You must be logged in to undo votes.\n\n");
         printf("%sTip:%s Use %sLOGIN;%s to access your account.\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);

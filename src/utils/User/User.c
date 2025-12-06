@@ -1,4 +1,5 @@
 #include "User.h"
+#include "../Profil/Profil.h"
 
 int findIdByUsername(const char *username)
 {
@@ -348,7 +349,7 @@ void loginUser()
     wordToString(userIdStr, u->user_id);
     
     printf("%s Account ID:    %s%s%s\n", BOX_V, BOLD_WHITE, userIdStr, RESET);
-    printf("%s Karma:         %s%d%s\n", BOX_V, BOLD_YELLOW, u->karma, RESET);
+    printf("%s Karma:         %s%d%s\n", BOX_V, BOLD_YELLOW, computeUserKarma(user_id), RESET);
     printf("%s Member since:  %s%s%s\n", BOX_V, BOLD_WHITE, timeStr, RESET);
     
     printSectionDivider();

@@ -76,7 +76,7 @@ int computeUserKarma(int userIndex) {
     while (p != NULL) {
         if (p->element.type == TYPE_POST) {
             Post post = p->element.data.post;
-            if (compareWord(post.author_id, userId) == 0)
+            if (compareWord(post.author_id, userId) != 0)
             {
                 karma += post.upvotes;
                 karma -= post.downvotes;
@@ -87,7 +87,7 @@ int computeUserKarma(int userIndex) {
 
     // Hitung karma untuk komen
     for (int i = 0; i < COMMENT_COUNT; i++) {
-        if (compareWord(COMMENTS[i].author_id, userId) == 0)
+        if (compareWord(COMMENTS[i].author_id, userId) != 0)
         {
             karma += COMMENTS[i].upvotes;
             karma -= COMMENTS[i].downvotes;
@@ -144,7 +144,7 @@ void getSubgrodditName(Word subId, char *out) {
     while (p != NULL) {
         if (p->element.type == TYPE_SUBGRODDIT) {
             SubGroddit s = p->element.data.subgroddit;
-            if (compareWord(s.subgroddit_id, subId) == 0) {
+            if (compareWord(s.subgroddit_id, subId) != 0) {
                 wordToString(out, s.name);
                 return;
             }
