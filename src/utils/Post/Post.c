@@ -581,7 +581,7 @@ void commandDeletePost()
      * Hanya pembuat post yang boleh menghapus postingan.
      * Jika author_id != user yang sedang login, tolak operasi.
      */
-    if (compareWord(p->author_id, USERS[CURRENT_USER_INDEX].user_id) != 0)
+    if (compareWord(p->author_id, USERS[CURRENT_USER_INDEX].user_id) == 0)
     {
         printf("\n");
         printError("Authorization failed");
