@@ -1,13 +1,13 @@
 ### IF2110 Algorithm and Programming II - Tubes 1
-# Groddit - Social Media Platform
+# GRODDIT - Social Media Platform
 
 > A Reddit-inspired social media platform built in C
 
 Groddit is a terminal based social media application that brings the essence of Reddit to your command line. Create posts, engage in discussions, vote on content, and connect with other users, all through an elegant text-based user interface.
 
-## Team / Developer
+## Developer
 
-**Kelompok K01-I:**
+**Kelompok K01-I: CREDIT**
 
 - 13524001 Samuelson D Tanuraharja
 - 13524019 Kevin Wirya Valerian
@@ -58,16 +58,6 @@ make
 ```bash
 ./bin/main
 ```
-
-### Initial Configuration
-
-On first run, you'll be prompted to select a configuration folder:
-- `config-1/`: Sample data with basic users and posts
-- `PwHashed/`: Sample data with password hashing enabled
-- `FileEnc/`: Sample data with file encryption enabled
-- `PwHashedAndFileEnc/`: Maximum security configuration
-
-Simply type the folder name (e.g., `config-1`) when prompted.
 
 ## Developing
 
@@ -223,7 +213,7 @@ SET_SECURITY FILE ON;
 
 Set custom encryption seed:
 ```
-SET_SECURITY ENC_SEED 12345;
+SET_SECURITY ENC_SEED <any positive number>;
 ```
 
 Disable file encryption:
@@ -241,6 +231,7 @@ Data is stored in CSV format under `config/` folders:
 - `social.csv`: Follow relationships
 - `voting.csv`: Vote records
 - `security.conf`: Security configuration
+- `blacklisted_words.json`: Blacklisted words for POST and COMMENT
 
 ## Contributing
 
@@ -248,9 +239,9 @@ Contributions are welcome! This project is part of IF2110 Algorithm and Programm
 
 If you'd like to contribute:
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
+2. Create a feature branch (`git checkout -b feat/test`)
+3. Commit your changes (`git commit -m 'Feat: add some feature'`)
+4. Push to the branch (`git push origin feat/test`)
 5. Open a Pull Request
 
 Please ensure your code follows the existing style and includes appropriate documentation.
@@ -265,5 +256,6 @@ Please ensure your code follows the existing style and includes appropriate docu
 ## License
 
 This project is developed as part of academic coursework at Institut Teknologi Bandung. All rights reserved to the course instructors and student contributors.
+
 
 ---
