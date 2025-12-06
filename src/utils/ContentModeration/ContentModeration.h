@@ -21,6 +21,8 @@ boolean content_moderation_init(const char *pathConf); // inisialisasi moderasi 
 
 extern Blacklist GLOBAL_BLACKLIST; // blacklist global
 
+int SaveBlacklistJSON(const char *filepath); // simpan blacklist ke file JSON
+
 int LoadBlacklistJSON(const char *filepath); // load blacklist dari file JSON
 
 int CheckBlacklistedContent(const char *text, char foundWords[][MAX_WORD_LEN], int *foundCount);

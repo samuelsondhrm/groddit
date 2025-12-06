@@ -417,6 +417,21 @@ void performSave(const char *folder)
     save_security_conf(path);
     printf(" %s[DONE]%s\n", GREEN, RESET);
 
+        // 8. SAVE BLACKLIST JSON
+    printf("%s %sSaving blacklist...%s", BOX_V, DIM, RESET);
+    fflush(stdout);
+    buildPath(path, folder, "blacklisted_words.json");
+
+    if (SaveBlacklistJSON(path))
+    {
+        printf(" %s[OK] %d words%s\n", GREEN, GLOBAL_BLACKLIST.count, RESET);
+    }
+    else
+    {
+        printf(" %s[FAILED]%s\n", BOLD_RED, RESET);
+    }
+
+
     printSectionDivider();
     printf("\n");
     printSuccess("Data saved successfully!");
