@@ -188,7 +188,7 @@ void showUserProfile(const char *username) {
     int comments = countUserComments(idx);
     int followers = countUserFollowers(idx);
     int following = countUserFollowing(idx);
-    int karma = u->karma; 
+    int karma = computeUserKarma(idx); 
 
     printf("\n");
     printf("%s", BOLD_CYAN);
