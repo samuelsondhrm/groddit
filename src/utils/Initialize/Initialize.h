@@ -21,4 +21,7 @@ int isFolderValid(const char *folder);
 // Inisialisasi
 void initialize();
 
+// Welcome screen
+void printWelcomeScreen();
+
 #endif

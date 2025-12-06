@@ -154,9 +154,22 @@ void displayTrendingResults(const char *subgrodditName, int timeValue,
 }
 
 void commandTrending() {
+    clearScreen();
+    printBreadcrumb("Home > Trending Topics");
+    
+    printHorizontalLine(80, DBOX_TL, DBOX_H, DBOX_TR);
+    printf("%s║%s                         %sTRENDING TOPICS%s                           %s║%s\n", 
+           BOLD_CYAN, RESET, BOLD_WHITE, RESET, BOLD_CYAN, RESET);
+    printHorizontalLine(80, DBOX_BL, DBOX_H, DBOX_BR);
+    printf("%s\n", RESET);
+
     ADVWORD_INPUT();
     if (currentWord.Length == 0) {
-        printf("Format perintah TRENDING salah. Gunakan 'TRENDING <subgroddit> <waktu> <hour/minute/second>;' atau 'TRENDING <subgroddit> ALL;'.\n");
+        printError("Invalid command format");
+        printf("Subgroddit name is required.\n\n");
+        printf("%sUsage:%s %sTRENDING <subgroddit> <time> <unit>;%s\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
+        printf("%s   or:%s %sTRENDING <subgroddit> ALL;%s\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
+        printf("%sExample:%s %sTRENDING r/programming 24 hour;%s\n", DIM, RESET, BOLD_WHITE, RESET);
         return;
     }
     
@@ -165,7 +178,10 @@ void commandTrending() {
     
     ADVWORD_INPUT();
     if (currentWord.Length == 0) {
-        printf("Format perintah TRENDING salah. Gunakan 'TRENDING <subgroddit> <waktu> <hour/minute/second>;' atau 'TRENDING <subgroddit> ALL;'.\n");
+        printError("Invalid command format");
+        printf("Time period or ALL is required.\n\n");
+        printf("%sUsage:%s %sTRENDING <subgroddit> <time> <unit>;%s\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
+        printf("%s   or:%s %sTRENDING <subgroddit> ALL;%s\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
         return;
     }
     
@@ -184,59 +200,75 @@ void commandTrending() {
             while (currentWord.Length != 0) {
                 ADVWORD_INPUT();
             }
-            printf("Format perintah TRENDING salah. Gunakan 'TRENDING <subgroddit> ALL;'.\n");
+            printError("Invalid command format");
+            printf("Too many arguments for ALL mode.\n\n");
+            printf("%sUsage:%s %sTRENDING <subgroddit> ALL;%s\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
             return;
         }
     } else {
         timeValue = wordToInt(currentWord);
         if (timeValue <= 0) {
-            printf("Nilai waktu harus berupa angka positif.\n");
+            printError("Invalid time value");
+            printf("Time must be a positive number.\n");
             return;
         }
         
         ADVWORD_INPUT();
         if (currentWord.Length == 0) {
-            printf("Format perintah TRENDING salah. Gunakan 'TRENDING <subgroddit> <waktu> <hour/minute/second>;'.\n");
+            printError("Invalid command format");
+            printf("Time unit is required (hour/minute/second).\n\n");
+            printf("%sUsage:%s %sTRENDING <subgroddit> <time> <unit>;%s\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
             return;
         }
         
         wordToString(timeUnit, currentWord);
+        
+        if (strCmp(timeUnit, "hour") != 0 && 
+            strCmp(timeUnit, "minute") != 0 && 
+            strCmp(timeUnit, "second") != 0) {
+            printError("Invalid time unit");
+            printf("Unit must be: %shour%s, %sminute%s, or %ssecond%s\n", 
+                   BOLD_YELLOW, RESET, BOLD_YELLOW, RESET, BOLD_YELLOW, RESET);
+            return;
+        }
         
         ADVWORD_INPUT();
         if (currentWord.Length != 0) {
             while (currentWord.Length != 0) {
                 ADVWORD_INPUT();
             }
-            printf("Format perintah TRENDING salah. Gunakan 'TRENDING <subgroddit> <waktu> <hour/minute/second>;'.\n");
-            return;
-        }
-        
-        if (strCmp(timeUnit, "hour") != 0 && 
-            strCmp(timeUnit, "minute") != 0 && 
-            strCmp(timeUnit, "second") != 0) {
-            printf("Unit waktu tidak valid! Gunakan hour, minute, atau second.\n");
+            printError("Invalid command format");
+            printf("Too many arguments provided.\n\n");
+            printf("%sUsage:%s %sTRENDING <subgroddit> <time> <unit>;%s\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
             return;
         }
     }
     
-    int subIdx = findSubgrodditIndexByName(subgrodditName);
-    if (subIdx == -1) {
-        printf("Subgroddit %s belum ditemukan!\n", subgrodditName);
-        printf("Gunakan perintah CREATE_SUBGRODDIT untuk membuatnya terlebih dahulu.\n");
-        return;
+    printf("\n");
+    spinnerAnimation("Analyzing trending topics", 10);
+    
+    SubGroddit *sub = NULL;
+    Node *p = SUBGRODDITS.head;
+    while (p != NULL) {
+        if (p->element.type == TYPE_SUBGRODDIT) {
+            char name[256];
+            wordToString(name, p->element.data.subgroddit.name);
+            if (strCmp(name, subgrodditName) == 0) {
+                sub = &p->element.data.subgroddit;
+                break;
+            }
+        }
+        p = p->next;
     }
     
-    Node *subNode = SUBGRODDITS.head;
-    int idx = 0;
-    while (subNode != NULL && idx < subIdx) {
-        subNode = subNode->next;
-        idx++;
-    }
-    if (subNode == NULL || subNode->element.type != TYPE_SUBGRODDIT) {
-        printf("Error: Subgroddit tidak ditemukan.\n");
+    if (sub == NULL) {
+        printf("\n");
+        printError("Subgroddit not found");
+        printf("No subgroddit named: %s%s%s\n\n", BOLD_RED, subgrodditName, RESET);
+        printf("%sTip:%s Use %sSEARCH_SUBGRODDIT r/;%s to see all subgroddits.\n", 
+               BOLD_CYAN, RESET, BOLD_WHITE, RESET);
         return;
     }
-    SubGroddit *sub = &subNode->element.data.subgroddit;
     
     time_t threshold = 0;
     
@@ -257,10 +289,10 @@ void commandTrending() {
     int keywordCount = 0;
     int capacity = 0;
     
-    Node *p = POSTS.head;
-    while (p != NULL) {
-        if (p->element.type == TYPE_POST) {
-            Post *post = &p->element.data.post;
+    Node *postNode = POSTS.head;
+    while (postNode != NULL) {
+        if (postNode->element.type == TYPE_POST) {
+            Post *post = &postNode->element.data.post;
             
             boolean inSubgroddit = (compareWord(post->subgroddit_id, sub->subgroddit_id) == 1);
             boolean inTimeRange = useAllTime || (post->created_at >= threshold);
@@ -290,27 +322,21 @@ void commandTrending() {
                 }
             }
         }
-        p = p->next;
+        postNode = postNode->next;
     }
     
     if (keywordCount == 0) {
         printf("\n");
+        printSectionHeader("", "TRENDING TOPICS");
+        printf("\n%s %sSubgroddit:%s %s%s%s\n", BOX_V, BOLD_WHITE, RESET, BOLD_MAGENTA, subgrodditName, RESET);
         if (useAllTime) {
-            printf("TRENDING IN %s (All Time)", subgrodditName);
-            int headerLen = 28 + strlen(subgrodditName);
-            for (int i = headerLen; i < 63; i++) {
-                printf(" ");
-            }
+            printf("%s %sPeriod:%s %sAll Time%s\n", BOX_V, BOLD_WHITE, RESET, BOLD_CYAN, RESET);
         } else {
-            printf("TRENDING IN %s (Last %d %s)", subgrodditName, timeValue, timeUnit);
-            int headerLen = 26 + strlen(subgrodditName) + 
-                            (timeValue >= 10 ? 2 : 1) + strlen(timeUnit);
-            for (int i = headerLen; i < 63; i++) {
-                printf(" ");
-            }
+            printf("%s %sPeriod:%s %sLast %d %s%s\n", BOX_V, BOLD_WHITE, RESET, BOLD_CYAN, timeValue, timeUnit, RESET);
         }
-        printf("\n");
-        printf("Tidak ada data trending untuk periode ini.\n");
+        printSectionDivider();
+        printf("\n%s %s(No trending data for this period)%s\n", BOX_V, DIM, RESET);
+        printSectionDivider();
         if (keywordArray != NULL) {
             free(keywordArray);
         }
@@ -337,29 +363,31 @@ void commandTrending() {
         topCount++;
     }
     
+    printf("\n");
+    printSectionHeader("", "TRENDING TOPICS");
+    printf("\n%s %sSubgroddit:%s %s%s%s\n", BOX_V, BOLD_WHITE, RESET, BOLD_MAGENTA, subgrodditName, RESET);
     if (useAllTime) {
-        printf("TRENDING IN %s (All Time)", subgrodditName);
-        int headerLen = 28 + strlen(subgrodditName);
-        for (int i = headerLen; i < 63; i++) {
-            printf(" ");
-        }
-        printf("\n");
-        for (int i = 0; i < topCount && i < 5; i++) {
-            int pad = 15-(int)strlen(topKeywords[i].keyword);
-            if (pad<1) pad = 1;
-            printf("%d. \"%s\" %*s- %d mentions\n",
-                i+1,
-                topKeywords[i].keyword,
-                pad,
-                "",
-                topKeywords[i].frequency);
-        }
-        if (topCount > 0) {
-            printf("Hottest topic: \"%s\" in \"%s\"\n", 
-                   topKeywords[0].keyword, topKeywords[0].hottestPostTitle);
-        }
+        printf("%s %sPeriod:%s %sAll Time%s\n", BOX_V, BOLD_WHITE, RESET, BOLD_CYAN, RESET);
     } else {
-        displayTrendingResults(subgrodditName, timeValue, timeUnit, topKeywords, topCount);
+        printf("%s %sPeriod:%s %sLast %d %s%s\n", BOX_V, BOLD_WHITE, RESET, BOLD_CYAN, timeValue, timeUnit, RESET);
+    }
+    printSectionDivider();
+    printf("\n");
+    
+    for (int i = 0; i < topCount && i < 5; i++) {
+        printf("%s %s%d.%s \"%s%s%s\" %s- %d mentions%s\n",
+            BOX_V, BOLD_WHITE, i+1, RESET,
+            BOLD_YELLOW, topKeywords[i].keyword, RESET,
+            DIM, topKeywords[i].frequency, RESET);
+    }
+    printSectionDivider();
+    
+    if (topCount > 0) {
+        printf("\n");
+        printInfo("Hottest topic: ");
+        printf("\"%s%s%s\" in \"%s%s%s\"\n", 
+               BOLD_YELLOW, topKeywords[0].keyword, RESET,
+               BOLD_CYAN, topKeywords[0].hottestPostTitle, RESET);
     }
     
     deallocateHeap(&maxHeap);

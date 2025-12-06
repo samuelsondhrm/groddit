@@ -369,10 +369,24 @@ boolean load_security_conf(const char *path)
 
 void handleSecurityCommand()
 {
+    clearScreen();
+    printBreadcrumb("Home > Security Settings");
+    
+    printHorizontalLine(80, DBOX_TL, DBOX_H, DBOX_TR);
+    printf("%s║%s                        %sSECURITY SETTINGS%s                         %s║%s\n", 
+           BOLD_CYAN, RESET, BOLD_WHITE, RESET, BOLD_CYAN, RESET);
+    printHorizontalLine(80, DBOX_BL, DBOX_H, DBOX_BR);
+    printf("%s\n", RESET);
+
     ADVWORD_INPUT();
     if (currentWord.Length == 0)
     {
-        printf("Format salah. Gunakan: SET_SECURITY <KEY>;\n");
+        printError("Invalid command format");
+        printf("Security option is required.\n\n");
+        printf("%sUsage:%s\n", BOLD_WHITE, RESET);
+        printf("  %sSET_SECURITY PASSWORD;%s          - Enable password hashing\n", BOLD_CYAN, RESET);
+        printf("  %sSET_SECURITY FILE <ON|OFF>;%s     - Toggle file encryption\n", BOLD_CYAN, RESET);
+        printf("  %sSET_SECURITY ENC_SEED <number>;%s - Set encryption seed\n", BOLD_CYAN, RESET);
         return;
     }
 
@@ -384,18 +398,42 @@ void handleSecurityCommand()
         ADVWORD_INPUT();
         if (currentWord.Length != 0)
         {
-            printf("Format salah. Gunakan: SET_SECURITY PASSWORD;\n");
+            while (currentWord.Length != 0)
+            {
+                ADVWORD_INPUT();
+            }
+            printError("Invalid command format");
+            printf("Too many arguments provided.\n\n");
+            printf("%sUsage:%s %sSET_SECURITY PASSWORD;%s\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
             return;
         }
 
+        printf("\n");
+        printSectionHeader("", "PASSWORD HASHING");
+        printf("\n");
+
         if (g_pwd_hash)
         {
-            printf("PASSWORD_HASHING sudah aktif sebelumnya.\n");
+            printf("%s %s⚠ Password hashing is already enabled%s\n", BOX_V, BOLD_YELLOW, RESET);
+            printSectionDivider();
+            printf("\n");
+            printInfo("Current status: ");
+            printf("%sENABLED%s - All passwords are hashed using FNV-1a 32-bit\n", BOLD_GREEN, RESET);
         }
         else
         {
+            spinnerAnimation("Enabling password hashing", 8);
+            printf("\n\n");
             enable_password_hashing();
-            printf("PASSWORD_HASHING diaktifkan.\n");
+            printf("%s %s[SUCCESS] Password hashing enabled%s\n", BOX_V, GREEN, RESET);
+            printf("%s %sMigrating existing passwords...%s", BOX_V, DIM, RESET);
+            fflush(stdout);
+            printf(" %sDone%s\n", BOLD_GREEN, RESET);
+            printSectionDivider();
+            printf("\n");
+            printSuccess("Security enhanced!");
+            printf("All passwords are now hashed using %sFNV-1a 32-bit%s algorithm.\n\n", BOLD_CYAN, RESET);
+            printf("%sNote:%s Remember to %sSAVE;%s to persist this change.\n", BOLD_WHITE, RESET, BOLD_YELLOW, RESET);
         }
         return;
     }
@@ -405,26 +443,86 @@ void handleSecurityCommand()
         ADVWORD_INPUT();
         if (currentWord.Length == 0)
         {
-            printf("Format salah. Gunakan: SET_SECURITY FILE <ON|OFF>;\n");
+            printError("Invalid command format");
+            printf("Value is required: %sON%s or %sOFF%s\n\n", BOLD_GREEN, RESET, BOLD_RED, RESET);
+            printf("%sUsage:%s %sSET_SECURITY FILE <ON|OFF>;%s\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
+            printf("%sExample:%s %sSET_SECURITY FILE ON;%s\n", DIM, RESET, BOLD_WHITE, RESET);
             return;
         }
 
         char val[64];
         wordToString(val, currentWord);
 
+        ADVWORD_INPUT();
+        if (currentWord.Length != 0)
+        {
+            while (currentWord.Length != 0)
+            {
+                ADVWORD_INPUT();
+            }
+            printError("Invalid command format");
+            printf("Too many arguments provided.\n\n");
+            printf("%sUsage:%s %sSET_SECURITY FILE <ON|OFF>;%s\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
+            return;
+        }
+
+        printf("\n");
+        printSectionHeader("", "FILE ENCRYPTION");
+        printf("\n");
+
         if (strcmp(val, "ON") == 0)
         {
-            g_file_enc = true;
-            printf("FILE_ENCRYPTION diaktifkan.\n");
+            if (g_file_enc)
+            {
+                printf("%s %s⚠ File encryption is already enabled%s\n", BOX_V, BOLD_YELLOW, RESET);
+                printSectionDivider();
+                printf("\n");
+                printInfo("Current status: ");
+                printf("%sENABLED%s - All files are encrypted with LCG keystream\n", BOLD_GREEN, RESET);
+            }
+            else
+            {
+                spinnerAnimation("Enabling file encryption", 8);
+                printf("\n\n");
+                g_file_enc = true;
+                printf("%s %s[SUCCESS] File encryption enabled%s\n", BOX_V, GREEN, RESET);
+                printf("%s %sUsing LCG keystream cipher%s\n", BOX_V, DIM, RESET);
+                printf("%s %sCurrent seed: %s%u%s\n", BOX_V, DIM, BOLD_WHITE, g_seed, RESET);
+                printSectionDivider();
+                printf("\n");
+                printSuccess("File encryption activated!");
+                printf("All future SAVE operations will encrypt CSV files.\n\n");
+                printf("%sNote:%s Remember to %sSAVE;%s to persist this change.\n", BOLD_WHITE, RESET, BOLD_YELLOW, RESET);
+            }
         }
         else if (strcmp(val, "OFF") == 0)
         {
-            g_file_enc = false;
-            printf("FILE_ENCRYPTION dimatikan.\n");
+            if (!g_file_enc)
+            {
+                printf("%s %s⚠ File encryption is already disabled%s\n", BOX_V, BOLD_YELLOW, RESET);
+                printSectionDivider();
+                printf("\n");
+                printInfo("Current status: ");
+                printf("%sDISABLED%s - Files are saved in plain text\n", BOLD_RED, RESET);
+            }
+            else
+            {
+                spinnerAnimation("Disabling file encryption", 8);
+                printf("\n\n");
+                g_file_enc = false;
+                printf("%s %s[SUCCESS] File encryption disabled%s\n", BOX_V, GREEN, RESET);
+                printSectionDivider();
+                printf("\n");
+                printWarning("Security reduced!");
+                printf("Future SAVE operations will store files in %splain text%s.\n\n", BOLD_YELLOW, RESET);
+                printf("%sNote:%s Remember to %sSAVE;%s to persist this change.\n", BOLD_WHITE, RESET, BOLD_YELLOW, RESET);
+            }
         }
         else
         {
-            printf("Nilai tidak dikenal. Gunakan 'ON' atau 'OFF'.\n");
+            printError("Invalid value");
+            printf("Unknown value: %s%s%s\n\n", BOLD_RED, val, RESET);
+            printf("%sValid options:%s %sON%s or %sOFF%s\n", BOLD_WHITE, RESET, BOLD_GREEN, RESET, BOLD_RED, RESET);
         }
 
         return;
@@ -435,19 +533,74 @@ void handleSecurityCommand()
         ADVWORD_INPUT();
         if (currentWord.Length == 0)
         {
-            printf("Format: SET_SECURITY ENC_SEED <number>;\n");
+            printError("Invalid command format");
+            printf("Seed value is required.\n\n");
+            printf("%sUsage:%s %sSET_SECURITY ENC_SEED <number>;%s\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
+            printf("%sExample:%s %sSET_SECURITY ENC_SEED 987654321;%s\n", DIM, RESET, BOLD_WHITE, RESET);
             return;
         }
 
         char val[64];
         wordToString(val, currentWord);
 
+        ADVWORD_INPUT();
+        if (currentWord.Length != 0)
+        {
+            while (currentWord.Length != 0)
+            {
+                ADVWORD_INPUT();
+            }
+            printError("Invalid command format");
+            printf("Too many arguments provided.\n\n");
+            printf("%sUsage:%s %sSET_SECURITY ENC_SEED <number>;%s\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
+            return;
+        }
+
+        // Validate numeric input
+        boolean valid = true;
+        for (int i = 0; val[i] != '\0'; i++)
+        {
+            if (val[i] < '0' || val[i] > '9')
+            {
+                valid = false;
+                break;
+            }
+        }
+
+        if (!valid)
+        {
+            printError("Invalid seed value");
+            printf("Seed must be a positive number.\n\n");
+            printf("%sExample:%s %sSET_SECURITY ENC_SEED 987654321;%s\n", DIM, RESET, BOLD_WHITE, RESET);
+            return;
+        }
+
+        uint32_t oldSeed = g_seed;
         int newSeed = atoi(val);
         g_seed = (uint32_t)newSeed;
 
-        printf("ENC_SEED diubah menjadi %u.\n", g_seed);
+        printf("\n");
+        printSectionHeader("", "ENCRYPTION SEED");
+        printf("\n");
+        spinnerAnimation("Updating encryption seed", 8);
+        printf("\n\n");
+        printf("%s %sPrevious seed:%s %s%u%s\n", BOX_V, DIM, RESET, BOLD_RED, oldSeed, RESET);
+        printf("%s %sNew seed:%s      %s%u%s\n", BOX_V, DIM, RESET, BOLD_GREEN, g_seed, RESET);
+        printSectionDivider();
+        printf("\n");
+        printSuccess("Encryption seed updated!");
+        printf("LCG keystream will use the new seed: %s%u%s\n\n", BOLD_CYAN, g_seed, RESET);
+        printf("%sWarning:%s Files encrypted with different seeds %scannot be decrypted%s!\n", 
+               BOLD_YELLOW, RESET, BOLD_RED, RESET);
+        printf("%sNote:%s Remember to %sSAVE;%s to persist this change.\n", BOLD_WHITE, RESET, BOLD_YELLOW, RESET);
+
         return;
     }
 
-    printf("KEY '%s' tidak dikenal di SET_SECURITY.\n", key);
+    printError("Unknown security option");
+    printf("Unrecognized key: %s%s%s\n\n", BOLD_RED, key, RESET);
+    printf("%sAvailable options:%s\n", BOLD_WHITE, RESET);
+    printf("  • %sPASSWORD%s   - Enable password hashing\n", BOLD_CYAN, RESET);
+    printf("  • %sFILE%s       - Toggle file encryption (ON/OFF)\n", BOLD_CYAN, RESET);
+    printf("  • %sENC_SEED%s   - Set encryption seed (number)\n", BOLD_CYAN, RESET);
 }

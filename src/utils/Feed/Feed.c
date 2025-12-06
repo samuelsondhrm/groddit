@@ -56,22 +56,6 @@ static int buildFollowedArray(boolean **followedOut) {
     return count;
 }
 
-/* Cetak header feed */
-static void printFeedHeader(const char *username, boolean isLatest) {
-    printf("═════════════════════════════════════════\n");
-    printf("📰  Feed: %s (sorted by %s)\n",
-           username,
-           isLatest ? "LATEST - newest first"
-                    : "NEWEST - oldest first");
-    printf("═════════════════════════════════════════\n");
-}
-
-/* Cetak footer feed */
-static void printFeedFooter(void) {
-    printf("Gunakan VIEW_POST <ID> untuk melihat detail postingan.\n");
-    printf("═════════════════════════════════════════\n");
-}
-
 /* Implementasi Utama */
 
 void commandShowFeed() {
@@ -80,14 +64,18 @@ void commandShowFeed() {
         while (currentWord.Length != 0) {
             ADVWORD_INPUT();
         }
-        printf("Anda belum login! Masuk terlebih dahulu untuk dapat mengakses Groddit.\n");
+        printError("Not logged in");
+        printf("You must be logged in to view feed.\n");
+        printf("\nUse %sLOGIN;%s to sign in to your account.\n", BOLD_WHITE, RESET);
         return;
     }
 
     // Baca mode: LATEST/NEWEST
     ADVWORD_INPUT();
     if (currentWord.Length == 0) {
-        printf("Format perintah SHOW_FEED salah. Gunakan 'SHOW_FEED LATEST [LIMIT];' atau 'SHOW_FEED NEWEST [LIMIT];'\n");
+        printError("Invalid command format");
+        printf("Use: %sSHOW_FEED LATEST [LIMIT];%s or %sSHOW_FEED NEWEST [LIMIT];%s\n", 
+               BOLD_WHITE, RESET, BOLD_WHITE, RESET);
         return;
     }
 
@@ -104,7 +92,9 @@ void commandShowFeed() {
         while (currentWord.Length != 0) {
             ADVWORD_INPUT();
         }
-        printf("Mode feed tidak dikenal. Gunakan 'LATEST' atau 'NEWEST'.\n");
+        printError("Invalid mode");
+        printf("Mode %s%s%s not recognized. Use %sLATEST%s or %sNEWEST%s.\n", 
+               BOLD_YELLOW, modeStr, RESET, BOLD_WHITE, RESET, BOLD_WHITE, RESET);
         return;
     }
 
@@ -118,7 +108,8 @@ void commandShowFeed() {
             while (currentWord.Length != 0) {
                 ADVWORD_INPUT();
             }
-            printf("LIMIT harus berupa bilangan bulat positif.\n");
+            printError("Invalid LIMIT");
+            printf("LIMIT must be a positive integer.\n");
             return;
         }
 
@@ -128,7 +119,8 @@ void commandShowFeed() {
             while (currentWord.Length != 0) {
                 ADVWORD_INPUT();
             }
-            printf("Format perintah SHOW_FEED salah. Gunakan 'SHOW_FEED %s [LIMIT];'\n", modeStr);
+            printError("Too many arguments");
+            printf("Use: %sSHOW_FEED %s [LIMIT];%s\n", BOLD_WHITE, modeStr, RESET);
             return;
         }
     }
@@ -138,18 +130,21 @@ void commandShowFeed() {
 
     if (POST_COUNT <= 0) {
         // Case tidak ada post pada followed accounts.
-        char currName[256];
-        wordToString(currName, USERS[CURRENT_USER_INDEX].username);
-        printFeedHeader(currName, isLatest);
-        printf("Feed kosong. Belum ada post di Groddit.\n");
-        printf("═════════════════════════════════════════\n");
+        clearScreen();
+        printBreadcrumb("Main Menu > Feed");
+        printf("\n");
+        printWarning("No posts available");
+        printf("There are no posts yet in Groddit.\n");
+        printf("\n%sTip:%s Use %sPOST;%s to create your first post!\n", 
+               BOLD_CYAN, RESET, BOLD_WHITE, RESET);
         return;
     }
 
     boolean *followed = NULL;
     int followedCount = buildFollowedArray(&followed);
     if (followedCount < 0) {
-        printf("Terjadi kesalahan pada data sosial.\n");
+        printError("Social graph error");
+        printf("An error occurred while processing social data.\n");
         return;
     }
 
@@ -158,9 +153,13 @@ void commandShowFeed() {
 
     if (followedCount == 0) {
         // Case tidak ada yang difollow oleh CURRENT_USER
-        printFeedHeader(currName, isLatest);
-        printf("Feed kosong. Kamu belum mengikuti siapa pun.\n");
-        printf("═════════════════════════════════════════\n");
+        clearScreen();
+        printBreadcrumb("Main Menu > Feed");
+        printf("\n");
+        printWarning("Empty feed");
+        printf("You are not following anyone yet.\n");
+        printf("\n%sTip:%s Use %sFOLLOW <username>;%s to follow users and see their posts.\n", 
+               BOLD_CYAN, RESET, BOLD_WHITE, RESET);
         if (followed) free(followed);
         return;
     }
@@ -201,9 +200,13 @@ void commandShowFeed() {
 
     if (candCount == 0) {
         // Sudah follow orang, tapi belum ada post dari mereka
-        printFeedHeader(currName, isLatest);
-        printf("Feed kosong. Belum ada postingan dari akun yang kamu ikuti.\n");
-        printf("═════════════════════════════════════════\n");
+        clearScreen();
+        printBreadcrumb("Main Menu > Feed");
+        printf("\n");
+        printWarning("No posts from followed users");
+        printf("Users you follow haven't posted yet.\n");
+        printf("\n%sTip:%s Check back later or follow more users!\n", 
+               BOLD_CYAN, RESET);
         free(followed);
         free(candidPosts);
         free(candidAuthors);
@@ -232,7 +235,28 @@ void commandShowFeed() {
         maxToShow = limit;
     }
 
-    printFeedHeader(currName, isLatest);
+    // Clear screen and show header
+    clearScreen();
+    printBreadcrumb("Main Menu > Feed");
+
+    printf("\n");
+    printf("%s", BOLD_CYAN);
+    printHorizontalLine(80, DBOX_TL, DBOX_H, DBOX_TR);
+    printf("%s                    YOUR FEED : %s%-20s%s   %s\n", 
+           DBOX_V, BOLD_WHITE, currName, RESET, DBOX_V);
+    printHorizontalLine(80, DBOX_BL, DBOX_H, DBOX_BR);
+    printf("%s\n", RESET);
+
+    printf("%s%s %s Sorting:%s %s%s%s  %s%s Posts:%s %s%d%s  ", 
+           BOX_V, BOLD_WHITE, "⚡", RESET, 
+           isLatest ? BOLD_GREEN : BOLD_YELLOW, 
+           isLatest ? "LATEST (newest first)" : "NEWEST (oldest first)", RESET,
+           BOLD_WHITE, "", RESET, BOLD_CYAN, maxToShow, RESET);
+    if (limit > 0) {
+        printf("%s(limited to %d)%s", DIM, limit, RESET);
+    }
+    printf("\n");
+    printSectionDivider();
 
     int printed = 0;
     while (printed < maxToShow && !isHeapEmpty(H)) {
@@ -247,23 +271,37 @@ void commandShowFeed() {
         char titleStr[256];
         char timeStr[256];
         char authorName[256];
+        char subName[256];
 
         wordToString(postId, post->post_id);
         wordToString(titleStr, post->title);
         timeToStr(timeStr, post->created_at);
         wordToString(authorName, USERS[authorIdx].username);
+        getSubgrodditName(post->subgroddit_id, subName);
 
-        printf("%d. [%s] %s (%s) - oleh %s\n",
-               printed + 1,
-               postId,
-               titleStr,
-               timeStr,
-               authorName);
+        printf("%s\n", BOX_V);
+        printf("%s %s%d.%s [%s%s%s] %s%s%s\n", 
+               BOX_V, BOLD_CYAN, printed + 1, RESET,
+               BOLD_MAGENTA, postId, RESET,
+               BOLD_WHITE, titleStr, RESET);
+        printf("%s    %sr/%s%s %s│%s by %s@%s%s %s│%s %s%s%s\n", 
+               BOX_V, BOLD_YELLOW, subName, RESET, 
+               DIM, RESET, BOLD_CYAN, authorName, RESET,
+               DIM, RESET, DIM, timeStr, RESET);
+        printf("%s    %s↑ %d%s %s%s%s %s↓ %d%s\n", 
+               BOX_V, GREEN, post->upvotes, RESET,
+               DIM, "│", RESET,
+               RED, post->downvotes, RESET);
 
         printed++;
     }
 
-    printFeedFooter();
+    printf("%s\n", BOX_V);
+    printSectionDivider();
+    printf("\n");
+    printInfo("Feed loaded successfully");
+    printf("%sTip:%s Use %sVIEW_POST <ID>;%s to view post details and comments.\n", 
+           BOLD_CYAN, RESET, BOLD_WHITE, RESET);
 
     // dealokasi seluruh resource
     deallocateHeap(&H);

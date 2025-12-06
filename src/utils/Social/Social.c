@@ -53,31 +53,59 @@ static void removeSocialBuffer(int u, int v) {
  */
 
 void socialFollowUser(const char *targetUsername) {
+    clearScreen();
+    printBreadcrumb("Home > Follow User");
+    
+    printHorizontalLine(80, DBOX_TL, DBOX_H, DBOX_TR);
+    printf("%s║%s                          %sFOLLOW USER%s                              %s║%s\n", 
+           BOLD_CYAN, RESET, BOLD_WHITE, RESET, BOLD_CYAN, RESET);
+    printHorizontalLine(80, DBOX_BL, DBOX_H, DBOX_BR);
+    printf("%s\n", RESET);
+
     if (!isLoggedIn()) {
-        printf("Anda belum login. Silakan login terlebih dahulu.\n");
+        printError("Authentication required");
+        printf("You must be logged in to follow users.\n\n");
+        printf("%sTip:%s Use %sLOGIN;%s to access your account.\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
         return;
     }
 
     int src = CURRENT_USER_INDEX;
+    
+    printf("\n");
+    spinnerAnimation("Validating user", 6);
+    
     int dst = getUserIndexOrReport(targetUsername);
     if (dst == IDX_UNDEF) {
+        printf("\n");
+        printError("User not found");
+        printf("No user exists with username: %s@%s%s\n\n", BOLD_RED, targetUsername, RESET);
+        printf("%sTip:%s Check the username spelling.\n", BOLD_CYAN, RESET);
         return;
     }
 
     if (src == dst) {
-        printf("Anda tidak dapat mengikuti diri sendiri.\n");
+        printf("\n");
+        printError("Invalid action");
+        printf("You cannot follow yourself.\n");
         return;
     }
 
     if (!isValidVertex(SOCIAL_GRAPH, src) || !isValidVertex(SOCIAL_GRAPH, dst)) {
-        printf("Terjadi kesalahan pada data sosial.\n");
+        printf("\n");
+        printError("System error");
+        printf("Social graph data corrupted.\n");
         return;
     }
 
     if (isAdjacent(SOCIAL_GRAPH, src, dst)) {
-        printf("Anda sudah mengikuti %s.\n", findUsernameById(dst));
+        printf("\n");
+        printWarning("Already following");
+        printf("You are already following %s@%s%s\n", BOLD_CYAN, findUsernameById(dst), RESET);
         return;
     }
+
+    printf("\n");
+    spinnerAnimation("Processing follow request", 8);
 
     /* 1) update graph */
     addEdge(&SOCIAL_GRAPH, src, dst);
@@ -85,30 +113,59 @@ void socialFollowUser(const char *targetUsername) {
     /* 2) update buffer SOCIALS */
     addSocialBuffer(src, dst);
 
-    printf("Berhasil mengikuti %s.\n", findUsernameById(dst));
+    printf("\n");
+    printSuccess("Follow successful");
+    printf("You are now following %s@%s%s\n", BOLD_GREEN, findUsernameById(dst), RESET);
 }
 
 void socialUnfollowUser(const char *targetUsername) {
+    clearScreen();
+    printBreadcrumb("Home > Unfollow User");
+    
+    printHorizontalLine(80, DBOX_TL, DBOX_H, DBOX_TR);
+    printf("%s║%s                         %sUNFOLLOW USER%s                             %s║%s\n", 
+           BOLD_CYAN, RESET, BOLD_WHITE, RESET, BOLD_CYAN, RESET);
+    printHorizontalLine(80, DBOX_BL, DBOX_H, DBOX_BR);
+    printf("%s\n", RESET);
+
     if (!isLoggedIn()) {
-        printf("Anda belum login. Silakan login terlebih dahulu.\n");
+        printError("Authentication required");
+        printf("You must be logged in to unfollow users.\n\n");
+        printf("%sTip:%s Use %sLOGIN;%s to access your account.\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
         return;
     }
 
     int src = CURRENT_USER_INDEX;
+    
+    printf("\n");
+    spinnerAnimation("Validating user", 6);
+    
     int dst = getUserIndexOrReport(targetUsername);
     if (dst == IDX_UNDEF) {
+        printf("\n");
+        printError("User not found");
+        printf("No user exists with username: %s@%s%s\n\n", BOLD_RED, targetUsername, RESET);
+        printf("%sTip:%s Check the username spelling.\n", BOLD_CYAN, RESET);
         return;
     }
 
     if (!isValidVertex(SOCIAL_GRAPH, src) || !isValidVertex(SOCIAL_GRAPH, dst)) {
-        printf("Terjadi kesalahan pada data sosial.\n");
+        printf("\n");
+        printError("System error");
+        printf("Social graph data corrupted.\n");
         return;
     }
 
     if (!isAdjacent(SOCIAL_GRAPH, src, dst)) {
-        printf("Anda belum mengikuti %s.\n", findUsernameById(dst));
+        printf("\n");
+        printWarning("Not following");
+        printf("You are not following %s@%s%s\n\n", BOLD_CYAN, findUsernameById(dst), RESET);
+        printf("%sTip:%s Use %sFOLLOWING;%s to see who you follow.\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
         return;
     }
+
+    printf("\n");
+    spinnerAnimation("Processing unfollow request", 8);
 
     /* 1) update graph */
     removeEdge(&SOCIAL_GRAPH, src, dst);
@@ -116,7 +173,9 @@ void socialUnfollowUser(const char *targetUsername) {
     /* 2) update buffer SOCIALS */
     removeSocialBuffer(src, dst);
 
-    printf("Berhasil berhenti mengikuti %s.\n", findUsernameById(dst));
+    printf("\n");
+    printSuccess("Unfollow successful");
+    printf("You have unfollowed %s@%s%s\n", BOLD_YELLOW, findUsernameById(dst), RESET);
 }
 
 
@@ -126,67 +185,122 @@ void socialUnfollowUser(const char *targetUsername) {
  */
 
 void socialShowFollowing(const char *username) {
+    clearScreen();
+    printBreadcrumb("Home > Following List");
+    
+    printHorizontalLine(80, DBOX_TL, DBOX_H, DBOX_TR);
+    printf("%s║%s                         %sFOLLOWING LIST%s                            %s║%s\n", 
+           BOLD_CYAN, RESET, BOLD_WHITE, RESET, BOLD_CYAN, RESET);
+    printHorizontalLine(80, DBOX_BL, DBOX_H, DBOX_BR);
+    printf("%s\n", RESET);
+
     int idx;
 
     // Jika username NULL → gunakan current user
     if (username == NULL || username[0] == '\0') {
         if (!isLoggedIn()) {
-            printf("Anda belum login. Silakan login terlebih dahulu.\n");
+            printError("Authentication required");
+            printf("You must be logged in to view following list.\n\n");
+            printf("%sTip:%s Use %sLOGIN;%s to access your account.\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
             return;
         }
         idx = CURRENT_USER_INDEX;
     } else {
+        printf("\n");
+        spinnerAnimation("Loading user profile", 6);
         idx = getUserIndexOrReport(username);
-        if (idx == IDX_UNDEF) return;
+        if (idx == IDX_UNDEF) {
+            printf("\n");
+            printError("User not found");
+            printf("No user exists with username: %s@%s%s\n", BOLD_RED, username, RESET);
+            return;
+        }
     }
 
     if (!isValidVertex(SOCIAL_GRAPH, idx)) {
-        printf("Terjadi kesalahan pada data sosial.\n");
+        printError("System error");
+        printf("Social graph data corrupted.\n");
         return;
     }
 
-    printf("Daftar akun yang diikuti oleh %s:\n", findUsernameById(idx));
+    printf("\n");
+    printSectionHeader("", "ACCOUNTS FOLLOWED");
+    printf("\n%s %sUser:%s %s@%s%s\n", BOX_V, BOLD_WHITE, RESET, BOLD_CYAN, findUsernameById(idx), RESET);
+    printSectionDivider();
+    printf("\n");
 
     AdjAddr p = SOCIAL_GRAPH.adj[idx];
     if (p == NULL) {
-        printf("(Tidak mengikuti siapa pun)\n");
+        printf("%s %s(Not following anyone)%s\n", BOX_V, DIM, RESET);
+        printSectionDivider();
         return;
     }
 
+    int count = 0;
     while (p != NULL) {
-        printf("- %s\n", findUsernameById(p->v));
+        count++;
+        printf("%s %s%d.%s %s@%s%s\n", BOX_V, BOLD_WHITE, count, RESET, BOLD_CYAN, findUsernameById(p->v), RESET);
         p = p->next;
     }
+    printSectionDivider();
+    printf("\n");
+    printInfo("Total following: " );
+    printf("%s%d%s users\n", BOLD_WHITE, count, RESET);
 }
 
 
 void socialShowFollowers(const char *username) {
+    clearScreen();
+    printBreadcrumb("Home > Followers List");
+    
+    printHorizontalLine(80, DBOX_TL, DBOX_H, DBOX_TR);
+    printf("%s║%s                         %sFOLLOWERS LIST%s                            %s║%s\n", 
+           BOLD_CYAN, RESET, BOLD_WHITE, RESET, BOLD_CYAN, RESET);
+    printHorizontalLine(80, DBOX_BL, DBOX_H, DBOX_BR);
+    printf("%s\n", RESET);
+
     int target;
 
     if (username == NULL || username[0] == '\0') {
         if (!isLoggedIn()) {
-            printf("Anda belum login. Silakan login terlebih dahulu.\n");
+            printError("Authentication required");
+            printf("You must be logged in to view followers list.\n\n");
+            printf("%sTip:%s Use %sLOGIN;%s to access your account.\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
             return;
         }
         target = CURRENT_USER_INDEX;
     } else {
+        printf("\n");
+        spinnerAnimation("Loading user profile", 6);
         target = getUserIndexOrReport(username);
-        if (target == IDX_UNDEF) return;
+        if (target == IDX_UNDEF) {
+            printf("\n");
+            printError("User not found");
+            printf("No user exists with username: %s@%s%s\n", BOLD_RED, username, RESET);
+            return;
+        }
     }
 
     if (!isValidVertex(SOCIAL_GRAPH, target)) {
-        printf("Terjadi kesalahan pada data sosial.\n");
+        printError("System error");
+        printf("Social graph data corrupted.\n");
         return;
     }
 
-    printf("Daftar akun yang mengikuti %s:\n", findUsernameById(target));
+    printf("\n");
+    printSectionHeader("", "FOLLOWERS");
+    printf("\n%s %sUser:%s %s@%s%s\n", BOX_V, BOLD_WHITE, RESET, BOLD_CYAN, findUsernameById(target), RESET);
+    printSectionDivider();
+    printf("\n");
 
     boolean ada = false;
+    int count = 0;
     for (int u = 0; u < SOCIAL_GRAPH.nVertex; u++) {
         AdjAddr p = SOCIAL_GRAPH.adj[u];
         while (p != NULL) {
             if (p->v == target) {
-                printf("- %s\n", findUsernameById(u));
+                count++;
+                printf("%s %s%d.%s %s@%s%s\n", BOX_V, BOLD_WHITE, count, RESET, BOLD_CYAN, findUsernameById(u), RESET);
                 ada = true;
                 break;
             }
@@ -195,6 +309,10 @@ void socialShowFollowers(const char *username) {
     }
 
     if (!ada) {
-        printf("(Belum ada yang mengikuti akun ini)\n");
+        printf("%s %s(No followers yet)%s\n", BOX_V, DIM, RESET);
     }
+    printSectionDivider();
+    printf("\n");
+    printInfo("Total followers: ");
+    printf("%s%d%s users\n", BOLD_WHITE, count, RESET);
 }

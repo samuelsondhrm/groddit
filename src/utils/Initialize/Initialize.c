@@ -49,24 +49,40 @@ int isFolderValid(const char *folder)
 
 void initialize()
 {
-    // system("clear");
-
-
-    printf("Loading in...............");
+    // Clear screen and show welcome
+    clearScreen();
+    
     printf("\n");
-    loadingBarSmooth(30, 50000);
+    printf("%s", BOLD_CYAN);
+    printHorizontalLine(80, DBOX_TL, DBOX_H, DBOX_TR);
+    printf("%s                      INITIALIZING GRODDIT SYSTEM                      %s\n", DBOX_V, DBOX_V);
+    printHorizontalLine(80, DBOX_BL, DBOX_H, DBOX_BR);
+    printf("%s\n", RESET);
 
-    printf("\n\n");
+    printf("\n");
+    spinnerAnimation("Starting up system", 15);
+    printf("\n");
+
     printBanner();
-    printf("\n\n");
-    printf("Selamat datang di Groddit: CREDIT!\n");
+    printf("\n");
+    
+    printf("%s%s━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━%s\n", 
+           BOLD_WHITE, "   ", RESET);
+    printf("%s              Welcome to %sGRODDIT%s - Social Media Platform              %s\n", 
+           BOLD_WHITE, BOLD_CYAN, BOLD_WHITE, RESET);
+    printf("%s%s━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━%s\n", 
+           BOLD_WHITE, "   ", RESET);
 
     char folder[50];
     int folderValid = 0;
 
+    printf("\n");
+    printSectionHeader("", "CONFIGURATION FOLDER");
+    printf("\n");
+
     while (!folderValid)
     {
-        printf("Masukkan folder konfigurasi untuk dimuat: ");
+        printf("%s %sPlease enter configuration folder name:%s ", BOX_V, BOLD_WHITE, RESET);
         fflush(stdout);
 
         MODE = MODE_INPUT;
@@ -74,7 +90,10 @@ void initialize()
 
         if (currentWord.Length == 0)
         {
-            printf("[Error] Nama folder tidak boleh kosong!\n\n");
+            printf("\n");
+            printError("Empty folder name");
+            printf("Folder name cannot be empty!\n");
+            printf("\n");
             continue;
         }
 
@@ -82,37 +101,64 @@ void initialize()
 
         if (!isFolderValid(folder))
         {
-            printf("[Error] Folder '%s' tidak ditemukan. Silakan masukkan folder yang tepat.\n\n", folder);
+            printf("\n");
+            printError("Folder not found");
+            printf("Folder %s'%s'%s doesn't exist in config directory.\n", BOLD_YELLOW, folder, RESET);
+            printf("%sTip:%s Check available folders in %sconfig/%s directory.\n\n", 
+                   BOLD_CYAN, RESET, BOLD_WHITE, RESET);
             continue;
         }
 
         folderValid = 1;
-        printf("\nMemuat data dari folder '%s'..........\n", folder);
-        // loadingBarSmooth(30, 10000);
-        loadingBarSmooth(30, 50000);
-        printf("Data berhasil dimuat dari folder '%s'!\n", folder);
         printf("\n");
+        printSuccess("Folder validated");
+        printf("Loading configuration from %s'%s'%s\n", BOLD_CYAN, folder, RESET);
+        printf("\n");
+        
+        loadingBarSmooth(30, 50000);
+        printf("\n");
+        printSuccess("Configuration loaded");
     }
 
-    printf("\n");
+    printSectionDivider();
 
+    printf("\n");
+    printSectionHeader("", "LOADING SECURITY CONFIGURATION");
+    
     // Load security configuration
     char pathConf[150];
     buildPath(pathConf, folder, "security.conf");
     strcpy(global_security_conf_path, pathConf);
 
+    printf("%s %sFile:%s %s%s%s\n", BOX_V, BOLD_WHITE, RESET, DIM, pathConf, RESET);
+    spinnerAnimation("Processing security settings", 8);
+    
     if (!security_init(pathConf))
     {
-        printf("[Peringatan] Gagal memuat konfigurasi keamanan dari %s. Menggunakan pengaturan default.\n", pathConf);
+        printf("\n");
+        printWarning("Security configuration failed");
+        printf("Using default security settings.\n");
+    }
+    else
+    {
+        printf("\n");
+        printSuccess("Security configured");
     }
 
     uint8_t *buf = NULL;
     size_t len = 0;
     boolean enc = false;
 
+    printf("\n");
+    printSectionDivider();
+    printf("\n");
+    printSectionHeader("", "LOADING DATA MODULES");
+    printf("\n");
+
     // -------------------
     // COMMENTS (buffer)
     // -------------------
+    printf("%s %s[1/7]%s Loading %sComments%s", BOX_V, BOLD_CYAN, RESET, BOLD_WHITE, RESET);
     char pathComments[150];
     buildPath(pathComments, folder, "comment.csv");
 
@@ -132,12 +178,17 @@ void initialize()
 
     if (COMMENT_COUNT == -1)
     {
-        printf("[Gagal] Memuat komentar dari %s\n", pathComments);
+        printf(" %s[FAILED]%s\n", RED, RESET);
+    }
+    else
+    {
+        printf(" %s[OK] %d records%s\n", GREEN, COMMENT_COUNT, RESET);
     }
 
     // -------------------
     // POSTS (buffer)
     // -------------------
+    printf("%s %s[2/7]%s Loading %sPosts%s", BOX_V, BOLD_CYAN, RESET, BOLD_WHITE, RESET);
     char pathPosts[150];
     buildPath(pathPosts, folder, "post.csv");
 
@@ -157,12 +208,17 @@ void initialize()
 
     if (POST_COUNT == -1)
     {
-        printf("[Gagal] Memuat posts dari %s\n", pathPosts);
+        printf(" %s[FAILED]%s\n", RED, RESET);
+    }
+    else
+    {
+        printf(" %s[OK] %d records%s\n", GREEN, POST_COUNT, RESET);
     }
 
     // -------------------
     // USERS (buffer)
     // -------------------
+    printf("%s %s[3/7]%s Loading %sUsers%s", BOX_V, BOLD_CYAN, RESET, BOLD_WHITE, RESET);
     char pathUsers[150];
     buildPath(pathUsers, folder, "user.csv");
 
@@ -182,12 +238,17 @@ void initialize()
 
     if (USER_COUNT == -1)
     {
-        printf("[Gagal] Memuat users dari %s\n", pathUsers);
+        printf(" %s[FAILED]%s\n", RED, RESET);
+    }
+    else
+    {
+        printf(" %s[OK] %d records%s\n", GREEN, USER_COUNT, RESET);
     }
 
     // -------------------
     // SUBGRODDITS (buffer)
     // -------------------
+    printf("%s %s[4/7]%s Loading %sSubgroddits%s", BOX_V, BOLD_CYAN, RESET, BOLD_WHITE, RESET);
     char pathSubs[150];
     buildPath(pathSubs, folder, "subgroddit.csv");
 
@@ -207,12 +268,17 @@ void initialize()
 
     if (SUBGRODDIT_COUNT == -1)
     {
-        printf("[Gagal] Memuat subgroddits dari %s\n", pathSubs);
+        printf(" %s[FAILED]%s\n", RED, RESET);
+    }
+    else
+    {
+        printf(" %s[OK] %d records%s\n", GREEN, SUBGRODDIT_COUNT, RESET);
     }
 
     // -------------------
     // SOCIALS (buffer)
     // -------------------
+    printf("%s %s[5/7]%s Loading %sSocials%s", BOX_V, BOLD_CYAN, RESET, BOLD_WHITE, RESET);
     createGraph(&SOCIAL_GRAPH, USER_COUNT);
 
     char pathSocials[150];
@@ -234,9 +300,14 @@ void initialize()
 
     if (SOCIAL_COUNT == -1)
     {
-        printf("[Gagal] Memuat socials dari %s\n", pathSocials);
+        printf(" %s[FAILED]%s\n", RED, RESET);
+    }
+    else
+    {
+        printf(" %s[OK] %d records%s\n", GREEN, SOCIAL_COUNT, RESET);
     }
 
+    printf("%s %s       %s Building social graph...", BOX_V, DIM, RESET);
     for (int i = 0; i < SOCIAL_COUNT; i++)
     {
         char uId[32], vId[32];
@@ -251,10 +322,12 @@ void initialize()
             addEdge(&SOCIAL_GRAPH, u, v);
         }
     }
+    printf(" %sDone%s\n", GREEN, RESET);
 
     // -------------------
     // VOTINGS (buffer)
     // -------------------
+    printf("%s %s[6/7]%s Loading %sVotings%s", BOX_V, BOLD_CYAN, RESET, BOLD_WHITE, RESET);
     char pathVotings[150];
     buildPath(pathVotings, folder, "voting.csv");
 
@@ -274,17 +347,60 @@ void initialize()
 
     if (VOTING_COUNT == -1)
     {
-        printf("[Gagal] Memuat votings dari %s\n", pathVotings);
+        printf(" %s[FAILED]%s\n", RED, RESET);
+    }
+    else
+    {
+        printf(" %s[OK] %d records%s\n", GREEN, VOTING_COUNT, RESET);
     }
 
     // -------------------
     // CONTENT MODERATION
     // -------------------
+    printf("%s %s[7/7]%s Loading %sContent Moderation%s", BOX_V, BOLD_CYAN, RESET, BOLD_WHITE, RESET);
     char pathBlacklistWords[150];
     buildPath(pathBlacklistWords, folder, "blacklisted_words.json");
 
     if (!content_moderation_init(pathBlacklistWords))
     {
-        printf("[Warning] Content moderation tidak aktif.\n");
+        printf(" %s⚠ Inactive%s\n", YELLOW, RESET);
     }
+    else
+    {
+        printf(" %s[ACTIVE]%s\n", GREEN, RESET);
+    }
+
+    printf("\n");
+    printSectionDivider();
+    printf("\n");
+    printSuccess("System initialized successfully");
+    printf("All modules loaded and ready to use!\n");
+    printf("\n%sPress ENTER to continue...%s", BOLD_WHITE, RESET);
+    getchar();
+}
+
+void printWelcomeScreen()
+{
+    clearScreen();
+    printf("\n\n");
+    printBanner();
+    printf("%s%s", BOLD_CYAN, "  ");
+    printf("GRODDIT");
+    printf("%s\n", RESET);
+    printf("%s  A community platform for content sharing and discussion%s\n\n", DIM, RESET);
+    
+    printf("%s  QUICK START%s\n", BOLD_WHITE, RESET);
+    printf("%s  ───────────%s\n", DIM, RESET);
+    printf("  %s•%s New user?     Type %sREGISTER;%s to create an account\n", 
+           BOLD_CYAN, RESET, BOLD_YELLOW, RESET);
+    printf("  %s•%s Have account? Type %sLOGIN;%s to sign in\n", 
+           BOLD_CYAN, RESET, BOLD_YELLOW, RESET);
+    printf("  %s•%s Need help?    Type %sHELP;%s to see all commands\n\n", 
+           BOLD_CYAN, RESET, BOLD_YELLOW, RESET);
+    
+    printf("%s  SYSTEM STATUS:%s Loaded %s%d%s users, %s%d%s posts, %s%d%s subgroddits\n\n", 
+           DIM, RESET,
+           BOLD_CYAN, USER_COUNT, RESET,
+           BOLD_CYAN, POST_COUNT, RESET,
+           BOLD_CYAN, SUBGRODDIT_COUNT, RESET);
 }

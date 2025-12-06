@@ -12,6 +12,8 @@
 #include "../GlobalData/GlobalData.h"
 #include "../Helper/Helper.h"
 #include "../User/User.h"
+#include "../Profil/Profil.h"
+#include "../Kreativitas/Kreativitas.h"
 
 /**
  * Perintah utama fitur Feed:
