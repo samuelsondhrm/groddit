@@ -511,6 +511,12 @@ void commandDeletePost()
 
     if (!isLoggedIn())
     {
+        ADVWORD_INPUT();
+        while (currentWord.Length != 0)
+        {
+            ADVWORD_INPUT();
+        }
+
         printError("Authentication required");
         printf("You must be logged in to delete posts.\n\n");
         printf("%sTip:%s Use %sLOGIN;%s to access your account.\n", BOLD_CYAN, RESET, BOLD_WHITE, RESET);
@@ -571,7 +577,11 @@ void commandDeletePost()
 
     Post *p = &node->element.data.post;
 
-    if (compareWord(p->author_id, USERS[CURRENT_USER_INDEX].user_id) == 0)
+    /*
+     * Hanya pembuat post yang boleh menghapus postingan.
+     * Jika author_id != user yang sedang login, tolak operasi.
+     */
+    if (compareWord(p->author_id, USERS[CURRENT_USER_INDEX].user_id) != 0)
     {
         printf("\n");
         printError("Authorization failed");
