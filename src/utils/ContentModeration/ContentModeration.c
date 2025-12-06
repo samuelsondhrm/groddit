@@ -35,6 +35,30 @@ void ToLowercaseInplace(char *s)
     }
 }
 
+int SaveBlacklistJSON(const char *filepath)
+{
+    FILE *f = fopen(filepath, "w");
+    if (!f)
+        return 0;
+
+    fprintf(f, "{\n");
+    fprintf(f, "    \"blacklisted_words\": [\n");
+
+    for (int i = 0; i < GLOBAL_BLACKLIST.count; i++)
+    {
+        fprintf(f, "        \"%s\"", GLOBAL_BLACKLIST.words[i]);
+        if (i < GLOBAL_BLACKLIST.count - 1)
+            fprintf(f, ",");
+        fprintf(f, "\n");
+    }
+
+    fprintf(f, "    ]\n");
+    fprintf(f, "}\n");
+
+    fclose(f);
+    return 1;
+}
+
 int LoadBlacklistJSON(const char *filepath)
 {
     STARTJSON(filepath);
