@@ -418,7 +418,7 @@ void performSave(const char *folder)
     printf(" %s[DONE]%s\n", GREEN, RESET);
 
         // 8. SAVE BLACKLIST JSON
-    printf("%s %sSaving blacklist...%s", BOX_V, DIM, RESET);
+    printf("%s %sSaving blacklisted words...%s", BOX_V, DIM, RESET);
     fflush(stdout);
     buildPath(path, folder, "blacklisted_words.json");
 
