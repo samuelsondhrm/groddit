@@ -378,3 +378,29 @@ void initialize()
     printf("\n%sPress ENTER to continue...%s", BOLD_WHITE, RESET);
     getchar();
 }
+
+void printWelcomeScreen()
+{
+    clearScreen();
+    printf("\n\n");
+    printBanner();
+    printf("%s%s", BOLD_CYAN, "  ");
+    printf("GRODDIT");
+    printf("%s\n", RESET);
+    printf("%s  A community platform for content sharing and discussion%s\n\n", DIM, RESET);
+    
+    printf("%s  QUICK START%s\n", BOLD_WHITE, RESET);
+    printf("%s  ───────────%s\n", DIM, RESET);
+    printf("  %s•%s New user?     Type %sREGISTER;%s to create an account\n", 
+           BOLD_CYAN, RESET, BOLD_YELLOW, RESET);
+    printf("  %s•%s Have account? Type %sLOGIN;%s to sign in\n", 
+           BOLD_CYAN, RESET, BOLD_YELLOW, RESET);
+    printf("  %s•%s Need help?    Type %sHELP;%s to see all commands\n\n", 
+           BOLD_CYAN, RESET, BOLD_YELLOW, RESET);
+    
+    printf("%s  SYSTEM STATUS:%s Loaded %s%d%s users, %s%d%s posts, %s%d%s subgroddits\n\n", 
+           DIM, RESET,
+           BOLD_CYAN, USER_COUNT, RESET,
+           BOLD_CYAN, POST_COUNT, RESET,
+           BOLD_CYAN, SUBGRODDIT_COUNT, RESET);
+}

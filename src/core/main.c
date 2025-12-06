@@ -5,6 +5,7 @@ int main()
     initialize();
     clearScreen();
     printBanner();
+    printWelcomeScreen();
     
     char commandStr[50];
     boolean quit = false;

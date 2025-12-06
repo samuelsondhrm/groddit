@@ -283,7 +283,7 @@ void printMenu()
     
     printSectionDivider();
     
-    printSectionHeader("⬆️", "VOTING SYSTEM");
+    printSectionHeader("", "VOTING SYSTEM");
     printCommandHelp("UPVOTE_POST;", "Upvote a post", 1);
     printCommandHelp("DOWNVOTE_POST;", "Downvote a post", 1);
     printCommandHelp("UNDO_VOTE_POST;", "Remove your vote from post", 1);
@@ -325,7 +325,7 @@ void printMenu()
     
     printSectionDivider();
     
-    printSectionHeader("⚙️", "SYSTEM");
+    printSectionHeader("", "SYSTEM");
     printCommandHelp("HELP;", "Show this help menu", 1);
     printCommandHelp("EXIT;", "Exit the application", 1);
     printCommandHelp("QUIT;", "Exit the application", 1);
