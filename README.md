@@ -1,4 +1,4 @@
-### IF2110 Algorithm and Programming II - Tubes 1
+### IF2110 Algorithm and Programming II - Tugas Besar 1
 # GRODDIT - Social Media Platform
 
 > A Reddit-inspired social media platform built in C
@@ -259,3 +259,4 @@ This project is developed as part of academic coursework at Institut Teknologi B
 
 
 ---
+
